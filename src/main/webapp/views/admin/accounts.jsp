@@ -27,7 +27,7 @@
             </a>
         </div>
 
-        <!-- ALERT -->
+        <!-- ALERT (server-side, từ redirect) -->
         <c:if test="${not empty success}">
             <div class="ma-alert ma-alert-success">
                 <span class="ma-alert-ico">
@@ -45,6 +45,9 @@
                 <div class="ma-alert-title">${error}</div>
             </div>
         </c:if>
+
+        <!-- TOAST (client-side, sau fetch) -->
+        <div id="maToast" style="display:none;" aria-live="polite"></div>
 
         <!-- SEARCH + FILTER -->
         <div class="ma-search-box">
@@ -108,7 +111,8 @@
                                 </td>
 
                                 <td>
-                                    <span class="ma-badge status-${fn:toLowerCase(a.status)}">
+                                    <span class="ma-badge status-${fn:toLowerCase(a.status)}"
+                                          id="statusBadge-${a.accountType}-${a.accountId}">
                                         ${a.status}
                                     </span>
                                 </td>
@@ -120,34 +124,30 @@
                                     <div class="ma-actions">
 
                                         <!-- TOGGLE STATUS -->
-                                        <form method="post"
-                                              action="${ctx}/admin/accounts/toggle-status"
-                                              class="ma-inline">
+                                        <button type="button"
+                                                class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'} ma-open-toggle"
+                                                id="toggleBtn-${a.accountType}-${a.accountId}"
+                                                title="Toggle Active / Locked"
+                                                data-account-id="${a.accountId}"
+                                                data-account-type="${a.accountType}"
+                                                data-current-status="${a.status}"
+                                                data-fullname="${fn:escapeXml(a.fullName)}">
 
-                                            <input type="hidden" name="accountType" value="${a.accountType}">
-                                            <input type="hidden" name="accountId" value="${a.accountId}">
-                                            <input type="hidden" name="currentStatus" value="${a.status}">
+                                            <span class="ma-switch-track">
+                                                <span class="ma-switch-thumb"></span>
+                                            </span>
 
-                                            <button type="submit"
-                                                    class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'}"
-                                                    title="Toggle Active / Locked">
-
-                                                <span class="ma-switch-track">
-                                                    <span class="ma-switch-thumb"></span>
-                                                </span>
-
-                                                <span class="ma-switch-label">
-                                                    <c:choose>
-                                                        <c:when test="${fn:toLowerCase(a.status) == 'active'}">
-                                                            <i class="bi bi-unlock-fill"></i> Active
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <i class="bi bi-lock-fill"></i> Locked
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </span>
-                                            </button>
-                                        </form>
+                                            <span class="ma-switch-label">
+                                                <c:choose>
+                                                    <c:when test="${fn:toLowerCase(a.status) == 'active'}">
+                                                        <i class="bi bi-unlock-fill"></i> Active
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="bi bi-lock-fill"></i> Locked
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </button>
 
                                         <!-- SET PASSWORD (OPEN MODAL) -->
                                         <button type="button"
@@ -223,6 +223,48 @@
 
     </div>
 
+    <!-- ===== CONFIRM TOGGLE STATUS MODAL ===== -->
+    <div class="ma-modal" id="maToggleModal" aria-hidden="true"
+         style="display:none; position:fixed; inset:0; z-index:9999;
+                align-items:center; justify-content:center;">
+        <div class="ma-modal-backdrop" id="maToggleBackdrop"
+             style="position:fixed; inset:0; background:rgba(0,0,0,.45);"></div>
+
+        <div class="ma-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="maToggleTitle"
+             style="position:relative; z-index:1; width:100%; max-width:480px; margin:1rem;">
+            <div class="ma-modal-card">
+
+                <div class="ma-modal-head">
+                    <div>
+                        <div class="ma-modal-title" id="maToggleTitle">
+                            <i class="bi bi-arrow-left-right"></i>
+                            Change Account Status
+                        </div>
+                        <div class="ma-modal-sub" id="maToggleSub">—</div>
+                    </div>
+                    <button type="button" class="ma-modal-x" id="maToggleClose" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="ma-modal-body">
+                    <p id="maToggleMsg" style="margin:0 0 1.4rem; line-height:1.6;"></p>
+
+                    <div class="ma-modal-foot">
+                        <button type="button" class="ma-btn ghost" id="maToggleCancel">
+                            Cancel
+                        </button>
+                        <button type="button" class="ma-btn primary" id="maToggleConfirm">
+                            <i class="bi bi-check-lg"></i>
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- ===== SET PASSWORD MODAL (ONE TIME) ===== -->
     <div class="ma-modal" id="maPassModal" aria-hidden="true">
         <div class="ma-modal-backdrop" data-close="1"></div>
@@ -293,26 +335,163 @@
             const form = document.getElementById("maSearchForm");
             const keyword = document.getElementById("maKeyword");
             const role = document.getElementById("maRole");
-
             let timer = null;
 
             function debounceSubmit() {
-                if (timer)
-                    clearTimeout(timer);
-                timer = setTimeout(() => {
-                    if (form)
-                        form.submit();
-                }, 350);
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(() => { if (form) form.submit(); }, 350);
             }
 
-            if (keyword)
-                keyword.addEventListener("input", debounceSubmit);
-            if (role)
-                role.addEventListener("change", () => form && form.submit());
+            if (keyword) keyword.addEventListener("input", debounceSubmit);
+            if (role) role.addEventListener("change", () => form && form.submit());
         })();
     </script>
 
     <!-- MODAL JS (separate file) -->
     <script src="${ctx}/assets/js/pages/admin/accounts.js"></script>
+
+    <!-- ===== TOGGLE STATUS: CONFIRM MODAL + FETCH (không chuyển trang) ===== -->
+    <style>
+        .ma-toast {
+            position: fixed;
+            top: 1.2rem;
+            right: 1.4rem;
+            z-index: 9999;
+            min-width: 280px;
+            max-width: 440px;
+            padding: .85rem 1.2rem;
+            border-radius: 8px;
+            font-size: .92rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,.18);
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            animation: maToastIn .2s ease;
+        }
+        .ma-toast.toast-success { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
+        .ma-toast.toast-error   { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+        @keyframes maToastIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+
+    <script>
+        (function () {
+            /* ---------- state ---------- */
+            var _id = null, _type = null, _status = null;
+
+            var modal       = document.getElementById("maToggleModal");
+            var msgEl       = document.getElementById("maToggleMsg");
+            var subEl       = document.getElementById("maToggleSub");
+            var confirmBtn  = document.getElementById("maToggleConfirm");
+            var cancelBtn   = document.getElementById("maToggleCancel");
+            var closeBtn    = document.getElementById("maToggleClose");
+            var backdrop    = document.getElementById("maToggleBackdrop");
+            var ctxPath     = "${ctx}";
+
+            /* ---------- open ---------- */
+            function openModal(btn) {
+                _id     = btn.dataset.accountId;
+                _type   = btn.dataset.accountType;
+                _status = btn.dataset.currentStatus;
+
+                var name       = btn.dataset.fullname || "this account";
+                var nextStatus = _status.toUpperCase() === "ACTIVE" ? "LOCKED" : "ACTIVE";
+
+                subEl.textContent = name + " (" + _type + ")";
+                msgEl.innerHTML   = "Do you really want to change status from <strong>"
+                                  + _status + "</strong> to <strong>" + nextStatus + "</strong>?";
+
+                modal.style.display = "flex";
+                modal.setAttribute("aria-hidden", "false");
+            }
+
+            /* ---------- close ---------- */
+            function closeModal() {
+                modal.style.display = "none";
+                modal.setAttribute("aria-hidden", "true");
+            }
+
+            /* ---------- toast ---------- */
+            function showToast(msg, type) {
+                var t = document.getElementById("maToast");
+                t.className = "ma-toast toast-" + type;
+                t.innerHTML = (type === "success"
+                    ? '<i class="bi bi-check-circle-fill"></i>'
+                    : '<i class="bi bi-x-circle-fill"></i>') + " " + msg;
+                t.style.display = "flex";
+                clearTimeout(t._tid);
+                t._tid = setTimeout(function () { t.style.display = "none"; }, 4000);
+            }
+
+            /* ---------- update UI ---------- */
+            function applyUI(type, id, newStatus) {
+                var key    = type + "-" + id;
+                var badge  = document.getElementById("statusBadge-" + key);
+                var btn    = document.getElementById("toggleBtn-" + key);
+
+                if (badge) {
+                    badge.className   = "ma-badge status-" + newStatus.toLowerCase();
+                    badge.textContent = newStatus;
+                }
+
+                if (btn) {
+                    var isActive = newStatus.toUpperCase() === "ACTIVE";
+                    btn.classList.toggle("on",  isActive);
+                    btn.classList.toggle("off", !isActive);
+                    btn.dataset.currentStatus = newStatus;
+
+                    var lbl = btn.querySelector(".ma-switch-label");
+                    if (lbl) {
+                        lbl.innerHTML = isActive
+                            ? '<i class="bi bi-unlock-fill"></i> Active'
+                            : '<i class="bi bi-lock-fill"></i> Locked';
+                    }
+                }
+            }
+
+            /* ---------- confirm: fetch POST /admin/accounts ---------- */
+            confirmBtn.addEventListener("click", function () {
+                closeModal();
+
+                var params = new URLSearchParams();
+                params.append("action",        "toggle-status");
+                params.append("accountId",     _id);
+                params.append("accountType",   _type);
+                params.append("currentStatus", _status);
+
+                fetch(ctxPath + "/admin/accounts", {
+                    method:  "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body:    params.toString()
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.ok) {
+                        var newStatus = _status.toUpperCase() === "ACTIVE" ? "LOCKED" : "ACTIVE";
+                        applyUI(_type, _id, newStatus);
+                        showToast(data.message || "Status updated successfully.", "success");
+                    } else {
+                        showToast(data.message || "Failed to update status.", "error");
+                    }
+                })
+                .catch(function () {
+                    showToast("Network error. Please try again.", "error");
+                });
+            });
+
+            /* ---------- bind open buttons ---------- */
+            document.querySelectorAll(".ma-open-toggle").forEach(function (btn) {
+                btn.addEventListener("click", function () { openModal(btn); });
+            });
+
+            /* ---------- close handlers ---------- */
+            closeBtn.addEventListener("click",   closeModal);
+            cancelBtn.addEventListener("click",  closeModal);
+            backdrop.addEventListener("click",   closeModal);
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") closeModal();
+            });
+        })();
+    </script>
 
 </t:layout>

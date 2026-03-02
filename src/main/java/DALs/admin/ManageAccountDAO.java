@@ -150,4 +150,58 @@ public class ManageAccountDAO extends DBContext {
 
         return 0;
     }
+
+    /**
+     * Kiểm tra tenant có contract nào chưa END hoặc CANCEL không.
+     * Trả về true => còn contract active => KHÔNG được lock.
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean tenantHasActiveContract(int tenantId) {
+        String sql = """
+            SELECT COUNT(*) FROM CONTRACT
+            WHERE tenant_id = ?
+              AND UPPER(status) NOT IN ('ENDED', 'CANCELLED')
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tenantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Cập nhật account_status cho TENANT.
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean updateTenantStatus(int tenantId, String newStatus) {
+        String sql = "UPDATE TENANT SET account_status = ? WHERE tenant_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, tenantId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Cập nhật status cho STAFF (chỉ MANAGER).
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean updateStaffStatus(int staffId, String newStatus) {
+        String sql = "UPDATE STAFF SET status = ? WHERE staff_id = ? AND UPPER(staff_role) = 'MANAGER'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, staffId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

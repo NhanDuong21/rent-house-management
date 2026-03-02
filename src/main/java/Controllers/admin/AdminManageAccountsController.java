@@ -1,6 +1,7 @@
 package Controllers.admin;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 import DALs.admin.ManageAccountDAO;
@@ -39,7 +40,6 @@ public class AdminManageAccountsController extends HttpServlet {
             return;
         }
 
-        // filter theo role
         String role = request.getParameter("role");
         if (role == null || role.isBlank()) {
             role = "ALL";
@@ -97,5 +97,83 @@ public class AdminManageAccountsController extends HttpServlet {
         request.setAttribute("error", request.getParameter("error"));
 
         request.getRequestDispatcher("/views/admin/accounts.jsp").forward(request, response);
+    }
+
+    /**
+     * Xử lý toggle-status từ fetch (AJAX). Trả về JSON: {"ok": true/false,
+     * "message": "..."} Không redirect, không chuyển trang.
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        AuthResult auth = getAuth(request);
+        if (!isAdmin(auth)) {
+            writeJson(response, false, "No permission.");
+            return;
+        }
+
+        String action = request.getParameter("action");
+
+        if ("toggle-status".equals(action)) {
+
+            String accountType = request.getParameter("accountType");
+            String currentStatus = request.getParameter("currentStatus");
+            int accountId;
+
+            try {
+                accountId = Integer.parseInt(request.getParameter("accountId"));
+            } catch (NumberFormatException e) {
+                writeJson(response, false, "Invalid account ID.");
+                return;
+            }
+
+            // Xác định trạng thái mới
+            String newStatus = "ACTIVE".equalsIgnoreCase(currentStatus) ? "INACTIVE" : "ACTIVE";
+
+            if ("STAFF".equalsIgnoreCase(accountType)) {
+                // MANAGER: toggle tự do
+                boolean ok = accountDAO.updateStaffStatus(accountId, newStatus);
+                if (ok) {
+                    writeJson(response, true, "Status updated successfully.");
+                } else {
+                    writeJson(response, false, "Failed to update status. Make sure this account is a Manager.");
+                }
+
+            } else if ("TENANT".equalsIgnoreCase(accountType)) {
+                // Chỉ được LOCK khi tất cả contract đã END hoặc CANCEL
+                if ("LOCKED".equalsIgnoreCase(newStatus) && accountDAO.tenantHasActiveContract(accountId)) {
+                    writeJson(response, false,
+                            "Cannot lock this tenant. They still have active contract(s). All contracts must be ENDED or CANCELLED first.");
+                    return;
+                }
+                boolean ok = accountDAO.updateTenantStatus(accountId, newStatus);
+                if (ok) {
+                    writeJson(response, true, "Status updated successfully.");
+                } else {
+                    writeJson(response, false, "Failed to update tenant status.");
+                }
+
+            } else {
+                writeJson(response, false, "Unknown account type.");
+            }
+
+        } else {
+            writeJson(response, false, "Unknown action.");
+        }
+    }
+
+    /**
+     * Ghi JSON tối giản ra response.
+     */
+    private void writeJson(HttpServletResponse response, boolean ok, String message) throws IOException {
+        String safeMsg = message.replace("\\", "\\\\").replace("\"", "\\\"");
+        String json = "{\"ok\":" + ok + ",\"message\":\"" + safeMsg + "\"}";
+        try (PrintWriter out = response.getWriter()) {
+            out.print(json);
+        }
     }
 }
