@@ -872,4 +872,24 @@ FROM     CONTRACT INNER JOIN
         }
         return null;
     }
+
+    //check coi có contract nào đang activce/pending theo roomId
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean hasBlockingContractByRoomId(int roomId) {
+        String sql = """
+        SELECT TOP 1 1
+        FROM CONTRACT
+        WHERE room_id = ?
+          AND status IN ('ACTIVE','PENDING')
+    """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, roomId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 }
