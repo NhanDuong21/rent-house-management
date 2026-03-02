@@ -9,6 +9,7 @@ import java.util.List;
 import Models.dto.ManagerBillRowDTO;
 import Models.entity.Bill;
 import Models.entity.BillDetail;
+import Models.entity.Payment;
 import Utils.database.DBContext;
 
 /**
@@ -205,10 +206,109 @@ public class BillDAO extends DBContext {
         return 0;
     }
 
-    public static void main(String[] args) {
-        BillDAO bd = new BillDAO();
+    // get Bill detail for tenant
+    public Bill getCurrentBillForTenant(int tenant_id) {
+        String sql = "SELECT TOP 1 b.* "
+                + "FROM BILL b  "
+                + "JOIN CONTRACT c ON b.contract_id = c.contract_id "
+                + "WHERE c.tenant_id = ?  AND c.status = 'ACTIVE'"
+                + "ORDER BY  "
+                + "CASE WHEN b.status = 'UNPAID' THEN 0 ELSE 1 END, "
+                + "b.bill_month DESC";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, tenant_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Bill b = new Bill();
+                b.setBillId(rs.getInt("bill_id"));
+                b.setContractId(rs.getInt("contract_id"));
+                b.setBillMonth(rs.getDate("bill_month"));
+                b.setDueDate(rs.getDate("due_date"));
+                b.setStatus(rs.getString("status"));
+                b.setNote(rs.getString("note"));
+                b.setOldElectricNumber(rs.getInt("old_electric_number"));
+                b.setNewElectricNumber(rs.getInt("new_electric_number"));
+                b.setOldWaterNumber(rs.getInt("old_water_number"));
+                b.setNewWaterNumber(rs.getInt("new_water_number"));
+                return b;
+            }
 
-        System.out.println(bd.getStringRoomnumber(1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
+    //get total tenant unpaid
+    public BigDecimal getTotalTenantUnpaid(int tenant_id) {
+        String sql = "SELECT SUM(d.unit_price * d.quantity) AS total_unpaid "
+                + "FROM BILL b   "
+                + "JOIN CONTRACT c ON b.contract_id = c.contract_id "
+                + "JOIN BILL_DETAIL d ON b.bill_id = d.bill_id "
+                + "WHERE c.tenant_id = ?  AND b.status = 'UNPAID'";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, tenant_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && rs.getBigDecimal(1) != null) {
+                return rs.getBigDecimal(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    // GET LASTPAYMENT
+    public Payment getLastPaidAmountByTenant(int tenant_id) {
+        String sql = "SELECT TOP 1 P.* "
+                + "FROM CONTRACT C "
+                + "JOIN PAYMENT P ON P.contract_id = C.contract_id "
+                + "WHERE C.tenant_id = ? AND C.status = 'ACTIVE' "
+                + "ORDER BY paid_at DESC";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, tenant_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Payment p = new Payment();
+                p.setPaymentId(rs.getInt("payment_id"));
+                p.setContractId(rs.getInt("contract_id"));
+                p.setBillId(rs.getInt("bill_id"));
+                p.setMethod(rs.getString("method"));
+                p.setAmount(rs.getBigDecimal("amount"));
+                p.setPaidAt(rs.getTimestamp("paid_at"));
+                p.setStatus(rs.getString("status"));
+                p.setNote(rs.getString("note"));
+                return p;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getRoomNumberByTenantId(int tenant_id) {
+        String sql = "SELECT R.room_number "
+                + "FROM CONTRACT C "
+                + "JOIN TENANT T ON T.tenant_id = C.tenant_id "
+                + "JOIN ROOM R ON C.room_id = R.room_id "
+                + "WHERE C.tenant_id = ? AND C.status = 'ACTIVE'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, tenant_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("room_number");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+ 
 }
