@@ -132,9 +132,9 @@ public class AdminManageAccountsController extends HttpServlet {
             }
 
             // Xác định trạng thái mới
-            String newStatus = "ACTIVE".equalsIgnoreCase(currentStatus) ? "INACTIVE" : "ACTIVE";
-
             if ("STAFF".equalsIgnoreCase(accountType)) {
+                String newStatus = "ACTIVE".equalsIgnoreCase(currentStatus) ? "INACTIVE" : "ACTIVE";
+
                 // MANAGER: toggle tự do
                 boolean ok = accountDAO.updateStaffStatus(accountId, newStatus);
                 if (ok) {
@@ -144,6 +144,7 @@ public class AdminManageAccountsController extends HttpServlet {
                 }
 
             } else if ("TENANT".equalsIgnoreCase(accountType)) {
+                String newStatus = "ACTIVE".equalsIgnoreCase(currentStatus) ? "LOCKED" : "ACTIVE";
                 // Chỉ được LOCK khi tất cả contract đã END hoặc CANCEL
                 if ("LOCKED".equalsIgnoreCase(newStatus) && accountDAO.tenantHasActiveContract(accountId)) {
                     writeJson(response, false,
