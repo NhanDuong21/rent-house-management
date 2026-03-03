@@ -98,4 +98,10 @@ public class BillDetail {
         this.chargeType = chargeType;
     }
 
+    @Override
+    public String toString() {
+        return "BillDetail{" + "billDetailId=" + billDetailId + ", billId=" + billId + ", utilityId=" + utilityId + ", itemName=" + itemName + ", unit=" + unit + ", quantity=" + quantity + ", unitPrice=" + unitPrice + ", chargeType=" + chargeType + '}';
+    }
+    
+
 }

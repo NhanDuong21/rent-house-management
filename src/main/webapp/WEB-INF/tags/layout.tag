@@ -76,7 +76,7 @@
               href="${pageContext.request.contextPath}/assets/images/logo/favicon_logo.png">
 
         <link rel="stylesheet" href="<%=ctx%>/assets/css/layout/layout.css">
-        <!-- ✅ only added: bootstrap icons -->
+        <!-- only added: bootstrap icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
         <% if (pageCss != null) {%>

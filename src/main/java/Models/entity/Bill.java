@@ -120,4 +120,10 @@ public class Bill {
         this.newWaterNumber = newWaterNumber;
     }
 
+    @Override
+    public String toString() {
+        return "Bill{" + "billId=" + billId + ", contractId=" + contractId + ", billMonth=" + billMonth + ", dueDate=" + dueDate + ", status=" + status + ", note=" + note + ", oldElectricNumber=" + oldElectricNumber + ", newElectricNumber=" + newElectricNumber + ", oldWaterNumber=" + oldWaterNumber + ", newWaterNumber=" + newWaterNumber + '}';
+    }
+    
+
 }

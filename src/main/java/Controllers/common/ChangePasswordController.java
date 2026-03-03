@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ *
+ * @author Duong Thien Nhan - CE190741
+ */
 public class ChangePasswordController extends HttpServlet {
 
     private final PasswordService passwordService = new PasswordService();

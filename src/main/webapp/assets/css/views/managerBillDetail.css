@@ -1,0 +1,204 @@
+/* ===============================
+   CONTAINER (không đụng body)
+================================= */
+.tbd-container {
+  padding: 30px;
+}
+
+/* ===============================
+   PAGE HEADER
+================================= */
+.tbd-pagehead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tbd-back {
+  text-decoration: none;
+  font-weight: 500;
+  color: #374151;
+}
+
+.tbd-back:hover {
+  color: #2563eb;
+}
+
+.tbd-breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.tbd-minihelp {
+  font-size: 13px;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #4338ca;
+}
+
+/* ===============================
+   MAIN CARD
+================================= */
+.tbd-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 28px;
+}
+
+.tbd-card-body {
+  width: 100%;
+}
+
+/* ===============================
+   TOP SECTION
+================================= */
+.tbd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tbd-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.tbd-sub {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* ===============================
+   BADGE
+================================= */
+.tbd-badge {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tbd-badge.paid {
+  background: #16a34a;
+}
+
+.tbd-badge.unpaid {
+  background: #d97706;
+}
+
+/* ===============================
+   DIVIDER
+================================= */
+.tbd-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 20px 0;
+}
+
+.tbd-divider-soft {
+  background: #f3f4f6;
+}
+
+/* ===============================
+   GRID INFO
+================================= */
+.tbd-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.tbd-line {
+  font-size: 14px;
+}
+
+.tbd-label {
+  color: #6b7280;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tbd-value {
+  font-weight: 600;
+}
+
+/* ===============================
+   BREAKDOWN
+================================= */
+.tbd-section-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.tbd-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.tbd-total {
+  margin-top: 14px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.tbd-total span:last-child {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+/* ===============================
+   QR SECTION
+================================= */
+.tbd-qr-section {
+  text-align: center;
+}
+
+.tbd-qr-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.tbd-qr-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: inline-block;
+  background: #fafafa;
+}
+
+.tbd-qr-img {
+  width: 180px;
+  margin-bottom: 10px;
+}
+
+.tbd-qr-note {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ===============================
+   CONFIRM BUTTON
+================================= */
+.tbd-btn-confirm {
+  margin-top: 20px;
+  padding: 12px 22px;
+  background: #16a34a;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tbd-btn-confirm:hover {
+  background: #15803d;
+}

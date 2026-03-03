@@ -3,8 +3,12 @@ package Services.staff;
 import java.sql.Date;
 
 import DALs.auth.StaffDAO;
+import DALs.auth.TenantDAO;
+import Models.authentication.AuthResult;
 import Models.common.ServiceResult;
 import Models.entity.Staff;
+import Models.entity.Tenant;
+import Utils.security.HashUtil;
 
 /**
  * Description
@@ -15,6 +19,7 @@ import Models.entity.Staff;
 public class StaffService {
 
     private final StaffDAO staffDAO = new StaffDAO();
+    private final TenantDAO tenantDAO = new TenantDAO();
 
     // MANAGER: only phone + email
     public ServiceResult updateManagerContact(int staffId, String phoneRaw, String emailRaw) {
@@ -132,5 +137,52 @@ public class StaffService {
 
     private static String nvl(String s) {
         return (s == null) ? "" : s;
+    }
+
+    private boolean isAdmin(AuthResult auth) {
+        return auth != null && auth.getStaff() != null && "ADMIN".equalsIgnoreCase(auth.getRole()) && "ACTIVE".equalsIgnoreCase(auth.getStaff().getStatus());
+    }
+
+    public ServiceResult adminResetPassword(AuthResult auth, String accountType, int accountId, String newPassword, String confirmPassword) {
+
+        if (!isAdmin(auth)) {
+            return ServiceResult.fail("NO_PERMISSION");
+        }
+
+        if (newPassword == null || confirmPassword == null || newPassword.isBlank() || confirmPassword.isBlank()) {
+            return ServiceResult.fail("PASSWORD_REQUIRED");
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            return ServiceResult.fail("CONFIRM_MISMATCH");
+        }
+
+        if (newPassword.length() < 6) {
+            return ServiceResult.fail("PASSWORD_MINLEN");
+        }
+
+        String newHash = HashUtil.md5(newPassword);
+
+        if ("TENANT".equalsIgnoreCase(accountType)) {
+            Tenant t = tenantDAO.findById(accountId);
+            if (t == null) {
+                return ServiceResult.fail("TENANT_NOT_FOUND");
+            }
+
+            boolean ok = tenantDAO.adminResetPasswordForTenant(accountId, newHash);
+            return ok ? ServiceResult.ok("RESET_OK") : ServiceResult.fail("RESET_FAILED");
+        }
+
+        if ("STAFF".equalsIgnoreCase(accountType)) {
+            Staff s = staffDAO.findById(accountId);
+            if (s == null || !"MANAGER".equalsIgnoreCase(s.getStaffRole())) {
+                return ServiceResult.fail("MANAGER_NOT_FOUND");
+            }
+
+            boolean ok = staffDAO.updatePasswordForStaff(accountId, newHash);
+            return ok ? ServiceResult.ok("RESET_OK") : ServiceResult.fail("RESET_FAILED");
+        }
+
+        return ServiceResult.fail("INVALID_TYPE");
     }
 }

@@ -31,6 +31,15 @@ public class Tenant {
     public Tenant() {
     }
 
+    public Tenant(int tenantId, String fullName, String identityCode, String phoneNumber, String email, Date dateOfBirth) {
+        this.tenantId = tenantId;
+        this.fullName = fullName;
+        this.identityCode = identityCode;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public Tenant(int tenantId, String fullName, String identityCode, String phoneNumber, String email, String address,
             Date dateOfBirth, Integer gender, String avatar, String accountStatus, String passwordHash,
             boolean mustSetPassword, Timestamp createdAt, Timestamp updatedAt) {

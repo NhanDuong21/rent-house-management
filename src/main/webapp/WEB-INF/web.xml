@@ -202,4 +202,24 @@
         <servlet-name>ManageRoomsController</servlet-name>
         <url-pattern>/manager/rooms</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminAccountResetPasswordController</servlet-name>
+        <servlet-class>Controllers.admin.AdminAccountResetPasswordController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminAccountResetPasswordController</servlet-name>
+        <url-pattern>/admin/accounts/reset-password</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminManageAccountsController</servlet-name>
+        <servlet-class>Controllers.admin.AdminManageAccountsController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminManageAccountsController</servlet-name>
+        <url-pattern>/admin/accounts</url-pattern>
+    </servlet-mapping>
 </web-app>

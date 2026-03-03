@@ -245,4 +245,29 @@ public class StaffDAO extends DBContext {
         return false;
 
     }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public Staff findManager() {
+        String sql = """
+        SELECT TOP 1 staff_id, full_name, email, staff_role, status
+        FROM STAFF
+        WHERE staff_role = 'MANAGER' AND status = 'ACTIVE'
+        ORDER BY staff_id ASC
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Staff s = new Staff();
+                s.setStaffId(rs.getInt("staff_id"));
+                s.setFullName(rs.getString("full_name"));
+                s.setEmail(rs.getString("email"));
+                s.setStaffRole(rs.getString("staff_role"));
+                s.setStatus(rs.getString("status"));
+                return s;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -280,4 +280,281 @@ public class TenantDAO extends DBContext {
         }
         return false;
     }
+
+    //same logic updatePasswordForTenant do not use must set pass
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean adminResetPasswordForTenant(int tenantId, String newHash) {
+        String sql = """
+        UPDATE TENANT
+        SET password_hash = ?, updated_at = SYSDATETIME()
+        WHERE tenant_id = ?
+                """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newHash);
+            ps.setInt(2, tenantId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<Tenant> getAllTenants() {
+        List<Tenant> list = new ArrayList<>();
+        try {
+            String sql = "SELECT tenant_id, full_name, identity_code, phone_number, email, date_of_birth, gender, address, account_status FROM TENANT";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Tenant t = new Tenant();
+                t.setTenantId(rs.getInt("tenant_id"));
+                t.setFullName(rs.getString("full_name"));
+                t.setIdentityCode(rs.getString("identity_code"));
+                t.setPhoneNumber(rs.getString("phone_number"));
+                t.setEmail(rs.getString("email"));
+                t.setDateOfBirth(rs.getDate("date_of_birth"));
+                t.setGender(rs.getObject("gender") == null ? null : ((Number) rs.getObject("gender")).intValue());
+                t.setAddress(rs.getString("address"));
+                t.setAccountStatus(rs.getString("account_status"));
+                list.add(t);
+            }
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Tenant> searchTenant(String keyword) {
+        List<Tenant> list = new ArrayList<>();
+        try {
+            String sql = """
+            SELECT tenant_id, full_name, identity_code, phone_number, email, date_of_birth, gender, address, account_status
+            FROM TENANT
+            WHERE full_name LIKE ?
+               OR phone_number LIKE ?
+               OR email LIKE ?
+               OR identity_code LIKE ?
+        """;
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            String key = "%" + keyword + "%";
+            ps.setString(1, key);
+            ps.setString(2, key);
+            ps.setString(3, key);
+            ps.setString(4, key);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Tenant t = new Tenant();
+                t.setTenantId(rs.getInt("tenant_id"));
+                t.setFullName(rs.getString("full_name"));
+                t.setIdentityCode(rs.getString("identity_code"));
+                t.setPhoneNumber(rs.getString("phone_number"));
+                t.setEmail(rs.getString("email"));
+                t.setDateOfBirth(rs.getDate("date_of_birth"));
+                t.setGender(rs.getObject("gender") == null ? null : ((Number) rs.getObject("gender")).intValue());
+                t.setAddress(rs.getString("address"));
+                t.setAccountStatus(rs.getString("account_status"));
+                list.add(t);
+            }
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public boolean updateTenant(Tenant t) {
+        String sql = """
+        UPDATE TENANT
+        SET full_name = ?, 
+            identity_code = ?, 
+            phone_number = ?, 
+            email = ?, 
+            address = ?, 
+            date_of_birth = ?, 
+            gender = ?, 
+            avatar = ?, 
+            updated_at = GETDATE()
+        WHERE tenant_id = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, t.getFullName());
+            ps.setString(2, t.getIdentityCode());
+            ps.setString(3, t.getPhoneNumber());
+            ps.setString(4, t.getEmail());
+            ps.setString(5, t.getAddress());
+            ps.setDate(6, t.getDateOfBirth());
+            ps.setObject(7, t.getGender());
+            ps.setString(8, t.getAvatar());
+            ps.setInt(9, t.getTenantId());
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean lockTenant(int tenantId) {
+        String sql = "UPDATE TENANT SET account_status = 'LOCKED' WHERE tenant_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tenantId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean toggleStatus(int tenantId, String newStatus) {
+        String sql = "UPDATE TENANT SET account_status = ?, updated_at = SYSDATETIME() WHERE tenant_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, tenantId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Lấy danh sách tenant có phân trang (không tìm kiếm).
+     *
+     * @param page trang hiện tại (bắt đầu từ 1)
+     * @param pageSize số bản ghi mỗi trang
+     */
+    public List<Tenant> getTenantsPaged(int page, int pageSize) {
+        List<Tenant> list = new ArrayList<>();
+        String sql = """
+            SELECT tenant_id, full_name, identity_code, phone_number, email,
+                   date_of_birth, gender, address, account_status
+            FROM TENANT
+            ORDER BY tenant_id ASC
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, (page - 1) * pageSize);
+            ps.setInt(2, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tenant t = new Tenant();
+                t.setTenantId(rs.getInt("tenant_id"));
+                t.setFullName(rs.getString("full_name"));
+                t.setIdentityCode(rs.getString("identity_code"));
+                t.setPhoneNumber(rs.getString("phone_number"));
+                t.setEmail(rs.getString("email"));
+                t.setDateOfBirth(rs.getDate("date_of_birth"));
+                t.setGender(rs.getObject("gender") == null ? null : ((Number) rs.getObject("gender")).intValue());
+                t.setAddress(rs.getString("address"));
+                t.setAccountStatus(rs.getString("account_status"));
+                list.add(t);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Đếm tổng số tenant (để tính tổng trang).
+     */
+    public int countAllTenants() {
+        String sql = "SELECT COUNT(*) FROM TENANT";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Tìm kiếm tenant có phân trang.
+     */
+    public List<Tenant> searchTenantPaged(String keyword, int page, int pageSize) {
+        List<Tenant> list = new ArrayList<>();
+        String sql = """
+            SELECT tenant_id, full_name, identity_code, phone_number, email,
+                   date_of_birth, gender, address, account_status
+            FROM TENANT
+            WHERE full_name LIKE ?
+               OR phone_number LIKE ?
+               OR email LIKE ?
+               OR identity_code LIKE ?
+            ORDER BY tenant_id ASC
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String key = "%" + keyword + "%";
+            ps.setString(1, key);
+            ps.setString(2, key);
+            ps.setString(3, key);
+            ps.setString(4, key);
+            ps.setInt(5, (page - 1) * pageSize);
+            ps.setInt(6, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Tenant t = new Tenant();
+                t.setTenantId(rs.getInt("tenant_id"));
+                t.setFullName(rs.getString("full_name"));
+                t.setIdentityCode(rs.getString("identity_code"));
+                t.setPhoneNumber(rs.getString("phone_number"));
+                t.setEmail(rs.getString("email"));
+                t.setDateOfBirth(rs.getDate("date_of_birth"));
+                t.setGender(rs.getObject("gender") == null ? null : ((Number) rs.getObject("gender")).intValue());
+                t.setAddress(rs.getString("address"));
+                t.setAccountStatus(rs.getString("account_status"));
+                list.add(t);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Đếm kết quả tìm kiếm (để tính tổng trang khi search).
+     */
+    public int countSearchTenant(String keyword) {
+        String sql = """
+            SELECT COUNT(*) FROM TENANT
+            WHERE full_name LIKE ?
+               OR phone_number LIKE ?
+               OR email LIKE ?
+               OR identity_code LIKE ?
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String key = "%" + keyword + "%";
+            ps.setString(1, key);
+            ps.setString(2, key);
+            ps.setString(3, key);
+            ps.setString(4, key);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }
