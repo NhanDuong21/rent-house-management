@@ -458,6 +458,42 @@ WHERE   ROOM.room_id = ?
         return false;
     }
 
+    public boolean insertRoom(int blockId,
+            String roomNumber,
+            double area,
+            double price,
+            String status,
+            int floor,
+            int maxTenants,
+            boolean isMezzanine,
+            boolean hasAirConditioning,
+            String description) {
+
+        String query = "INSERT INTO ROOM (block_id, room_number, area, price, status, floor, max_tenants, is_mezzanine, has_air_conditioning, description) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            var ps = connection.prepareStatement(query);
+
+            ps.setInt(1, blockId);
+            ps.setString(2, roomNumber);
+            ps.setDouble(3, area);
+            ps.setDouble(4, price);
+            ps.setString(5, status);
+            ps.setInt(6, floor);
+            ps.setInt(7, maxTenants);
+            ps.setBoolean(8, isMezzanine);
+            ps.setBoolean(9, hasAirConditioning);
+            ps.setString(10, description);
+
+            int rs = ps.executeUpdate();
+            return rs > 0;
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return false;
+    }
     @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAllPagedV2(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
