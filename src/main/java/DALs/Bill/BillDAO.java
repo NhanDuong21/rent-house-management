@@ -265,7 +265,8 @@ public class BillDAO extends DBContext {
     public Payment getLastPaidAmountByTenant(int tenant_id) {
         String sql = "SELECT TOP 1 P.* "
                 + "FROM CONTRACT C "
-                + "JOIN PAYMENT P ON P.contract_id = C.contract_id "
+                + "JOIN BILL B ON B.contract_id = C.contract_id "
+                + "JOIN PAYMENT P ON P.bill_id = B.bill_id "
                 + "WHERE C.tenant_id = ? AND C.status = 'ACTIVE' "
                 + "ORDER BY paid_at DESC";
         try {

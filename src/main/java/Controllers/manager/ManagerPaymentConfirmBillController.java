@@ -39,7 +39,7 @@ public class ManagerPaymentConfirmBillController extends HttpServlet {
         PaymentConfirmBillDAO pcDAO = new PaymentConfirmBillDAO();
         try {
             pcDAO.confirmPaymentForManager(billId);
-            response.sendRedirect(request.getContextPath() + "/manager/bills/detail?billId=" + billId);
+            response.sendRedirect(request.getContextPath() + "/manager/billing/detail?billId=" + billId);
         } catch (SQLException e) {
             request.setAttribute("errorMsg", e.getMessage());
             request.getRequestDispatcher("/manager/bills/detail").forward(request, response);;
