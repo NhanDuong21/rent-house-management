@@ -393,11 +393,7 @@ public class BillDAO extends DBContext {
         }
         return null;
     }
-    public static void main(String[] args) {
-        BillDAO b = new BillDAO();
-        Bill bi = b.findBillDetailByIdForTenant(1, 1);
-        System.out.println(bi);
-    }
+
 
     //get total tenant unpaid
     public BigDecimal getTotalTenantUnpaid(int tenant_id) {
