@@ -40,6 +40,8 @@
                     <option value="">All status</option>
                     <option value="PAID">PAID</option>
                     <option value="UNPAID">UNPAID</option>
+                    <option value="OVERDUE">OVERDUE</option>
+                    <option value="CANCELLED">CANCELLED</option>
                 </select>
             </div>
         </div>
@@ -71,7 +73,7 @@
                             <td class="roomNumber">${b.roomNumber}</td>
                             <td>
                                 <span  class="dateBill">
-                                <fmt:formatDate value="${b.month}"  pattern="dd/MM/yyyy"/>
+                                    <fmt:formatDate value="${b.month}"  pattern="dd/MM/yyyy"/>
                                 </span>
                             </td>
                             <td>
@@ -86,12 +88,21 @@
                                     <c:when test="${b.status eq 'PAID'}">
                                         <span class="mb-badge paid">PAID</span>
                                     </c:when>
+
+                                    <c:when test="${b.status eq 'OVERDUE'}">
+                                        <span class="mb-badge overdue">OVERDUE</span>
+                                    </c:when>
+
+                                    <c:when test="${b.status eq 'CANCELLED'}">
+                                        <span class="mb-badge cancelled">CANCELLED</span>
+                                    </c:when>
+
                                     <c:otherwise>
                                         <span class="mb-badge unpaid">UNPAID</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
-                            <td>
+                            S                            <td>
                                 <a href="${pageContext.request.contextPath}/manager/billing/detail?billId=${b.billId}"
                                    class="mb-view-btn">
                                     👁 View

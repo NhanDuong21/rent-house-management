@@ -57,16 +57,23 @@ Author     : To Thi Thao Trang - CE191027
                         </div>
                     </div>
 
-                    <div class="tbd-status">
-                        <c:choose>
-                            <c:when test="${bill.status eq 'PAID'}">
-                                <span class="tbd-badge paid">PAID</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="tbd-badge unpaid">UNPAID</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                    <c:choose>
+                        <c:when test="${bill.status eq 'PAID'}">
+                            <span class="tbd-badge paid">PAID</span>
+                        </c:when>
+
+                        <c:when test="${bill.status eq 'OVERDUE'}">
+                            <span class="tbd-badge overdue">OVERDUE</span>
+                        </c:when>
+
+                        <c:when test="${bill.status eq 'CANCELLED'}">
+                            <span class="tbd-badge cancelled">CANCELLED</span>
+                        </c:when>
+
+                        <c:otherwise>
+                            <span class="tbd-badge unpaid">UNPAID</span>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <div class="tbd-divider"></div>
@@ -120,10 +127,10 @@ Author     : To Thi Thao Trang - CE191027
                             <span>
                                 ${d.itemName}
                                 <c:if test="${bill.billId == d.billId && d.utilityId == 1}">
-                                      (Old: ${bill.oldElectricNumber}, New : ${bill.newElectricNumber})
+                                    (Old: ${bill.oldElectricNumber}, New : ${bill.newElectricNumber})
                                 </c:if>
                                 <c:if test="${bill.billId == d.billId && d.utilityId == 2}">
-                                       (Old: ${bill.oldWaterNumber}, New: ${bill.newWaterNumber})
+                                    (Old: ${bill.oldWaterNumber}, New: ${bill.newWaterNumber})
                                 </c:if>
                             </span>
                             <span>
@@ -141,7 +148,7 @@ Author     : To Thi Thao Trang - CE191027
                 </div>
 
                 <!-- QR -->
-                <c:if test="${bill.status eq 'UNPAID'}">
+                <c:if test="${bill.status eq 'UNPAID' or bill.status eq 'OVERDUE'}">
                     <div class="tbd-divider"></div>
 
                     <div class="tbd-qr-section">
@@ -157,16 +164,14 @@ Author     : To Thi Thao Trang - CE191027
                             </div>
                         </div>
 
-                        <form action="${pageContext.request.contextPath}/manager/bills/paymentConfirm"
-                              method="post"
-                              style="margin-top:20px;">
+                        <form action="${pageContext.request.contextPath}/manager/bills/paymentConfirm"  method="post" style="margin-top:20px;">
                             <input type="hidden" name="billId" value="${bill.billId}">
                             <button class="tbd-btn-confirm">
                                 <i class="bi bi-check-circle"></i>
                                 Confirm Payment Received
                             </button>
                         </form>
-                        <c:if test="${not empty errorMessage}">
+                        <c:if test="${not empty errorMsg}">
                             <div class="alert alert-danger">
                                 ${errorMsg}
                             </div>
