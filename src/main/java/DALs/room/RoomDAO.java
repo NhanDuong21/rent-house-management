@@ -560,4 +560,53 @@ WHERE   ROOM.room_id = ?
         }
         return false;
     }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public int addRoom(Room r) {
+
+        String sql = """
+        INSERT INTO ROOM (
+            block_id,
+            room_number,
+            area,
+            price,
+            status,
+            floor,
+            max_tenants,
+            is_mezzanine,
+            has_air_conditioning,
+            description
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(
+                sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            int i = 1;
+
+            ps.setInt(i++, r.getBlockId());
+            ps.setString(i++, r.getRoomNumber());
+            ps.setBigDecimal(i++, r.getArea());
+            ps.setBigDecimal(i++, r.getPrice());
+            ps.setString(i++, r.getStatus());
+            ps.setObject(i++, r.getFloor());
+            ps.setObject(i++, r.getMaxTenants());
+            ps.setBoolean(i++, r.isMezzanine());
+            ps.setBoolean(i++, r.isAirConditioning());
+            ps.setString(i++, r.getDescription());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // room_id
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
 }
