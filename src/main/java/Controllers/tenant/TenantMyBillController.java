@@ -6,10 +6,13 @@ package Controllers.tenant;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 import DALs.Bill.BillDAO;
+import DALs.Bill.PaymentConfirmBillDAO;
 import Models.authentication.AuthResult;
 import Models.entity.Bill;
+import Models.entity.BillDetail;
 import Models.entity.Payment;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -37,19 +40,31 @@ public class TenantMyBillController extends HttpServlet {
         }
         int tenant_id = auth.getTenant().getTenantId();
         BillDAO bd = new BillDAO();
+        PaymentConfirmBillDAO pd = new PaymentConfirmBillDAO();
         Bill b = bd.getCurrentBillForTenant(tenant_id);
+        Payment pending = pd.getPendingPaymentByBillId(b.getBillId());
+        List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(b.getBillId());
+        String payment_qr = bd.getQRFromContractByBillId(b.getBillId());
+        if (payment_qr == null) {
+            payment_qr = "/assets/images/qr/myqr.png";
+        }
         BigDecimal totalTenantUnpaid = bd.getTotalTenantUnpaid(tenant_id);
         Payment lastPayment = bd.getLastPaidAmountByTenant(tenant_id);
         String RoomNumber = bd.getRoomNumberByTenantId(tenant_id);
         BigDecimal totalAmount = BigDecimal.ZERO;
+        
         if(b != null) {
             totalAmount = bd.totalAmount(b.getBillId());
         }
+        
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("RoomNumber", RoomNumber);
         request.setAttribute("Bill", b);
         request.setAttribute("totalTenantUnpaid", totalTenantUnpaid);
         request.setAttribute("lastPayment", lastPayment);
+        request.setAttribute("ListBillDetail", listBillDetail);
+        request.setAttribute("pendingPayment", pending);
+        request.setAttribute("qr", payment_qr);
         request.getRequestDispatcher("/views/tenant/myBill.jsp").forward(request, response);
     }
 
