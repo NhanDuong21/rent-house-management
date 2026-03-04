@@ -152,8 +152,8 @@ public class ManageAccountDAO extends DBContext {
     }
 
     /**
-     * Kiểm tra tenant có contract nào chưa END hoặc CANCEL không.
-     * Trả về true => còn contract active => KHÔNG được lock.
+     * Kiểm tra tenant có contract nào chưa END hoặc CANCEL không. Trả về true
+     * => còn contract active => KHÔNG được lock.
      */
     @SuppressWarnings("CallToPrintStackTrace")
     public boolean tenantHasActiveContract(int tenantId) {
@@ -165,7 +165,9 @@ public class ManageAccountDAO extends DBContext {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt(1) > 0;
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,6 +204,117 @@ public class ManageAccountDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    /**
+     * Check email tồn tại
+     */
+    public boolean existsEmail(String email) {
+        String sql = """
+        SELECT 1 FROM TENANT WHERE email = ?
+        UNION
+        SELECT 1 FROM STAFF WHERE email = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Create Account Tenant
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean insertTenant(String fullName,
+            String identityCode,
+            String phoneNumber,
+            String email,
+            String address,
+            String dob,
+            int gender,
+            String passwordHash) {
+
+        String sql = """
+        INSERT INTO TENANT
+        (full_name, identity_code, phone_number, email,
+         address, date_of_birth, gender, avatar,
+         account_status, password_hash,
+         must_set_password, created_at, updated_at, token)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 
+                'assets/images/avatar/avDefault.png',
+                'ACTIVE', ?, 
+                1, GETDATE(), GETDATE(), NULL)
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, fullName);
+            ps.setString(2, identityCode);
+            ps.setString(3, phoneNumber);
+            ps.setString(4, email);
+            ps.setString(5, address);
+            ps.setDate(6, java.sql.Date.valueOf(dob));
+            ps.setInt(7, gender);
+            ps.setString(8, passwordHash);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Create Account manager
+     */
+    public boolean insertManager(String fullName,
+            String identityCode,
+            String phoneNumber,
+            String email,
+            String dob,
+            int gender,
+            String passwordHash) {
+
+        String sql = """
+        INSERT INTO STAFF
+        (full_name, phone_number, email,
+         identity_code, date_of_birth, gender,
+         staff_role, password_hash,
+         avatar, status,
+         created_at, updated_at, token)
+        VALUES (?, ?, ?, ?, ?, ?,
+                'MANAGER', ?,
+                'assets/images/avatar/avDefault.png',
+                'ACTIVE',
+                GETDATE(), GETDATE(), NULL)
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, fullName);
+            ps.setString(2, phoneNumber);
+            ps.setString(3, email);
+            ps.setString(4, identityCode);
+            ps.setDate(5, java.sql.Date.valueOf(dob));
+            ps.setInt(6, gender);
+            ps.setString(7, passwordHash);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 }
