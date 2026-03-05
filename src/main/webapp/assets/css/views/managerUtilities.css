@@ -37,6 +37,44 @@
 .mb-generate-btn:hover {
     background: #1e40af;
 }
+
+
+/* SEARCH */
+.mb-search-box {
+    display: block;
+    background: #e9eaec;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mb-search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mb-search-form .bi-search {
+    color: #6b7280;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.mb-search-form input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    min-width: 0;
+    color: #374151;
+}
+
+.mb-search-form input::placeholder {
+    color: #9ca3af;
+}
 /* TABLE */
 .mb-table {
     width: 100%;
