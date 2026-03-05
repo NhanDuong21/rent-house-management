@@ -155,7 +155,9 @@
   border-color: #16a34a;
   color: white;
 }
-
+.er-btn.success {
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.18);
+}
 .er-btn.success:hover {
   filter: brightness(0.96);
 }

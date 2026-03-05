@@ -69,10 +69,10 @@
   }
 
   // ===== Delete Image Confirm (custom modal) =====
+  // (This will only be usable when delete forms exist (NOT INACTIVE). Safe to keep.)
   const confirmModal = document.getElementById("erConfirm");
   const confirmText = document.getElementById("erConfirmText");
   const confirmOk = document.getElementById("erConfirmOk");
-
   let pendingForm = null;
 
   function openConfirm(filename) {
@@ -121,5 +121,51 @@
   document.addEventListener("keydown", (e) => {
     if (!confirmModal || !confirmModal.classList.contains("is-open")) return;
     if (e.key === "Escape") closeConfirm();
+  });
+
+  // ===== Restore Room Confirm =====
+  const restoreBtn = document.querySelector(".js-restore-room");
+  const restoreModal = document.getElementById("erRestoreConfirm");
+  const restoreText = document.getElementById("erRestoreText");
+  const restoreGo = document.getElementById("erRestoreGo");
+
+  function openRestore(url, roomName) {
+    if (!restoreModal) return;
+    restoreModal.classList.add("is-open");
+    restoreModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    if (restoreGo) restoreGo.setAttribute("href", url || "#");
+    if (restoreText) {
+      restoreText.textContent =
+        'Restore room "' + (roomName || "") + '"? Room will become AVAILABLE.';
+    }
+  }
+
+  function closeRestore() {
+    if (!restoreModal) return;
+    restoreModal.classList.remove("is-open");
+    restoreModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  if (restoreBtn) {
+    restoreBtn.addEventListener("click", () => {
+      const url = restoreBtn.getAttribute("data-restore-url");
+      const name = restoreBtn.getAttribute("data-room-name");
+      openRestore(url, name);
+    });
+  }
+
+  if (restoreModal) {
+    restoreModal.addEventListener("click", (e) => {
+      if (e.target && e.target.getAttribute("data-close") === "1")
+        closeRestore();
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (!restoreModal || !restoreModal.classList.contains("is-open")) return;
+    if (e.key === "Escape") closeRestore();
   });
 })();
