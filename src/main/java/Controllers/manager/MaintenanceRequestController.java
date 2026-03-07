@@ -64,6 +64,24 @@ public class MaintenanceRequestController extends HttpServlet {
                 .forward(request, response);
     }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        MaintenanceRequestDAO dao = new MaintenanceRequestDAO();
+
+        try {
+            int id = Integer.parseInt(request.getParameter("requestId"));
+            String status = request.getParameter("status");
+            MaintenanceRequestDTO maintenance = dao.getRequestById(id);
+            dao.updateStatus(id, status);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        response.sendRedirect(request.getContextPath() + "/manager/maintenance");
+    }
 
     private void showMaintenanceDetail(HttpServletRequest request, HttpServletResponse response, MaintenanceRequestDAO dao)
             throws ServletException, IOException {
