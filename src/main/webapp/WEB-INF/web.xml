@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+    <servlet>
+        <servlet-name>MaintenanceRequest</servlet-name>
+        <servlet-class>Controllers.manager.MaintenanceRequestController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AdminAddRoomControllerNewServlet</servlet-name>
         <url-pattern>/admin/rooms/create</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaintenanceRequest</servlet-name>
+        <url-pattern>/manager/maintenance</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
     <context-param>
-        <param-name>roomImageSourceDir</param-name> <!-- clone ve thi edit url nay theo may-->
+        <param-name>roomImageSourceDir</param-name>
+        <!-- clone ve thi edit url nay theo may-->
         <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/rooms</param-value>
     </context-param>
-
     <!-- context param dẫn tới contact.properties ( file giống json )-->
     <context-param>
         <param-name>contact_props_path</param-name>
@@ -258,7 +263,6 @@
         <servlet-name>AdminRoomImageDeleteController</servlet-name>
         <url-pattern>/admin/rooms/images/delete</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>AdminRestoreRoomController</servlet-name>
         <servlet-class>Controllers.admin.AdminRestoreRoomController</servlet-class>
