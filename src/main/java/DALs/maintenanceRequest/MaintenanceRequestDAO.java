@@ -22,6 +22,7 @@ public class MaintenanceRequestDAO extends DBContext {
         List<MaintenanceRequestDTO> list = new ArrayList<>();
         String sql = "SELECT "
                 + "mr.request_id, "
+                + "mr.tenant_id, "
                 + "r.room_number, "
                 + "t.full_name, "
                 + "mr.issue_category, "
@@ -35,6 +36,7 @@ public class MaintenanceRequestDAO extends DBContext {
             while (rs.next()) {
                 MaintenanceRequestDTO dto = new MaintenanceRequestDTO();
                 dto.setRequestId(rs.getInt("request_id"));
+                dto.setTenantId(rs.getInt("tenant_id"));
                 dto.setRoomNumber(rs.getString("room_number"));
                 dto.setFullName(rs.getString("full_name"));
                 dto.setIssueCategory(rs.getString("issue_category"));
@@ -49,9 +51,9 @@ public class MaintenanceRequestDAO extends DBContext {
     }
 
     public MaintenanceRequestDTO getRequestById(int id) {
-
         String sql = "SELECT "
                 + "mr.request_id, "
+                + "mr.tenant_id, "
                 + "r.room_number, "
                 + "t.full_name, "
                 + "mr.issue_category, "
@@ -64,13 +66,13 @@ public class MaintenanceRequestDAO extends DBContext {
                 + "JOIN ROOM r ON mr.room_id = r.room_id "
                 + "JOIN TENANT t ON mr.tenant_id = t.tenant_id "
                 + "WHERE mr.request_id = ?";
-
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     MaintenanceRequestDTO dto = new MaintenanceRequestDTO();
                     dto.setRequestId(rs.getInt("request_id"));
+                    dto.setTenantId(rs.getInt("tenant_id"));
                     dto.setRoomNumber(rs.getString("room_number"));
                     dto.setFullName(rs.getString("full_name"));
                     dto.setIssueCategory(rs.getString("issue_category"));
@@ -82,11 +84,9 @@ public class MaintenanceRequestDAO extends DBContext {
                     return dto;
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -104,7 +104,6 @@ public class MaintenanceRequestDAO extends DBContext {
     }
 
     public void updateStatus(int id, String status) {
-
         String sql = """
         UPDATE MAINTENANCE_REQUEST
         SET status=?,
@@ -115,15 +114,11 @@ public class MaintenanceRequestDAO extends DBContext {
                 END
         WHERE request_id=?
         """;
-
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-
             ps.setString(1, status);
             ps.setString(2, status);
             ps.setInt(3, id);
-
             ps.executeUpdate();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,10 +126,10 @@ public class MaintenanceRequestDAO extends DBContext {
 
     public List<MaintenanceRequestDTO> getRequestsByTenantId(int tenantId) {
         List<MaintenanceRequestDTO> list = new ArrayList<>();
-
         String sql = """
         SELECT 
             mr.request_id,
+            mr.tenant_id,
             r.room_number,
             t.full_name,
             mr.issue_category,
@@ -146,29 +141,27 @@ public class MaintenanceRequestDAO extends DBContext {
         JOIN TENANT t ON mr.tenant_id = t.tenant_id
         WHERE mr.tenant_id = ?
         ORDER BY mr.created_at DESC
-    """;
+        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()) {
                 MaintenanceRequestDTO dto = new MaintenanceRequestDTO();
                 dto.setRequestId(rs.getInt("request_id"));
+                dto.setTenantId(rs.getInt("tenant_id"));
                 dto.setRoomNumber(rs.getString("room_number"));
                 dto.setFullName(rs.getString("full_name"));
                 dto.setIssueCategory(rs.getString("issue_category"));
                 dto.setStatus(rs.getString("status"));
                 dto.setDescription(rs.getString("description"));
                 dto.setCreatedAt(rs.getTimestamp("created_at"));
-
                 list.add(dto);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return list;
     }
 }
