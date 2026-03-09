@@ -19,7 +19,7 @@ import Utils.database.DBContext;
  */
 public class MaintenanceRequestDAO extends DBContext {
 
-    public List<MaintenanceRequestDTO> getAllRequests(int page, int pageSize) {
+    public List<MaintenanceRequestDTO> getAllRequests(int page, int pageSize, String search) {
         List<MaintenanceRequestDTO> list = new ArrayList<>();
         String sql = """
         SELECT
@@ -33,12 +33,14 @@ public class MaintenanceRequestDAO extends DBContext {
         FROM MAINTENANCE_REQUEST mr
         JOIN ROOM r ON mr.room_id = r.room_id
         JOIN TENANT t ON mr.tenant_id = t.tenant_id
+        WHERE r.room_number LIKE ?
         ORDER BY mr.created_at DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
     """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, (page - 1) * pageSize);
-            ps.setInt(2, pageSize);
+            ps.setString(1, "%" + search + "%");
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 MaintenanceRequestDTO dto = new MaintenanceRequestDTO();
@@ -97,9 +99,13 @@ public class MaintenanceRequestDAO extends DBContext {
         return null;
     }
 
-    public int countRequest() {
-        String sql = "SELECT COUNT(*) FROM MAINTENANCE_REQUEST";
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+    public int countRequest(String search) {
+        String sql = "SELECT COUNT(*) FROM MAINTENANCE_REQUEST mr "
+                + "JOIN ROOM r ON mr.room_id = r.room_id "
+                + "WHERE r.room_number LIKE ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "%" + search + "%");
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -165,7 +171,8 @@ public class MaintenanceRequestDAO extends DBContext {
         }
         return list;
     }
-        public int countRequestByTenantId(int tenantId) {
+
+    public int countRequestByTenantId(int tenantId) {
         String sql = "SELECT COUNT(*) FROM MAINTENANCE_REQUEST WHERE tenant_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
@@ -178,7 +185,6 @@ public class MaintenanceRequestDAO extends DBContext {
         }
         return 0;
     }
-
 
     public Integer getUtilityIdByName(String name) {
         String sql = "SELECT utility_id FROM UTILITY WHERE utility_name = ? AND is_active = 1";
