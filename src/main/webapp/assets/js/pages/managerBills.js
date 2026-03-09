@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const billId = billIdText.textContent.toLowerCase();
             const roomNumber = roomNumberText.textContent.toLowerCase();
-            const billStatus = statusText.textContent;
+            const billStatus = statusText.textContent.trim();
             const dateBill = dateText.textContent.trim();
             //Search condition
             const matchSearch = roomNumber.includes(searchKeyword) || billId.includes(searchKeyword);

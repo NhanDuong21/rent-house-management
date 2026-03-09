@@ -22,6 +22,14 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ManagerPaymentConfirmBillController extends HttpServlet {
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.sendRedirect(request.getContextPath() + "/manager/billing");
+
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String billIdString = request.getParameter("billId");
@@ -39,10 +47,10 @@ public class ManagerPaymentConfirmBillController extends HttpServlet {
         PaymentConfirmBillDAO pcDAO = new PaymentConfirmBillDAO();
         try {
             pcDAO.confirmPaymentForManager(billId);
-            response.sendRedirect(request.getContextPath() + "/manager/bills/detail?billId=" + billId);
+            response.sendRedirect(request.getContextPath() + "/manager/billing/detail?billId=" + billId);
         } catch (SQLException e) {
             request.setAttribute("errorMsg", e.getMessage());
-            request.getRequestDispatcher("/manager/bills/detail").forward(request, response);;
+            request.getRequestDispatcher("/manager/billing/detail").forward(request, response);
         }
     }
 

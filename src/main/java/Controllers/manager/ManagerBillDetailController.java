@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import DALs.Bill.BillDAO;
+import DALs.Bill.PaymentConfirmBillDAO;
 import Models.entity.Bill;
 import Models.entity.BillDetail;
 import jakarta.servlet.ServletException;
@@ -21,31 +22,32 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author To Thi Thao Trang - CE191027
  */
-@WebServlet(name = "ManagerBillDetailController",urlPatterns = {"/manager/billing/detail"})
+@WebServlet(name = "ManagerBillDetailController", urlPatterns = {"/manager/billing/detail"})
 public class ManagerBillDetailController extends HttpServlet {
- 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BillDAO bd = new BillDAO();
+        PaymentConfirmBillDAO paymentDAO = new PaymentConfirmBillDAO();
         int billId = Integer.parseInt(request.getParameter("billId"));
         Bill bill = bd.findBillDetailByIdForManager(billId);
-        List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(billId);
+        List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(billId);     
         BigDecimal totalAmount = bd.totalAmount(billId);
-        String payment_qr =bd.getQRFromContractByBillId(billId);
+        String paymentStatus = paymentDAO.getLatestPaymentStatus(billId);
+        String payment_qr = bd.getQRFromContractByBillId(billId);
         String roomNumber = bd.getStringRoomnumber(billId);
         if (payment_qr == null) {
             payment_qr = "/assets/images/qr/myqr.png";
         }
+        
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("roomNumber", roomNumber);
         request.setAttribute("bill", bill);
         request.setAttribute("ListBillDetail", listBillDetail);
+        request.setAttribute("paymentStatus", paymentStatus);
         request.setAttribute("qr", payment_qr);
-       request.getRequestDispatcher("/views/manager/billDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/manager/billDetail.jsp").forward(request, response);
     }
 
-    
-
-    
 }
