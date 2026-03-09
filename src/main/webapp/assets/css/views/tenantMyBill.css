@@ -214,6 +214,23 @@
     color: #dc3545;
 }
 
+/* WARNING - NO BILL */
+.tb-paid-box.warning {
+    background: #fff4e5;
+}
+
+.tb-paid-box.warning .tb-paid-icon {
+    background: #f59e0b;
+}
+
+.tb-paid-box.warning .tb-paid-title {
+    color: #92400e;
+}
+
+.tb-paid-box.warning .tb-paid-sub {
+    color: #b45309;
+}
+
 /* CANCELLED */
 .tb-paid-box.cancelled {
     background: #f1f3f5;
@@ -885,4 +902,22 @@ color:#721c24;
         padding:5px 10px;
     }
 
+}
+.payment-alert {
+    margin-top: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px 14px;
+}
+
+.payment-alert.alert-info {
+    background-color: #f4f8ff;
+    border: 1px solid #d6e4ff;
+    color: #2c5aa0;
+}
+
+.payment-alert.alert-warning {
+    background-color: #fff8e6;
+    border: 1px solid #ffe0a3;
+    color: #9a6b00;
 }

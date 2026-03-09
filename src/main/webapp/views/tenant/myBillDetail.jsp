@@ -157,14 +157,23 @@
                         </c:when>
 
                         <c:when test="${billDetail.status eq 'UNPAID'}">
-                            <c:if test="${not empty pendingPayment}">
-                                <div class="alert alert-warning">
+
+                            <c:if test="${!allowPayment}">
+                                <div class="alert alert-info payment-alert">
+                                    Payment will be available next month.
+                                </div>
+                            </c:if>
+
+
+                            <c:if test="${not empty pendingPayment && allowPayment}">
+                                <div class="alert alert-warning payment-alert">
                                     Payment is waiting for manager confirmation.
                                 </div>
                             </c:if>
 
-                            <c:if test="${empty pendingPayment}">
+                            <c:if test="${empty pendingPayment && allowPayment}">
                                 <form action="${pageContext.request.contextPath}/tenant/payment" method="post">
+
                                     <input type="hidden" name="billId" value="${billDetail.billId}">
                                     <input type="hidden" name="amount" value="${totalAmount}">
 
@@ -178,12 +187,18 @@
                                     </select>
 
                                     <!-- QR -->
-                                    <div class="qr" style="text-align: center; margin: 10px;">
-                                        <img src="${pageContext.request.contextPath}${qr}" style="width:200px;height:200px;">
+                                    <div class="qr" style="text-align:center;margin:10px;">
+                                        <img src="${pageContext.request.contextPath}${qr}"
+                                             style="width:200px;height:200px;">
                                     </div>
-                                    <button type="submit" class="submit-btn"> Submit Payment </button>
+
+                                    <button type="submit" class="submit-btn">
+                                        Submit Payment
+                                    </button>
+
                                 </form>
                             </c:if>
+
                         </c:when>
                     </c:choose>
 

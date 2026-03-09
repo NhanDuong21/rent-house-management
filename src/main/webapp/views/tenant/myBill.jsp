@@ -35,9 +35,9 @@
             </div>
         </div>
 
+
         <!-- MAIN GRID -->
         <div class="tb-grid">
-
             <!-- LEFT SIDE - BILL DETAIL -->
             <div class="tb-card">
 
@@ -48,6 +48,7 @@
                     </div>
 
                     <c:choose>
+
                         <c:when test="${Bill.status eq 'PAID'}">
                             <span class="tb-badge paid">PAID</span>
                         </c:when>
@@ -55,9 +56,15 @@
                         <c:when test="${Bill.status eq 'CANCELLED'}">
                             <span class="tb-badge cancelled">CANCELLED</span>
                         </c:when>
-                        <c:otherwise>
+
+                        <c:when test="${Bill.status eq 'UNPAID'}">
                             <span class="tb-badge unpaid">UNPAID</span>
+                        </c:when>
+
+                        <c:otherwise>
+                            <span class="tb-badge unpaid">UNKNOWN</span>
                         </c:otherwise>
+
                     </c:choose>
                 </div>
 
@@ -71,29 +78,49 @@
                         <span class="tb-value">${RoomNumber}</span>
                     </div>
 
+                    <fmt:setLocale value="en_US"/>
+
                     <div class="tb-line">
                         <span class="tb-label">Billing Period</span>
                         <span class="tb-value">
-                            <fmt:setLocale value="en_US"/>
-                            <fmt:formatDate value="${Bill.billMonth}" pattern="MMMM"/>
-                            Bill
+                            <c:choose>
+                                <c:when test="${not empty Bill.billMonth}">
+                                    <fmt:formatDate value="${Bill.billMonth}" pattern="MMMM"/> Bill
+                                </c:when>
+                                <c:otherwise>
+                                    N/A
+                                </c:otherwise>
+                            </c:choose>
                         </span>
                     </div>
 
                     <div class="tb-line">
                         <span class="tb-label">Issue Date</span>
                         <span class="tb-value">
-                            <fmt:formatDate value="${Bill.billMonth}" pattern="dd/MM/yyyy"/>
+                            <c:choose>
+                                <c:when test="${not empty Bill.billMonth}">
+                                    <fmt:formatDate value="${Bill.billMonth}" pattern="dd/MM/yyyy"/>
+                                </c:when>
+                                <c:otherwise>
+                                    N/A
+                                </c:otherwise>
+                            </c:choose>
                         </span>
                     </div>
 
                     <div class="tb-line">
                         <span class="tb-label">Due Date</span>
                         <span class="tb-value">
-                            <fmt:formatDate value="${Bill.dueDate}" pattern="dd/MM/yyyy"/>
+                            <c:choose>
+                                <c:when test="${not empty Bill.dueDate}">
+                                    <fmt:formatDate value="${Bill.dueDate}" pattern="dd/MM/yyyy"/>
+                                </c:when>
+                                <c:otherwise>
+                                    N/A
+                                </c:otherwise>
+                            </c:choose>
                         </span>
                     </div>
-
                 </div>
 
                 <div class="tb-divider soft"></div>
@@ -115,11 +142,19 @@
                         </div>
                     </c:when>
 
-                    <c:otherwise>
+                    <c:when test="${Bill.status == 'UNPAID'}">
                         <div class="tb-paid-box danger">
                             <div class="tb-paid-icon">✕</div>
                             <div class="tb-paid-title">This bill is unpaid</div>
                             <div class="tb-paid-sub">Please complete your payment before due date</div>
+                        </div>
+                    </c:when>
+
+                    <c:otherwise>
+                        <div class="tb-paid-box warning">
+                            <div class="tb-paid-icon">✕</div>
+                            <div class="tb-paid-title">You don't have a bill yet</div>
+                            <div class="tb-paid-sub">Please wait for the next billing cycle</div>
                         </div>
                     </c:otherwise>
 
@@ -129,7 +164,6 @@
                     View Detail
                 </button>
             </div>
-
             <!-- RIGHT SIDE - SUMMARY -->
             <div class="tb-summary">
 
@@ -191,6 +225,12 @@
                 </div>
             </div>
         </div>
+
+        <c:if test="${empty Bill}">
+            <div class="tb-empty">
+                You currently have no active bill.
+            </div>
+        </c:if>
         <!-- BILL LIST SECTION -->
         <div class="bill-section">
 
@@ -374,13 +414,19 @@
 
                     <c:when test="${Bill.status eq 'UNPAID'}">
 
-                        <c:if test="${not empty pendingPayment}">
-                            <div class="alert alert-warning">
+                        <c:if test="${not empty pendingPayment && allowPayment}">
+                            <div class="alert alert-warning payment-alert">
                                 Payment is waiting for manager confirmation.
                             </div>
                         </c:if>
 
-                        <c:if test="${empty pendingPayment}">
+                        <c:if test="${!allowPayment}">
+                            <div class="alert alert-info payment-alert">
+                                Payment will be available next month.
+                            </div>
+                        </c:if>
+
+                        <c:if test="${empty pendingPayment && allowPayment}">
                             <form action="${pageContext.request.contextPath}/tenant/payment"
                                   method="post">
                                 <input type="hidden" name="billId" value="${Bill.billId}">
@@ -393,10 +439,13 @@
                                     <option value="CASH">Cash</option>
                                 </select>
 
-                                <div id="qrContainer" style="display: none ; text-align:center;">
+                                <div id="qrContainer" style="display:none;text-align:center;">
                                     <img id="qrImage"
-                                         src="${pageContext.request.contextPath}${qr}"  alt="QR Code" style="width:200px; height:200px;">
+                                         src="${pageContext.request.contextPath}${qr}"
+                                         alt="QR Code"
+                                         style="width:200px;height:200px;">
                                 </div>
+
                                 <button type="submit" class="submit-btn">
                                     Submit Payment
                                 </button>

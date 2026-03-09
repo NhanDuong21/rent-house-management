@@ -6,6 +6,7 @@ package Controllers.tenant;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import DALs.Bill.BillDAO;
@@ -43,22 +44,40 @@ public class TenantMyBillController extends HttpServlet {
         BillDAO bd = new BillDAO();
         PaymentConfirmBillDAO pd = new PaymentConfirmBillDAO();
         Bill b = bd.getCurrentBillForTenant(tenant_id);
-        Payment pending = pd.getPendingPaymentByBillId(b.getBillId());
-        List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(b.getBillId());
-        String payment_qr = bd.getQRFromContractByBillId(b.getBillId());
+
+        Payment pending = null;
+        List<BillDetail> listBillDetail = null;
+        String payment_qr = null;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        boolean allowPayment = false;
+        if (b != null) {
+            pending = pd.getPendingPaymentByBillId(b.getBillId());
+            listBillDetail = bd.getListBillDetailByBillId(b.getBillId());
+            payment_qr = bd.getQRFromContractByBillId(b.getBillId());
+            totalAmount = bd.totalAmount(b.getBillId());
+             //lay ngay tháng hien tai
+            LocalDate today = LocalDate.of(2026, 4, 10);
+            // lay tháng bill
+            LocalDate billMonth = b.getBillMonth().toLocalDate();
+            
+            // tháng bill + 1 tháng
+            LocalDate nextMonth = billMonth.plusMonths(1);
+            
+            //month hien tai = month ke tiep moi cho chuyn
+            allowPayment = today.getMonthValue() == nextMonth.getMonthValue()
+                    && today.getYear() == nextMonth.getYear();
+        }
+
         if (payment_qr == null) {
             payment_qr = "/assets/images/qr/myqr.png";
         }
+        String RoomNumber = bd.getRoomNumberByTenantId(tenant_id);
         BigDecimal totalTenantUnpaid = bd.getTotalTenantUnpaid(tenant_id);
         Payment lastPayment = bd.getLastPaidAmountByTenant(tenant_id);
-        String RoomNumber = bd.getRoomNumberByTenantId(tenant_id);
+        
         List<ManagerBillRowDTO> listTenantBills = bd.listBillForTenant(tenant_id);
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        
-        if(b != null) {
-            totalAmount = bd.totalAmount(b.getBillId());
-        }
-        
+
+        request.setAttribute("allowPayment", allowPayment);
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("RoomNumber", RoomNumber);
         request.setAttribute("Bill", b);
