@@ -184,23 +184,24 @@ public class PaymentConfirmBillDAO extends DBContext {
 
     public List<PaymentHistoryRowDTO> getAllPaymentHistoryByTenantId(int tenant_id) {
         List<PaymentHistoryRowDTO> list = new ArrayList<>();
-        String sql = "SELECT   "
-                + "p.payment_id, "
-                + "t.full_name, "
-                + "r.room_number,  "
-                + "p.method,  "
-                + "p.status, "
-                + "b.bill_month, "
-                + "p.paid_at, "
-                + "p.amount "
-                + "FROM PAYMENT p "
-                + "LEFT JOIN CONTRACT c ON p.contract_id = c.contract_id "
-                + "LEFT JOIN BILL b ON p.bill_id = b.bill_id "
-                + "LEFT JOIN CONTRACT c2 ON b.contract_id = c2.contract_id "
-                + "LEFT JOIN ROOM r  ON r.room_id = ISNULL(c.room_id, c2.room_id) "
-                + "LEFT JOIN TENANT t  ON t.tenant_id = ISNULL(c.tenant_id, c2.tenant_id) "
-                + "WHERE t.tenant_id = ? "
-                + "ORDER BY p.paid_at DESC";
+
+      String sql = "SELECT "
+                    + "p.payment_id, "
+                    + "t.full_name, "
+                    + "r.room_number, "
+                    + "p.method, "
+                    + "p.status, "
+                    + "b.bill_month, "
+                    + "p.paid_at, "
+                    + "p.amount "
+                    + "FROM PAYMENT p "
+                    + "LEFT JOIN CONTRACT c ON p.contract_id = c.contract_id "
+                    + "LEFT JOIN BILL b ON p.bill_id = b.bill_id "
+                    + "LEFT JOIN CONTRACT c2 ON b.contract_id = c2.contract_id "
+                    + "LEFT JOIN ROOM r ON r.room_id = ISNULL(c.room_id, c2.room_id) "
+                    + "LEFT JOIN TENANT t ON t.tenant_id = ISNULL(c.tenant_id, c2.tenant_id) "
+                    + "WHERE t.tenant_id = ? "
+                    + "ORDER BY p.paid_at DESC";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -224,4 +225,26 @@ public class PaymentConfirmBillDAO extends DBContext {
         return list;
     }
 
+        // getStatus payment = bill_id
+    public String getLatestPaymentStatus(int billId) {
+        String sql = """
+                    SELECT TOP 1 status
+                    FROM PAYMENT
+                    WHERE bill_id = ?
+                    ORDER BY paid_at DESC
+                """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, billId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("status");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
