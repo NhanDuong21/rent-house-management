@@ -181,3 +181,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this t
     font-weight:700;
     text-decoration:none;
 }
+/* SEARCH */
+.search-box {
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 12px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.search-box i {
+    color: #6b7280;
+}
+.search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-weight: 600;
+}
