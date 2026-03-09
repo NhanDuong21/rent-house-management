@@ -165,5 +165,79 @@ public class MaintenanceRequestDAO extends DBContext {
         }
         return list;
     }
+        public int countRequestByTenantId(int tenantId) {
+        String sql = "SELECT COUNT(*) FROM MAINTENANCE_REQUEST WHERE tenant_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tenantId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
+
+    public Integer getUtilityIdByName(String name) {
+        String sql = "SELECT utility_id FROM UTILITY WHERE utility_name = ? AND is_active = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("utility_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<TenantMyRoomDTO> getRoomsByTenantId(int tenantId) {
+        List<TenantMyRoomDTO> list = new ArrayList<>();
+        String sql = """
+        SELECT r.room_id, r.room_number
+        FROM CONTRACT c
+        JOIN ROOM r ON c.room_id = r.room_id
+        WHERE c.tenant_id = ? AND c.status = 'ACTIVE'
+        ORDER BY r.room_number
+    """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tenantId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                TenantMyRoomDTO dto = new TenantMyRoomDTO();
+                dto.setRoomId(rs.getInt("room_id"));
+                dto.setRoomNumber(rs.getString("room_number"));
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void createRequest(int tenantId, int roomId, String category, String description, String images, Integer utilityId) {
+        String insertSql = """
+        INSERT INTO MAINTENANCE_REQUEST
+        (tenant_id, room_id, issue_category, utility_id, description, image_url, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
+    """;
+        try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
+            ps.setInt(1, tenantId);
+            ps.setInt(2, roomId);
+            ps.setString(3, category);
+            if (utilityId != null) {
+                ps.setInt(4, utilityId);
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
+            ps.setString(5, description);
+            ps.setString(6, images);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
