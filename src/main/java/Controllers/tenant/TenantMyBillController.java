@@ -56,7 +56,8 @@ public class TenantMyBillController extends HttpServlet {
             payment_qr = bd.getQRFromContractByBillId(b.getBillId());
             totalAmount = bd.totalAmount(b.getBillId());
              //lay ngay tháng hien tai
-            LocalDate today = LocalDate.of(2026, 4, 10);
+             //
+            LocalDate today = LocalDate.now();
             // lay tháng bill
             LocalDate billMonth = b.getBillMonth().toLocalDate();
             

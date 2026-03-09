@@ -7,6 +7,7 @@ package Controllers.tenant;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import DALs.Bill.BillDAO;
@@ -29,32 +30,56 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(urlPatterns = {"/tenant/billdetail"})
 public class TenantMyBillDetailController extends HttpServlet {
 
+   
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         AuthResult auth = (AuthResult) session.getAttribute("auth");
-        BillDAO bd = new BillDAO();
-        PaymentConfirmBillDAO pd = new PaymentConfirmBillDAO();
+
         if (auth == null || auth.getTenant() == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         int tenant_id = auth.getTenant().getTenantId();
         int billId = Integer.parseInt(request.getParameter("billId"));
+        BillDAO bd = new BillDAO();
+        PaymentConfirmBillDAO pd = new PaymentConfirmBillDAO();
         Bill billDetail = bd.findBillDetailByIdForTenant(billId, tenant_id);
+        if (billDetail == null) {
+            response.sendRedirect(request.getContextPath() + "/tenant/bill");
+            return;
+        }
+        //lay ngay tháng hien tai
+        //LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.of(2026, 4, 10);
+        // lay tháng bill
+        LocalDate billMonth = billDetail.getBillMonth().toLocalDate();
+        
+        // tháng bill + 1 tháng
+        LocalDate nextMonth = billMonth.plusMonths(1);
+        
+        //month hien tai = month ke tiep moi cho chuyn
+        boolean allowPayment = today.getMonthValue() == nextMonth.getMonthValue()
+                && today.getYear() == nextMonth.getYear();
+          
         List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(billId);
         Payment pendingPayment = pd.getPendingPaymentByBillId(billDetail.getBillId());
         BigDecimal totalAmount = bd.totalAmount(billId);
         String RoomNumber = bd.getRoomNumberByTenantId(tenant_id);
         String payment_qr = bd.getQRFromContractByBillId(billDetail.getBillId());
-    
+        if (payment_qr == null) {
+            payment_qr = "/assets/images/qr/myqr.png";
+        }
+        request.setAttribute("allowPayment", allowPayment); 
         request.setAttribute("billDetail", billDetail);
         request.setAttribute("ListBillDetail", listBillDetail);
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("RoomNumber", RoomNumber);
         request.setAttribute("pendingPayment", pendingPayment);
         request.setAttribute("qr", payment_qr);
+
         request.getRequestDispatcher("/views/tenant/myBillDetail.jsp").forward(request, response);
     }
 

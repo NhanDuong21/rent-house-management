@@ -40,7 +40,7 @@ public class TenantRequestPaymentController extends HttpServlet {
         String method = request.getParameter("method");
         try {
             pm.createPaymentForTenant(billId, method, amount);
-            response.sendRedirect("/tenant/billdetail");
+            response.sendRedirect(request.getContextPath() +"/tenant/bill");
         } catch (Exception e) {
             e.printStackTrace();
         }
