@@ -160,18 +160,44 @@ Author     : To Thi Thao Trang - CE191027
                             </div>
                         </div>
 
-                        <form action="${pageContext.request.contextPath}/manager/bills/paymentConfirm"  method="post" style="margin-top:20px;">
-                            <input type="hidden" name="billId" value="${bill.billId}">
-                            <button class="tbd-btn-confirm">
-                                <i class="bi bi-check-circle"></i>
-                                Confirm Payment Received
-                            </button>
-                        </form>
+                        <c:choose>
+
+
+                            <c:when test="${paymentStatus eq 'PENDING'}">
+
+                                <form action="${pageContext.request.contextPath}/manager/bills/paymentConfirm"
+                                      method="post" style="margin-top:20px;">
+                                    <input type="hidden" name="billId" value="${bill.billId}">
+                                    <button class="tbd-btn-confirm">
+                                        <i class="bi bi-check-circle"></i>
+                                        Confirm Payment Received
+                                    </button>
+                                </form>
+
+                            </c:when>
+
+
+                            <c:otherwise>
+
+                                <button class="tbd-btn-confirm" disabled style="margin-top:20px;">
+                                    <i class="bi bi-check-circle"></i>
+                                    Confirm Payment Received
+                                </button>
+
+                                <div class="tbd-qr-note" style="margin-top:8px;color:#888;">
+                                    Waiting for tenant payment request
+                                </div>
+
+                            </c:otherwise>
+
+                        </c:choose>
+
                         <c:if test="${not empty errorMsg}">
                             <div class="alert alert-danger">
                                 ${errorMsg}
                             </div>
                         </c:if>
+
                     </div>
                 </c:if>
 
