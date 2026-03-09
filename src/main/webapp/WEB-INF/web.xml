@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
     <context-param>
-    <param-name>maintenanceImageDir</param-name>
-    <!-- clone ve thi edit url nay theo may -->
-    <param-value>C:/Users/truon/OneDrive/Desktop/SWP/land-house-management/src/main/webapp/assets/images/maintenance</param-value>
-</context-param>
+        <param-name>maintenanceImageDir</param-name>
+        <!-- clone ve thi edit url nay theo may -->
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/maintenance</param-value>
+    </context-param>
     <servlet>
         <servlet-name>MaintenanceRequest</servlet-name>
         <servlet-class>Controllers.manager.MaintenanceRequestForManagerController</servlet-class>
