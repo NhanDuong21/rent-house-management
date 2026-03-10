@@ -9,6 +9,31 @@
 
     <!-- Page CSS -->
     <link rel="stylesheet" href="${ctx}/assets/css/views/managerTenant.css">
+    <style>
+        .mt-alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+        .mt-alert-error {
+            background-color: #fff0f0;
+            border: 1px solid #f5c2c2;
+            color: #b91c1c;
+        }
+        .mt-alert span { flex: 1; }
+        .mt-alert-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            padding: 0 4px;
+            font-size: 0.85rem;
+        }
+    </style>
 
     <div class="mt-container">
 
@@ -17,6 +42,17 @@
             <h2>Manage Tenants</h2>
             <p>View and manage all tenant information</p>
         </div>
+
+        <!-- LOCK ERROR ALERT -->
+        <c:if test="${not empty lockError}">
+            <div class="mt-alert mt-alert-error" id="lockErrorAlert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>${lockError}</span>
+                <button type="button" class="mt-alert-close" onclick="this.parentElement.remove()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </c:if>
 
         <!-- SEARCH -->
         <div class="mt-search-box">

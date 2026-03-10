@@ -22,7 +22,7 @@
                 <p>View and manage all tenant bills</p>
             </div>
 
-            <a href="${pageContext.request.contextPath}/manager/billing/create"
+            <a href="${pageContext.request.contextPath}/manager/billing/generate"
                class="mb-generate-btn">
                 + Generate Bill
             </a>
@@ -40,6 +40,7 @@
                     <option value="">All status</option>
                     <option value="PAID">PAID</option>
                     <option value="UNPAID">UNPAID</option>
+                    <option value="CANCELLED">CANCELLED</option>
                 </select>
             </div>
         </div>
@@ -60,6 +61,7 @@
                         <th>Due Date</th>
                         <th>Total Amount</th>
                         <th>Status</th>
+                        <th>Payment Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -71,7 +73,7 @@
                             <td class="roomNumber">${b.roomNumber}</td>
                             <td>
                                 <span  class="dateBill">
-                                <fmt:formatDate value="${b.month}"  pattern="dd/MM/yyyy"/>
+                                    <fmt:formatDate value="${b.month}"  pattern="dd/MM/yyyy"/>
                                 </span>
                             </td>
                             <td>
@@ -86,16 +88,76 @@
                                     <c:when test="${b.status eq 'PAID'}">
                                         <span class="mb-badge paid">PAID</span>
                                     </c:when>
+
+                                    <c:when test="${b.status eq 'CANCELLED'}">
+                                        <span  class="mb-badge cancelled">CANCELLED</span>
+                                    </c:when>
+
                                     <c:otherwise>
                                         <span class="mb-badge unpaid">UNPAID</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                             <td>
+                                <c:choose>
+
+
+                                    <c:when test="${empty b.paymentStatus}">
+                                        <span class="mb-badge nopayment">NO REQUEST</span>
+                                    </c:when>
+
+
+                                    <c:when test="${b.paymentStatus eq 'PENDING'}">
+                                        <span class="mb-badge pending">PENDING</span>
+                                    </c:when>
+
+
+                                    <c:when test="${b.paymentStatus eq 'CONFIRMED'}">
+                                        <span class="mb-badge paid">CONFIRMED</span>
+                                    </c:when>
+
+
+                                    <c:when test="${b.paymentStatus eq 'REJECTED'}">
+                                        <span class="mb-badge cancelled">REJECTED</span>
+                                    </c:when>
+
+                                </c:choose>
+                            </td>
+                            <td class="mb-actions">
+
+                                <!-- VIEW -->
                                 <a href="${pageContext.request.contextPath}/manager/billing/detail?billId=${b.billId}"
                                    class="mb-view-btn">
                                     👁 View
                                 </a>
+
+                                <!-- EDIT -->
+                                <c:choose>
+
+
+                                    <c:when test="${b.status eq 'UNPAID' and b.paymentStatus ne 'PENDING'}">
+                                        <a href="${pageContext.request.contextPath}/manager/billing/input?billId=${b.billId}"
+                                           class="mb-edit-btn">
+                                            ✏ Input Meter
+                                        </a>
+                                    </c:when>
+
+
+                                    <c:otherwise>
+                                        <button class="mb-edit-btn disabled" disabled>
+                                            ✏ Input Meter
+                                        </button>
+                                    </c:otherwise>
+
+                                </c:choose>
+
+                                <!-- CANCEL -->
+                                <a href="${pageContext.request.contextPath}/manager/billing/cancel?billId=${b.billId}"
+                                   class="mb-cancel-btn"
+                                   onclick="return confirm('Are you sure to cancel this bill?')">
+                                    x Cancel
+                                </a>
+
                             </td>
                         </tr>
                     </c:forEach>

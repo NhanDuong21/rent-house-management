@@ -68,13 +68,58 @@ public class ManagerViewListTenantController extends HttpServlet {
         String action = request.getParameter("action");
         if ("toggleStatus".equals(action)) {
             String idStr = request.getParameter("id");
+            String keyword = request.getParameter("keyword");
+            String pageStr = request.getParameter("page");
+
             try {
                 int id = Integer.parseInt(idStr);
+                Tenant tenant = service.findById(id);
+
+                // Nếu đang ACTIVE → muốn chuyển sang LOCKED → kiểm tra contract
+                if (tenant != null && "ACTIVE".equals(tenant.getAccountStatus())) {
+                    if (service.hasActiveContract(id)) {
+                        // Tenant còn hợp đồng chưa kết thúc → không cho phép LOCK
+                        // Forward lại trang với thông báo lỗi
+                        int currentPageErr = 1;
+                        if (pageStr != null) {
+                            try { currentPageErr = Math.max(1, Integer.parseInt(pageStr)); }
+                            catch (NumberFormatException ignored) {}
+                        }
+
+                        int totalRecords;
+                        List<Tenant> listErr;
+                        final int PAGE_SIZE = 10;
+                        if (keyword == null || keyword.trim().isEmpty()) {
+                            keyword = null;
+                            listErr = service.getTenantsPaged(currentPageErr, PAGE_SIZE);
+                            totalRecords = service.countAllTenants();
+                        } else {
+                            listErr = service.searchTenantPaged(keyword, currentPageErr, PAGE_SIZE);
+                            totalRecords = service.countSearchTenant(keyword);
+                        }
+                        int totalPagesErr = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
+                        if (totalPagesErr < 1) totalPagesErr = 1;
+
+                        request.setAttribute("tenants", listErr);
+                        request.setAttribute("keyword", keyword);
+                        request.setAttribute("currentPage", currentPageErr);
+                        request.setAttribute("totalPages", totalPagesErr);
+                        request.setAttribute("totalRecords", totalRecords);
+                        request.setAttribute("lockError",
+                                "Cannot lock tenant \"" + tenant.getFullName()
+                                + "\" because they still have an active contract. "
+                                + "Please ensure all contracts are ENDED or CANCELLED first.");
+
+                        request.getRequestDispatcher("/views/manager/managerTenant.jsp")
+                                .forward(request, response);
+                        return;
+                    }
+                }
+
                 service.toggleStatus(id);
             } catch (NumberFormatException ignored) {
             }
-            String keyword = request.getParameter("keyword");
-            String pageStr = request.getParameter("page");
+
             String redirect = request.getContextPath() + "/manager/tenants";
             boolean hasQuery = false;
             if (keyword != null && !keyword.isBlank()) {

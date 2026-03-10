@@ -1,0 +1,209 @@
+.tbg-container{
+    padding:40px;
+}
+
+/* =========================
+PAGE HEADER
+========================= */
+
+.tbg-pagehead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.tbg-pagehead-left{
+    display:flex;
+    flex-direction:column;
+}
+
+.tbg-back{
+    text-decoration:none;
+    font-weight:500;
+    color:#333;
+    display:flex;
+    gap:6px;
+    align-items:center;
+}
+
+.tbg-back:hover{
+    color:#2563eb;
+}
+
+.tbg-breadcrumb{
+    margin-top:5px;
+    font-size:13px;
+    color:#888;
+}
+
+.tbg-breadcrumb .active{
+    color:#111;
+    font-weight:500;
+}
+
+.tbg-minihelp{
+    background:#f2f6ff;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+/* =========================
+CARD
+========================= */
+
+.tbg-card{
+    background:white;
+    border-radius:12px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.05);
+}
+
+.tbg-card-body{
+    padding:30px;
+}
+
+.tbg-title{
+    font-size:22px;
+    font-weight:600;
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.tbg-sub{
+    color:#777;
+    margin-top:4px;
+}
+
+.tbg-divider{
+    height:1px;
+    background:#eee;
+    margin:20px 0;
+}
+
+/* =========================
+FORM
+========================= */
+
+.tbg-form{
+    max-width:900px;
+}
+
+/* TOP SECTION */
+
+.tbg-form-top{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    margin-bottom:20px;
+}
+
+.tbg-left,
+.tbg-right{
+    display:flex;
+    flex-direction:column;
+}
+
+/* field */
+
+.tbg-field{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:18px;
+}
+
+.tbg-field label{
+    font-size:14px;
+    margin-bottom:6px;
+    font-weight:500;
+}
+
+.tbg-field input,
+.tbg-field select{
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:14px;
+    transition:all 0.2s;
+}
+
+.tbg-field input:focus,
+.tbg-field select:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 2px rgba(37,99,235,0.1);
+}
+
+/* readonly usage */
+
+.tbg-field input[readonly]{
+    background:#f9fafb;
+    font-weight:600;
+    color:#2563eb;
+}
+
+/* =========================
+GRID
+========================= */
+
+/* electric water */
+
+.tbg-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-top:10px;
+}
+
+/* =========================
+BUTTON
+========================= */
+
+.tbg-actions{
+    margin-top:25px;
+}
+
+.tbg-btn-generate{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:500;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:all 0.2s;
+}
+
+.tbg-btn-generate:hover{
+    background:#1e4ed8;
+    transform:translateY(-1px);
+}
+
+/* =========================
+ERROR
+========================= */
+.tbg-error{
+    margin-top:15px;
+    padding:10px 14px;
+    border-left:4px solid #dc2626;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:14px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.tbg-error::before{
+    content:"⚠";
+    font-size:16px;
+}

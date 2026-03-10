@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
-    <servlet-mapping>
-        <servlet-name>AdminCreateAccountController</servlet-name>
-        <url-pattern>/admin/accounts/create</url-pattern>
-    </servlet-mapping>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+    version="5.0">
+
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
     <!-- context param dẫn tới contact.properties ( file giống json )-->
     <context-param>
         <param-name>contact_props_path</param-name>
@@ -17,10 +18,6 @@
     <servlet>
         <servlet-name>HomeController</servlet-name>
         <servlet-class>Controllers.guest.HomeController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AdminCreateAccountController</servlet-name>
-        <servlet-class>Controllers.admin.AdminCreateAccountController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
@@ -249,5 +246,13 @@
     <servlet-mapping>
         <servlet-name>AdminRoomImageDeleteController</servlet-name>
         <url-pattern>/admin/rooms/images/delete</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminRestoreRoomController</servlet-name>
+        <servlet-class>Controllers.admin.AdminRestoreRoomController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminRestoreRoomController</servlet-name>
+        <url-pattern>/admin/rooms/restore</url-pattern>
     </servlet-mapping>
 </web-app>

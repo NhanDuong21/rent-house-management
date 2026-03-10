@@ -419,6 +419,34 @@ public class TenantDAO extends DBContext {
         return false;
     }
 
+    /**
+     * Kiểm tra xem tenant có hợp đồng nào KHÔNG phải ENDED hoặc CANCELLED
+     * không. Nếu có → không được LOCK tenant.
+     *
+     * @param tenantId ID của tenant cần kiểm tra
+     * @return true nếu tenant CÓ hợp đồng đang active (không thể lock), false
+     * nếu tất cả hợp đồng đã ENDED hoặc CANCELLED (hoặc không có hợp đồng nào)
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public boolean hasActiveContract(int tenantId) {
+        String sql = """
+            SELECT COUNT(*) FROM CONTRACT
+            WHERE tenant_id = ?
+              AND status NOT IN ('ENDED', 'CANCELLED')
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, tenantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     @SuppressWarnings("CallToPrintStackTrace")
     public boolean toggleStatus(int tenantId, String newStatus) {
         String sql = "UPDATE TENANT SET account_status = ?, updated_at = SYSDATETIME() WHERE tenant_id = ?";

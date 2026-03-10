@@ -154,6 +154,11 @@
     color: white;
 }
 
+.mb-badge.cancelled {
+    background: #6b7280; 
+    color: white;
+}
+
 /* VIEW BUTTON */
 .mb-view-btn {
     padding: 6px 12px;
@@ -168,7 +173,15 @@
 .mb-view-btn:hover {
     background: #e5e7eb;
 }
+.mb-badge.nopayment{
+    background:#eee;
+    color:#555;
+}
 
+.mb-badge.pending{
+    background:#fff3cd;
+    color:#856404;
+}
 /* EMPTY */
 .mb-empty {
     text-align: center;
@@ -199,5 +212,38 @@
     background: #2563eb;
     color: white;
     font-weight: bold;
+    pointer-events: none;
+}
+.mb-actions{
+    display:flex;
+    gap:6px;
+}
+
+/* style chung cho 2 nút */
+.mb-edit-btn,
+.mb-cancel-btn{
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+}
+
+/* màu riêng */
+.mb-edit-btn{
+    background: #3498db;
+}
+
+.mb-cancel-btn{
+    background: #e74c3c;
+}
+
+/* disabled giống nhau */
+.mb-edit-btn.disabled,
+.mb-cancel-btn.disabled{
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
     pointer-events: none;
 }

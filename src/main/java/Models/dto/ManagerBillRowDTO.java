@@ -21,11 +21,12 @@ public class ManagerBillRowDTO {
     private Date dueDate;
     private BigDecimal TotalAmount;
     private String status;
+    private String paymentStatus;
 
     public ManagerBillRowDTO() {
     }
 
-    public ManagerBillRowDTO(int billId, String roomNumber, Date month, String tenantName, String blockName, Date dueDate, BigDecimal TotalAmount, String status) {
+    public ManagerBillRowDTO(int billId, String roomNumber, Date month, String tenantName, String blockName, Date dueDate, BigDecimal TotalAmount, String status, String paymentStatus) {
         this.billId = billId;
         this.roomNumber = roomNumber;
         this.month = month;
@@ -34,8 +35,10 @@ public class ManagerBillRowDTO {
         this.dueDate = dueDate;
         this.TotalAmount = TotalAmount;
         this.status = status;
+        this.paymentStatus = paymentStatus;
     }
-
+    
+    
     public int getBillId() {
         return billId;
     }
@@ -100,12 +103,20 @@ public class ManagerBillRowDTO {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "ManagerBillRowDTO{" + "billId=" + billId + ", roomNumber=" + roomNumber + ", month=" + month + ", tenantName=" + tenantName + ", blockName=" + blockName + ", dueDate=" + dueDate + ", TotalAmount=" + TotalAmount + ", status=" + status + '}';
+    public String getPaymentStatus() {
+        return paymentStatus;
     }
 
-     
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "ManagerBillRowDTO{" + "billId=" + billId + ", roomNumber=" + roomNumber + ", month=" + month + ", tenantName=" + tenantName + ", blockName=" + blockName + ", dueDate=" + dueDate + ", TotalAmount=" + TotalAmount + ", status=" + status + ", paymentStatus=" + paymentStatus + '}';
+    }
+    
+    
     
 }
 

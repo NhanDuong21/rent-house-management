@@ -152,6 +152,15 @@ public class TenantService {
         if (t.getDateOfBirth().after(today)) {
             throw new IllegalArgumentException("Date of Birth không được lớn hơn ngày hiện tại.");
         }
+        // 6. Address
+        String address = t.getAddress();
+        if (address == null || address.trim().isEmpty()) {
+            throw new IllegalArgumentException("Address không được để trống.");
+        }
+    }
+
+    public boolean hasActiveContract(int id) {
+        return tenantDAO.hasActiveContract(id);
     }
 
 }

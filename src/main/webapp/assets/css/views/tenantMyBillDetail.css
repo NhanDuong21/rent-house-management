@@ -1,0 +1,300 @@
+/* ================================= */
+/* CONTAINER */
+/* ================================= */
+
+.tbd-container{
+    margin:auto;
+    padding:30px 20px;
+}
+
+/* ===============================
+   PAGE HEADER
+================================= */
+.tbd-pagehead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tbd-back {
+  text-decoration: none;
+  font-weight: 500;
+  color: #374151;
+}
+
+.tbd-back:hover {
+  color: #2563eb;
+}
+
+.tbd-breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.tbd-minihelp {
+  font-size: 13px;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #4338ca;
+}
+
+/* ================================= */
+/* CARD */
+/* ================================= */
+
+.tbd-card{
+    background:#ffffff;
+    border-radius:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.05);
+    margin-top: 10px;
+}
+
+.tbd-card-body{
+    padding:28px;
+}
+
+
+/* ================================= */
+/* TOP TITLE */
+/* ================================= */
+
+.tbd-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.tbd-title{
+    font-size:20px;
+    font-weight:700;
+    color:#111827;
+}
+
+.tbd-sub{
+    font-size:13px;
+    color:#6b7280;
+    margin-top:4px;
+}
+
+/* ================================= */
+/* BADGE */
+/* ================================= */
+
+.tbd-badge{
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.tbd-badge.paid{
+    background:#e6f4ea;
+    color:#166534;
+}
+
+.tbd-badge.unpaid{
+    background:#fdecea;
+    color:#b91c1c;
+}
+
+.tbd-badge.cancelled{
+    background:#f1f3f5;
+    color:#495057;
+}
+
+/* ================================= */
+/* SECTION BOX */
+/* ================================= */
+
+.modal-section{
+    background:#f8f9fb;
+    padding:25px 25px;
+    border-radius:16px;
+    margin:20px auto;  
+}
+
+.modal-section h4{
+    font-weight:600;
+    font-size:15px;
+    margin-top: 0px;
+    margin-bottom: 18px;
+    color:#374151;
+}
+/* ===============================
+   DIVIDER
+================================= */
+.tbd-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 20px 0;
+}
+
+.tbd-divider-soft {
+  background: #f3f4f6;
+}
+
+/* ================================= */
+/* INFO GRID */
+/* ================================= */
+
+.modal-info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap: 20px;
+}
+
+.modal-info-label{
+    color:#6b7280;
+    display: block;
+    margin-bottom:4px;
+    font-size: 14px;
+}
+
+.modal-info-value{
+    font-weight:600;
+}
+
+/* ================================= */
+/* BILL BREAKDOWN */
+/* ================================= */
+
+.tb-break-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    font-size:14px;
+}
+
+.tb-break-row:not(.tb-break-total){
+    border-bottom:1px solid #f1f3f5;
+}
+
+.tb-break-total{
+    font-weight:700;
+    font-size:16px;
+    padding-top:14px;
+    margin-top:10px;
+    border-top:2px solid #e5e7eb;
+}
+
+.tb-break-total span:last-child{
+    color:#2563eb;
+    font-size:17px;
+}
+
+/* ================================= */
+/* ALERT */
+/* ================================= */
+
+.alert{
+    padding:18px 20px;
+    border-radius:14px;
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    font-weight:500;
+    font-size:14px;
+}
+
+.alert-success{
+    background:#e6f4ea;
+    color:#166534;
+}
+
+.alert-secondary{
+    background:#f1f3f5;
+    color:#495057;
+}
+
+.alert-warning{
+    background:#fff3cd;
+    color:#856404;
+}
+
+/* ================================= */
+/* PAYMENT FORM */
+/* ================================= */
+
+.custom-modal label{
+    font-size:13px;
+    font-weight:500;
+    color:#374151;
+}
+
+.custom-modal select,
+select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid #d1d5db;
+    margin-top:8px;
+    margin-bottom:14px;
+    font-size:14px;
+    transition:0.2s ease;
+}
+
+select:focus{
+    outline:none;
+    border-color:#0d6efd;
+    box-shadow:0 0 0 3px rgba(13,110,253,0.15);
+}
+
+/* ================================= */
+/* BUTTON */
+/* ================================= */
+
+.submit-btn{
+    width:100%;
+    padding:11px;
+    border:none;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.submit-btn:hover{
+    background:#1e4fd6;
+}
+
+/* ================================= */
+/* QR */
+/* ================================= */
+
+.qr{
+    margin:10px 0 15px 0;
+    
+}
+
+.qr img{
+    border-radius:10px;
+    
+}
+.payment-alert {
+    margin-top: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px 14px;
+}
+
+.payment-alert.alert-info {
+    background-color: #f4f8ff;
+    border: 1px solid #d6e4ff;
+    color: #2c5aa0;
+}
+
+.payment-alert.alert-warning {
+    background-color: #fff8e6;
+    border: 1px solid #ffe0a3;
+    color: #9a6b00;
+}

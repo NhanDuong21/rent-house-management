@@ -1,0 +1,197 @@
+@import url("../base/bootstrap.min.css");
+
+.ml-container {
+  padding: 30px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* HEADER */
+
+.ml-header {
+  margin-bottom: 25px;
+}
+
+.ml-header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.ml-header p {
+  margin-top: 5px;
+  color: #6b7280;
+}
+
+/* CARD */
+
+.ml-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ml-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.ml-card-title {
+  font-weight: 800;
+}
+
+/* SEARCH */
+
+.ml-search-form {
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ml-search-form input {
+  border: none;
+  outline: none;
+  background: transparent;
+  min-width: 220px;
+  font-weight: 600;
+}
+
+.ml-search-ico {
+  color: #6b7280;
+}
+
+/* TABLE */
+
+.ml-table-wrap {
+  overflow-x: auto;
+}
+
+.ml-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ml-table th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 800;
+}
+
+.ml-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.ml-table tr:hover {
+  background: #f9fafb;
+}
+
+.ml-empty {
+  text-align: center;
+  padding: 20px;
+  color: #9ca3af;
+  font-weight: 700;
+}
+
+/* TEXT STYLE */
+
+.ml-mono {
+  font-family: monospace;
+  font-weight: 800;
+}
+
+.ml-room {
+  font-weight: 700;
+}
+
+.ml-desc {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* STATUS */
+
+.ml-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+}
+
+.status-PENDING {
+  background: #f59e0b;
+}
+
+.status-IN_PROGRESS {
+  background: #3b82f6;
+}
+
+.status-DONE {
+  background: #16a34a;
+}
+
+/* ACTION */
+
+.ml-action-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  background: #f9fafb;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.ml-action-btn:hover {
+  background: #e5e7eb;
+}
+
+/* PAGINATION */
+
+.ml-pager {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.ml-pagination {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 0;
+}
+
+.ml-pagination li a {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #111827;
+  font-weight: 700;
+}
+
+.ml-pagination li.active a {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+.ml-pagination li.disabled a {
+  opacity: 0.5;
+  pointer-events: none;
+}

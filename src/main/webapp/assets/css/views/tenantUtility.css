@@ -1,0 +1,107 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 5, 2026, 1:41:51 PM
+    Author     : Bui Nhu Y
+*/
+/* TENANT UTILITIES */
+.tu-container {
+    padding: 40px 60px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* HEADER */
+.tu-header {
+    margin-bottom: 40px;
+}
+.tu-header h2 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: 700;
+}
+.tu-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+/* BANNER */
+.tu-banner {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 30px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 36px;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+}
+.tu-banner h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+}
+.tu-banner p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    max-width: 700px;
+}
+.tu-manage-btn {
+    background: #2563eb;
+    color: white;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+.tu-manage-btn:hover {
+    background: #1e40af;
+}
+
+/* CARDS */
+.tu-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.tu-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+    transition: 0.2s;
+}
+.tu-card:hover {
+    box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+    transform: translateY(-2px);
+}
+.tu-card-icon {
+    font-size: 36px;
+    margin-bottom: 14px;
+}
+.tu-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.tu-card-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+    text-align: center;
+}
