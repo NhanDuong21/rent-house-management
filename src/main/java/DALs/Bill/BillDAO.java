@@ -392,7 +392,7 @@ public class BillDAO extends DBContext {
     }
     //tạo bill đầu tháng(chỉ insert tiền phòng + wifi,  null didenj nước)
 
-    public int createDraftBill(int roomId, int month, int year) throws SQLException {
+    public int createDraftBill(int roomId, int month, int year , Date dueDate) throws SQLException {
         int contractId = getActiveContractByRoom(roomId);
         if (contractId == -1) {
             throw new SQLException("No active contract");
@@ -401,8 +401,6 @@ public class BillDAO extends DBContext {
         connection.setAutoCommit(false);
 
         try {
-            Date dueDate = Date.valueOf(year + "-" + String.format("%02d", month) + "-05");
-
             int billId = insertBill(contractId, billMonth, dueDate, 0, 0, 0, 0);
 
             BigDecimal roomPrice = getRoomPrice(contractId);

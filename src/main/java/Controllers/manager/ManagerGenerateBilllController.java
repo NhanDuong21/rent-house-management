@@ -97,7 +97,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         }
 
         // CREATE BILL
-        dao.createDraftBill(roomId, month, year);
+        dao.createDraftBill(roomId, month, year, java.sql.Date.valueOf(dueDate));
         response.sendRedirect(request.getContextPath() + "/manager/billing");
 
     } catch (Exception e) {

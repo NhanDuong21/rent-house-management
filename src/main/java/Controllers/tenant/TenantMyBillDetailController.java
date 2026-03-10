@@ -53,7 +53,7 @@ public class TenantMyBillDetailController extends HttpServlet {
         }
         //lay ngay tháng hien tai
         //LocalDate today = LocalDate.now();
-        LocalDate today = LocalDate.of(2026, 4, 10);
+        LocalDate today = LocalDate.now();
         // lay tháng bill
         LocalDate billMonth = billDetail.getBillMonth().toLocalDate();
         

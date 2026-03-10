@@ -79,9 +79,9 @@
                             <td>
                                 <c:choose>
 
-                                    <c:when test="${empty payment.billMonth}"> Deposit </c:when>
+                                    <c:when test="${empty p.billMonth}"> Deposit </c:when>
                                     <c:otherwise>
-                                        <fmt:formatDate value="${payment.billMonth}" pattern="MMM yyyy"/>
+                                        <fmt:formatDate value="${p.billMonth}" pattern="MMM yyyy"/>
                                     </c:otherwise>
 
                                 </c:choose>
