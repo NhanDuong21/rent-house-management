@@ -61,7 +61,7 @@ public class TenantUtilityController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         utilitiesDAO dao = new utilitiesDAO();
-        List<Utility> utility = dao.getManagerUntilities();
+        List<Utility> utility = dao.getExtraUtility();
         request.setAttribute("utility", utility);
         request.getRequestDispatcher("/views/tenant/tenantUtility.jsp").forward(request, response);
     }

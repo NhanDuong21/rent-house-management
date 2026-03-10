@@ -152,4 +152,32 @@ public class utilitiesDAO extends DBContext {
         return false;
     }
 
+    public List<Utility> getExtraUtility() {
+        List<Utility> list = new ArrayList<>();
+        String sql = "SELECT [utility_id],\n"
+                + "[utility_name], [unit], [standard_price], [is_active]\n"
+                + ", [status]\n"
+                + "FROM [dbo].[UTILITY]\n"
+                + "WHERE [utility_name] not like '%Electric%'\n"
+                + "AND [utility_name] not like '%Water%'\n"
+                + "AND [utility_name] not like '%Internet%'\n"
+                + "ORDER BY utility_id";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Utility u = new Utility();
+                u.setUtilityId(rs.getInt("utility_id"));
+                u.setUtilityName(rs.getString("utility_name"));
+                u.setUnit(rs.getString("unit"));
+                u.setStandardPrice(rs.getBigDecimal("standard_price"));
+                u.setActive(rs.getBoolean("is_active"));
+                u.setStatus(rs.getString("status"));
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
