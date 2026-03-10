@@ -16,11 +16,37 @@ public class AdminRoomImageDeleteController extends HttpServlet {
 
     private final RoomImageDAO imgDao = new RoomImageDAO();
 
+    private String getSourceUploadPath() {
+        return getServletContext().getInitParameter("roomImageSourceDir");
+    }
+
+    private String getRuntimeUploadPath(HttpServletRequest req) {
+        return req.getServletContext().getRealPath("/assets/images/rooms");
+    }
+
+    private void deleteIfExists(String folderPath, String filename) {
+        if (folderPath == null || folderPath.isBlank()) {
+            return;
+        }
+
+        File file = new File(folderPath, filename);
+        if (file.exists() && file.isFile()) {
+            file.delete();
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        int imageId = Integer.parseInt(req.getParameter("imageId"));
-        String filename = req.getParameter("filename"); // để xóa file vật lý 
+        int imageId;
+        try {
+            imageId = Integer.parseInt(req.getParameter("imageId"));
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/admin/rooms?err=invalid_image");
+            return;
+        }
+
+        String filename = req.getParameter("filename");
 
         Integer roomId = imgDao.deleteImageReturnRoomId(imageId);
         if (roomId == null) {
@@ -29,11 +55,10 @@ public class AdminRoomImageDeleteController extends HttpServlet {
         }
 
         if (filename != null && !filename.isBlank()) {
-            String path = req.getServletContext().getRealPath("/assets/images/rooms/" + filename);
-            File f = new File(path);
-            if (f.exists()) {
-                f.delete();
-            }
+            filename = new File(filename).getName();
+
+            deleteIfExists(getSourceUploadPath(), filename);
+            deleteIfExists(getRuntimeUploadPath(req), filename);
         }
 
         resp.sendRedirect(req.getContextPath() + "/admin/rooms/edit?id=" + roomId + "&msg=img_deleted");

@@ -18,10 +18,20 @@ public class AdminRoomImageSetCoverController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        int roomId = Integer.parseInt(req.getParameter("roomId"));
-        int imageId = Integer.parseInt(req.getParameter("imageId"));
+        int roomId;
+        int imageId;
+
+        try {
+            roomId = Integer.parseInt(req.getParameter("roomId"));
+            imageId = Integer.parseInt(req.getParameter("imageId"));
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/admin/rooms?err=invalid_data");
+            return;
+        }
 
         boolean ok = imgDao.setCover(roomId, imageId);
-        resp.sendRedirect(req.getContextPath() + "/admin/rooms/edit?id=" + roomId + (ok ? "&msg=cover_set" : "&err=cover_fail"));
+
+        resp.sendRedirect(req.getContextPath() + "/admin/rooms/edit?id=" + roomId + (ok ? "&msg=cover_set" : "&err=cover_fail")
+        );
     }
 }

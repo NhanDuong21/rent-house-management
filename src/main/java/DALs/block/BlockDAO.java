@@ -53,4 +53,46 @@ public class BlockDAO extends DBContext {
             return false;
         }
     }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public int insertAndReturnId(String blockName) {
+
+        String sql = "INSERT INTO BLOCK(block_name) VALUES (?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, blockName);
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    @SuppressWarnings("CallToPrintStackTrace")
+    public Integer findIdByName(String blockName) {
+        String sql = "SELECT block_id FROM BLOCK WHERE LOWER(block_name) = LOWER(?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, blockName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("block_id");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

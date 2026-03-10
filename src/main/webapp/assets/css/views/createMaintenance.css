@@ -1,0 +1,151 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 9, 2026, 1:29:21 PM
+    Author     : truon
+*/
+.create-maintenance-wrapper {
+    min-height: calc(100vh - 120px);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-maintenance-card {
+    width: 480px;
+    background: white;
+    padding: 28px 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+}
+
+.create-maintenance-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #0f172a;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #334155;
+}
+
+.hint {
+    font-weight: 400;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color .2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.file-input {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+/* CATEGORY RADIO GROUP */
+.category-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.category-radio {
+    display: none;
+}
+
+.category-label {
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: .25s;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.category-label:hover {
+    border-color: #93c5fd;
+}
+
+.category-radio:checked + .category-label {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+/* ACTIONS */
+.create-maintenance-actions {
+    margin-top: 22px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-save {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-save:hover {
+    background: #2563eb;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+}

@@ -1,0 +1,259 @@
+@import url("../base/bootstrap.min.css");
+
+.mlt-container {
+  padding: 30px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* HEADER */
+.mlt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mlt-header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mlt-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* PRIMARY BUTTON */
+.mlt-primary-btn {
+  background: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mlt-primary-btn:hover {
+  background: #1e40af;
+  color: #fff;
+}
+
+.mlt-btn-ico {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mlt-btn-ico i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* CARD */
+.mlt-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mlt-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mlt-card-title {
+  font-weight: 800;
+  color: #111827;
+}
+
+/* TABLE */
+.mlt-table-wrap {
+  overflow-x: auto;
+}
+
+.mlt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mlt-table th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 800;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.mlt-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f1f1;
+  vertical-align: middle;
+}
+
+.mlt-table tr:hover {
+  background: #f9fafb;
+}
+
+.mlt-empty {
+  text-align: center;
+  padding: 20px;
+  color: #9ca3af;
+  font-weight: 700;
+}
+
+/* TEXT */
+.mlt-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
+}
+
+.mlt-room {
+  font-weight: 700;
+}
+
+.mlt-desc {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* BADGE */
+.mlt-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.mlt-badge.status-PENDING {
+  background: #f59e0b;
+}
+
+.mlt-badge.status-IN_PROGRESS {
+  background: #3b82f6;
+}
+
+.mlt-badge.status-DONE {
+  background: #16a34a;
+}
+
+.mlt-badge.status-REJECTED {
+  background: #ef4444;
+}
+
+/* ACTION BUTTON */
+.mlt-action-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  background: #f9fafb;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  text-decoration: none;
+}
+
+.mlt-action-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* PAGINATION */
+.mlt-pager {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mlt-pagination {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mlt-pagination li {
+  display: inline-flex;
+}
+
+.mlt-pagination li a {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #111827;
+  font-weight: 800;
+  background: #fff;
+  min-width: 40px;
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mlt-pagination li a:hover {
+  background: #f3f4f6;
+}
+
+.mlt-pagination li.active a {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.mlt-pagination li.disabled a {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* MOBILE */
+@media (max-width: 576px) {
+  .mlt-container {
+    padding: 20px;
+  }
+
+  .mlt-header h2 {
+    font-size: 22px;
+  }
+
+  .mlt-primary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mlt-desc {
+    max-width: 180px;
+  }
+}

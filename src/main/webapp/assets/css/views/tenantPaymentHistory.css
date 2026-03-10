@@ -1,0 +1,195 @@
+.tph-container {
+    padding: 30px;
+}
+
+/* HEADER */
+.tph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.tph-header h1 {
+    font-size: 2.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.tph-sub {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.tph-tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tph-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    background: #f1f3f5;
+    color: #333;
+    font-weight: 500;
+}
+
+.tph-tab.active {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* CARD */
+.tph-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* TABLE */
+.tph-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tph-table thead {
+    background: #f8f9fa;
+    text-align: center;
+}
+
+.tph-table th {
+    padding: 14px;
+    font-size: 14px;
+    text-align: left;
+    color: #6c757d;
+}
+
+.tph-table td {
+    padding: 14px;
+    font-size: 14px;
+    border-top: 1px solid #f1f3f5;
+}
+
+.tph-table tr:hover {
+    background: #f9fbff;
+}
+
+.amount {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* BADGE */
+.tph-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tph-badge.confirmed {
+    background: #e6f4ea;
+    color: #16a34a;
+}
+
+.tph-badge.pending {
+    background: #fff3cd;
+    color: #d97706;
+}
+
+.tph-badge.rejected {
+    background: #fdecea;
+    color: #dc3545;
+}
+
+/* VIEW BUTTON */
+.tph-view-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: #0d6efd;
+    color: white;
+    font-size: 13px;
+}
+
+.tph-view-btn:hover {
+    background: #0b5ed7;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+}
+/* ================= MOBILE CARD LAYOUT ================= */
+@media (max-width: 768px) {
+
+    .tph-table,
+    .tph-table thead,
+    .tph-table tbody,
+    .tph-table th,
+    .tph-table td,
+    .tph-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ẩn header table */
+    .tph-table thead {
+        display: none;
+    }
+
+    /* mỗi row thành card */
+    .tph-table tr {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .tph-table td {
+        border: none;
+        padding: 8px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* label bên trái */
+    .tph-table td::before {
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    /* label cho từng cột */
+    .tph-table td:nth-child(1)::before {
+        content: "Bill";
+    }
+
+    .tph-table td:nth-child(2)::before {
+        content: "Amount";
+    }
+
+    .tph-table td:nth-child(3)::before {
+        content: "Date";
+    }
+
+    .tph-table td:nth-child(4)::before {
+        content: "Status";
+    }
+
+    .tph-table td:nth-child(5)::before {
+        content: "Action";
+    }
+
+    /* button */
+    .tph-view-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+}
