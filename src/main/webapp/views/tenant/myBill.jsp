@@ -414,19 +414,13 @@
 
                     <c:when test="${Bill.status eq 'UNPAID'}">
 
-                        <c:if test="${not empty pendingPayment && allowPayment}">
+                        <c:if test="${not empty pendingPayment}">
                             <div class="alert alert-warning payment-alert">
                                 Payment is waiting for manager confirmation.
                             </div>
                         </c:if>
 
-                        <c:if test="${!allowPayment}">
-                            <div class="alert alert-info payment-alert">
-                                Payment will be available next month.
-                            </div>
-                        </c:if>
-
-                        <c:if test="${empty pendingPayment && allowPayment}">
+                        <c:if test="${empty pendingPayment}">
                             <form action="${pageContext.request.contextPath}/tenant/payment"
                                   method="post">
                                 <input type="hidden" name="billId" value="${Bill.billId}">
