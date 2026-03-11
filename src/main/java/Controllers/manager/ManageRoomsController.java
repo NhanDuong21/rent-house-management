@@ -25,24 +25,22 @@ public class ManageRoomsController extends HttpServlet {
             throws ServletException, IOException {
 
         ManageRoomsDAO dao = new ManageRoomsDAO();
-        String action = request.getParameter("action");
-        if ("edit".equals(action)) {
-            showEditRoom(request, response, dao);
-            return;
-        }
+
         int pageIndex = 1;
         int pageSize = 10;
+
         String page = request.getParameter("page");
 
         if (page != null) {
             try {
                 pageIndex = Integer.parseInt(page);
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 pageIndex = 1;
             }
         }
 
         int totalRoom = dao.countRoom();
+
         int totalPage = (int) Math.ceil((double) totalRoom / pageSize);
 
         if (totalPage == 0) {
@@ -57,10 +55,10 @@ public class ManageRoomsController extends HttpServlet {
             pageIndex = totalPage;
         }
 
-        List<Room> Rooms = dao.fetchAllRoom(pageIndex, pageSize);
+        List<Room> rooms = dao.fetchAllRoom(pageIndex, pageSize);
 
+        request.setAttribute("Rooms", rooms);
         request.setAttribute("totalRoom", totalRoom);
-        request.setAttribute("Rooms", Rooms);
         request.setAttribute("pageIndex", pageIndex);
         request.setAttribute("totalPage", totalPage);
 
@@ -75,32 +73,30 @@ public class ManageRoomsController extends HttpServlet {
         ManageRoomsDAO dao = new ManageRoomsDAO();
 
         try {
+
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             String status = request.getParameter("status");
+
             Room room = dao.getRoomById(roomId);
 
-            if (room != null && "OCCUPIED".equalsIgnoreCase(room.getStatus()) || "INACTIVE".equalsIgnoreCase(room.getStatus())) {
-                request.setAttribute("error", "Room is OCCUPIED or INACTIVE and cannot be edited");
-                request.setAttribute("room", room);
-                request.getRequestDispatcher("/views/manager/editRoom.jsp")
-                        .forward(request, response);
+            if (room == null) {
+                response.sendError(404);
                 return;
             }
+
+            if ("OCCUPIED".equalsIgnoreCase(room.getStatus())
+                    || "INACTIVE".equalsIgnoreCase(room.getStatus())) {
+
+                response.sendError(403);
+                return;
+            }
+
             dao.updateRoomStatus(roomId, status);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        response.sendRedirect(request.getContextPath() + "/manager/rooms");
-    }
-
-    private void showEditRoom(HttpServletRequest request, HttpServletResponse response, ManageRoomsDAO dao)
-            throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        Room room = dao.getRoomById(id);
-        request.setAttribute("room", room);
-        request.getRequestDispatcher("/views/manager/editRoom.jsp")
-                .forward(request, response);
+        response.setStatus(200);
     }
 }
