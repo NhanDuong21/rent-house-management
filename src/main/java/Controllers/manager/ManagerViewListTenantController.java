@@ -35,7 +35,6 @@ public class ManagerViewListTenantController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -48,90 +47,21 @@ public class ManagerViewListTenantController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Tự động đồng bộ status tenant dựa trên hợp đồng trước khi hiển thị danh sách.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         TenantService service = new TenantService();
-        List<Tenant> list;
 
-        // Xử lý toggle status
-        String action = request.getParameter("action");
-        if ("toggleStatus".equals(action)) {
-            String idStr = request.getParameter("id");
-            String keyword = request.getParameter("keyword");
-            String pageStr = request.getParameter("page");
-
-            try {
-                int id = Integer.parseInt(idStr);
-                Tenant tenant = service.findById(id);
-
-                // Nếu đang ACTIVE → muốn chuyển sang LOCKED → kiểm tra contract
-                if (tenant != null && "ACTIVE".equals(tenant.getAccountStatus())) {
-                    if (service.hasActiveContract(id)) {
-                        // Tenant còn hợp đồng chưa kết thúc → không cho phép LOCK
-                        // Forward lại trang với thông báo lỗi
-                        int currentPageErr = 1;
-                        if (pageStr != null) {
-                            try { currentPageErr = Math.max(1, Integer.parseInt(pageStr)); }
-                            catch (NumberFormatException ignored) {}
-                        }
-
-                        int totalRecords;
-                        List<Tenant> listErr;
-                        final int PAGE_SIZE = 10;
-                        if (keyword == null || keyword.trim().isEmpty()) {
-                            keyword = null;
-                            listErr = service.getTenantsPaged(currentPageErr, PAGE_SIZE);
-                            totalRecords = service.countAllTenants();
-                        } else {
-                            listErr = service.searchTenantPaged(keyword, currentPageErr, PAGE_SIZE);
-                            totalRecords = service.countSearchTenant(keyword);
-                        }
-                        int totalPagesErr = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
-                        if (totalPagesErr < 1) totalPagesErr = 1;
-
-                        request.setAttribute("tenants", listErr);
-                        request.setAttribute("keyword", keyword);
-                        request.setAttribute("currentPage", currentPageErr);
-                        request.setAttribute("totalPages", totalPagesErr);
-                        request.setAttribute("totalRecords", totalRecords);
-                        request.setAttribute("lockError",
-                                "Cannot lock tenant \"" + tenant.getFullName()
-                                + "\" because they still have an active contract. "
-                                + "Please ensure all contracts are ENDED or CANCELLED first.");
-
-                        request.getRequestDispatcher("/views/manager/managerTenant.jsp")
-                                .forward(request, response);
-                        return;
-                    }
-                }
-
-                service.toggleStatus(id);
-            } catch (NumberFormatException ignored) {
-            }
-
-            String redirect = request.getContextPath() + "/manager/tenants";
-            boolean hasQuery = false;
-            if (keyword != null && !keyword.isBlank()) {
-                redirect += "?keyword=" + java.net.URLEncoder.encode(keyword, "UTF-8");
-                hasQuery = true;
-            }
-            if (pageStr != null && !pageStr.isBlank()) {
-                redirect += (hasQuery ? "&" : "?") + "page=" + pageStr;
-            }
-            response.sendRedirect(redirect);
-            return;
-        }
+        // Tự động cập nhật status toàn bộ tenant dựa trên điều kiện hợp đồng
+        // - Có contract active (không phải ENDED/CANCELLED) → ACTIVE
+        // - Không có contract active → LOCKED
+        // - PENDING giữ nguyên
+        service.syncAllTenantStatuses();
 
         String keyword = request.getParameter("keyword");
         final int PAGE_SIZE = 10;
@@ -144,7 +74,9 @@ public class ManagerViewListTenantController extends HttpServlet {
             catch (NumberFormatException ignored) {}
         }
 
+        List<Tenant> list;
         int totalRecords;
+
         if (keyword == null || keyword.trim().isEmpty()) {
             keyword = null;
             list = service.getTenantsPaged(currentPage, PAGE_SIZE);
@@ -169,11 +101,6 @@ public class ManagerViewListTenantController extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -183,12 +110,10 @@ public class ManagerViewListTenantController extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }
