@@ -270,4 +270,16 @@ public class StaffDAO extends DBContext {
         }
         return null;
     }
+
+   public Integer findStaffIdByEmail(String email) {
+    String sql = "SELECT staff_id FROM STAFF WHERE email = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, email);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt("staff_id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;}
 }

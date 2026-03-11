@@ -6,28 +6,31 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Created on : Mar 5, 2026, 1:41:51 PM
     Author     : Bui Nhu Y
 */
-/* TENANT UTILITIES */
-.tu-container {
+/* TENANT UTILITIES - MAIN CONTAINER */
+.mb-container {
     padding: 40px 60px;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* HEADER */
+/* ==================== HEADER ==================== */
 .tu-header {
     margin-bottom: 40px;
 }
+
 .tu-header h2 {
     margin: 0;
     font-size: 40px;
     font-weight: 700;
+    color: #111827;
 }
+
 .tu-header p {
     margin: 6px 0 0;
     color: #6b7280;
     font-size: 15px;
 }
 
-/* BANNER */
+/* ==================== BANNER ==================== */
 .tu-banner {
     background: #ffffff;
     border: 1px solid #e5e7eb;
@@ -38,19 +41,24 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     align-items: flex-start;
     gap: 22px;
     margin-bottom: 36px;
-    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
 }
+
 .tu-banner h4 {
     margin: 0 0 8px;
     font-size: 16px;
     font-weight: 700;
+    color: #111827;
 }
+
 .tu-banner p {
     margin: 0;
     color: #6b7280;
     font-size: 14px;
     max-width: 700px;
 }
+
+/* ==================== MANAGE BUTTON ==================== */
 .tu-manage-btn {
     background: #2563eb;
     color: white;
@@ -61,37 +69,56 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     font-size: 14px;
     cursor: pointer;
     white-space: nowrap;
-    transition: 0.2s;
+    transition: background-color 0.2s ease;
 }
+
 .tu-manage-btn:hover {
     background: #1e40af;
 }
 
-/* CARDS */
+.tu-manage-btn:active {
+    transform: scale(0.98);
+}
+
+/* ==================== CARDS GRID ==================== */
 .tu-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
+    margin-bottom: 40px;
 }
+
+/* Individual Card */
 .tu-card {
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 16px;
-    padding: 30px 24px;
+    padding: 40px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
-    transition: 0.2s;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
+
 .tu-card:hover {
-    box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
     transform: translateY(-2px);
+    border-color: #d1d5db;
 }
+
+/* Card Icon */
 .tu-card-icon {
     font-size: 36px;
     margin-bottom: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+/* Card Name */
 .tu-card-name {
     font-size: 16px;
     font-weight: 700;
@@ -99,9 +126,238 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     margin-bottom: 10px;
     text-align: center;
 }
+
+/* Card Price */
 .tu-card-price {
     font-size: 18px;
     font-weight: 700;
     color: #2563eb;
     text-align: center;
+}
+
+/* ==================== MODAL - MANAGE SERVICES ==================== */
+.tu-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.tu-modal-overlay.active {
+    display: flex;
+}
+
+.tu-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Header */
+.tu-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.tu-modal-header h4 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 18px;
+    color: #111827;
+}
+
+.tu-modal-header small {
+    color: #6b7280;
+    font-size: 13px;
+    display: block;
+    margin-top: 4px;
+}
+
+.tu-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.tu-modal-close:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+/* Modal Description */
+.tu-modal-description {
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+}
+
+/* Modal Utilities List */
+.tu-utilities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+/* Modal Utility Item */
+.tu-utility-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.tu-utility-label:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.tu-utility-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2563eb;
+}
+
+.tu-utility-label input[type="checkbox"]:checked ~ div .tu-utility-name {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.tu-utility-icon {
+    font-size: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tu-utility-info {
+    flex: 1;
+}
+
+.tu-utility-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #111827;
+    margin: 0;
+}
+
+.tu-utility-price {
+    color: #6b7280;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+/* Modal Footer - Buttons */
+.tu-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.tu-btn-cancel {
+    padding: 10px 22px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.tu-btn-cancel:hover {
+    background: #f9fafb;
+    border-color: #bbb;
+}
+
+.tu-btn-confirm {
+    padding: 10px 22px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.tu-btn-confirm:hover {
+    background: #16a34a;
+}
+
+.tu-btn-confirm:active {
+    transform: scale(0.98);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1024px) {
+    .tu-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mb-container {
+        padding: 30px 40px;
+    }
+}
+
+@media (max-width: 640px) {
+    .tu-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .tu-banner {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .tu-manage-btn {
+        width: 100%;
+    }
+
+    .tu-modal-content {
+        width: 90%;
+        max-width: 100%;
+    }
+
+    .mb-container {
+        padding: 20px;
+    }
+
+    .tu-header h2 {
+        font-size: 28px;
+    }
 }

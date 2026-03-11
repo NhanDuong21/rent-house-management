@@ -585,4 +585,19 @@ public class TenantDAO extends DBContext {
         return 0;
     }
 
+    public Integer findTenantIdByEmail(String email) {
+        String sql = "SELECT tenant_id FROM TENANT WHERE email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("tenant_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

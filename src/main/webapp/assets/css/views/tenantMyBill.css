@@ -1,0 +1,923 @@
+.tb-container {
+    padding: 30px;
+    padding-top: 0px;
+    min-height: calc(100vh - 80px); /* giả sử navbar/header ~80px, điều chỉnh nếu khác */
+}
+
+/* HEADER */
+.tb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.tb-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: #111827;
+}
+
+.tb-sub {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.tb-tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tb-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    background: #f1f3f5;
+    color: #333;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.tb-tab:hover {
+    background: #e2e6ea;
+}
+
+.tb-tab.active {
+    background: #0d6efd;
+    color: white;
+}
+
+/* GRID */
+.tb-grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 15px;
+    align-items: start;
+}
+/* LEFT CARD */
+.tb-card {
+    background: white;
+    padding: 7px 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.tb-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.tb-card-header h3{
+    margin-bottom: 7px;
+}
+.tb-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 13px 0;
+}
+
+.tb-divider.soft {
+    background: #f1f3f5;
+}
+
+/* BILL INFO */
+.tb-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+    margin-top: 10px;
+}
+
+.tb-line {
+    font-size: 14px;
+}
+
+.tb-label {
+    color: #6b7280;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.tb-value {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* TOTAL BOX */
+.tb-total-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f3f4f6;
+    padding: 10px 10px;
+    border-radius: 14px;
+    margin-top: 8px;
+}
+
+.tb-total-label {
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+}
+
+.tb-total-value {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+/* BADGE */
+.tb-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tb-badge.paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.tb-badge.unpaid {
+    background: #fdecea;
+    color: #dc3545;
+}
+
+
+.tb-badge.cancelled {
+    background: #6c757d;
+    color: white;
+}
+
+/* STATUS BOX */
+.tb-paid-box {
+    padding: 13px 18px;
+    border-radius: 14px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* ICON */
+.tb-paid-icon {
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+
+
+
+/* PAID */
+.tb-paid-box.success {
+    background: #e6f4ea;
+}
+
+.tb-paid-box.success .tb-paid-icon {
+    background: #16a34a;
+}
+
+.tb-paid-box.success .tb-paid-title {
+    color: #166534;
+}
+
+.tb-paid-box.success .tb-paid-sub {
+    color: #15803d;
+}
+
+/* UNPAID */
+.tb-paid-box.danger {
+    background: #fdecea;
+}
+
+.tb-paid-box.danger .tb-paid-icon {
+    background: #dc3545;
+}
+
+.tb-paid-box.danger .tb-paid-title {
+    color: #b02a37;
+}
+
+.tb-paid-box.danger .tb-paid-sub {
+    color: #dc3545;
+}
+
+/* WARNING - NO BILL */
+.tb-paid-box.warning {
+    background: #fff4e5;
+}
+
+.tb-paid-box.warning .tb-paid-icon {
+    background: #f59e0b;
+}
+
+.tb-paid-box.warning .tb-paid-title {
+    color: #92400e;
+}
+
+.tb-paid-box.warning .tb-paid-sub {
+    color: #b45309;
+}
+
+/* CANCELLED */
+.tb-paid-box.cancelled {
+    background: #f1f3f5;
+}
+
+.tb-paid-box.cancelled .tb-paid-icon {
+    background: #6c757d;
+}
+
+.tb-paid-box.cancelled .tb-paid-title {
+    color: #495057;
+}
+
+.tb-paid-box.cancelled .tb-paid-sub {
+    color: #6c757d;
+}
+
+/* VIEW DETAIL BUTTON */
+.tb-detail-btn {
+    display: block;
+    margin: 10px 0px 10px auto;
+    padding: 10px 20px;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.tb-detail-btn:hover {
+    background-color: #0b5ed7;
+    color: #fff;
+}
+
+/* SUMMARY SIDE */
+.tb-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tb-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 140px;
+    padding: 22px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    transition: all 0.25s ease;
+    
+}
+
+.tb-summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+.tb-summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.tb-summary-label {
+    font-size: 14px;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.tb-summary-card h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.tb-summary-card h5 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.tb-summary-card .tb-payment-amount {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #198754;
+}
+
+.tb-no-payment {
+    font-size: 14px;
+    color: #6c757d;
+    font-style: italic;
+}
+.tb-summary-card.unpaid-list {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.tb-unpaid-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tb-unpaid-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    padding: 12px 14px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.tb-unpaid-item:hover {
+    background: #eef2ff;
+}
+
+.tb-mini-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.empty-state {
+    text-align: center;
+}
+
+.tb-empty {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f0fdf4;
+    color: #15803d;
+    font-weight: 500;
+}
+
+.tb-mini-btn:hover {
+    background: #1d4ed8;
+}
+.tb-mini-btn:hover {
+    background: #0b5ed7;
+}
+/* COLORS */
+.tb-summary-card.danger .tb-summary-icon {
+    background: #fdecea;
+    color: #dc3545;
+}
+
+.tb-summary-card.success .tb-summary-icon {
+    background: #e6f4ea;
+    color: #198754;
+}
+
+.tb-summary-card.primary .tb-summary-icon {
+    background: #e7f1ff;
+    color: #0d6efd;
+}
+
+.tb-summary-card.secondary .tb-summary-icon {
+    background: #f1f3f5;
+    color: #6c757d;
+}
+
+/* ============================= */
+/* MODAL OVERLAY + SCROLL FIX   */
+/* ============================= */
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;           /* ngăn scroll nền khi modal mở */
+}
+
+.custom-modal-content {
+    position: relative;
+    background: #ffffff;
+    width: 620px;
+    max-width: 94vw;
+    max-height: 92vh;           /* ← giới hạn chiều cao modal */
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 50px -12px rgba(0,0,0,0.25);
+    overflow-y: auto;           /* ← scroll chính ở đây */
+    overscroll-behavior: contain; /* mượt hơn trên mobile */
+    animation: fadeIn 0.25s ease;
+}
+
+/* Scrollbar đẹp (tùy chọn) */
+.custom-modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-modal-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+.custom-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
+
+.custom-modal-header {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.custom-modal-header h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.close-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #6b7280;
+    transition: 0.2s ease;
+}
+
+.close-btn:hover {
+    color: #dc3545;
+}
+
+/* ============================= */
+/* SECTION BOX */
+/* ============================= */
+
+.modal-section {
+    background: #f8f9fb;
+    padding: 20px 22px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+}
+
+.modal-section h6 {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 18px;
+    color: #374151;
+}
+
+/* ============================= */
+/* BILL INFO GRID */
+/* ============================= */
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 45px;
+}
+
+.modal-info-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.modal-info-value {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+/* ============================= */
+/* BREAKDOWN - SCROLL NẾU DÀI   */
+/* ============================= */
+
+.custom-modal-body {
+    margin-top: 10px;
+    max-height: 58vh;           
+    overflow-y: auto;
+    margin-right: -10px;       
+    padding-right: 10px;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Scrollbar đẹp cho breakdown */
+.custom-modal-body::-webkit-scrollbar {
+    width: 5px;
+}
+.custom-modal-body::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 999px;
+}
+
+.tb-break-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.tb-break-row:not(.tb-break-total) {
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.tb-break-total {
+    font-weight: 700;
+    font-size: 16px;
+    padding-top: 14px;
+    margin-top: 10px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.tb-break-total span:last-child {
+    color: #2563eb;
+    font-size: 17px;
+}
+/* ============================= */
+/* BILL STATUS ALERT (CUSTOM)   */
+/* ============================= */
+
+.alert {
+    padding: 18px 20px;
+    border-radius: 14px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;   /* xếp dọc */
+    align-items: center;
+    text-align: center;
+    font-weight: 500;
+    font-size: 14px;
+    gap: 6px;
+}
+
+/* PAID */
+.alert-success {
+    background: #e6f4ea;
+    color: #166534;
+}
+
+/* CANCELLED */
+.alert-secondary {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+/* WAITING CONFIRM */
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+/* ============================= */
+/* PAYMENT FORM */
+/* ============================= */
+
+.custom-modal form {
+    margin-top: 20px;
+}
+
+.custom-modal label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.custom-modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    margin-top: 8px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.custom-modal select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+
+/* ============================= */
+/* SUBMIT BUTTON */
+/* ============================= */
+
+.submit-btn {
+    width: 100%;
+    margin-top: 5px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 12px;
+    border: none;
+    background: #0d6efd;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+}
+
+/* ===== BILL SECTION ===== */
+.bill-section {
+    margin-top: 30px;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.bill-header {
+    margin-bottom: 20px;
+}
+
+.bill-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* ===== TABLE ===== */
+.bill-table-wrapper {
+    overflow-x: auto;
+}
+
+.bill-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.bill-table thead {
+    background: #f4f6f9;
+}
+
+.bill-table th {
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.bill-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.bill-table tr:hover {
+    background: #f9fbff;
+    transition: 0.2s;
+}
+
+.amount {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* ===== STATUS BADGE ===== */
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status.paid {
+    background: #e8f8f1;
+    color: #27ae60;
+}
+
+.status.unpaid {
+    background: #fff4e5;
+    color: #f39c12;
+}
+
+.status.cancelled {
+    background: #fdecea;
+    color: #e74c3c;
+}
+
+/* PAYMENT BADGE */
+
+.mb-badge{
+padding:4px 10px;
+border-radius:6px;
+font-size:12px;
+font-weight:600;
+display:inline-block;
+}
+
+/* no request */
+.mb-badge.nopayment{
+background:#f1f1f1;
+color:#666;
+}
+
+/* pending */
+.mb-badge.pending{
+background:#fff3cd;
+color:#856404;
+}
+
+/* confirmed */
+.mb-badge.paid{
+background:#d4edda;
+color:#155724;
+}
+
+/* rejected */
+.mb-badge.cancelled{
+background:#f8d7da;
+color:#721c24;
+}
+/* ===== BUTTON ===== */
+.btn-view {
+    padding: 6px 14px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.btn-view:hover {
+    background: #2980b9;
+}
+
+/* ===== EMPTY ===== */
+.empty-row {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+/* ============================= */
+/* ANIMATION */
+/* ============================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .tb-container {
+        padding: 5px;
+    }
+    .tb-card{
+        width: 100%;
+    }
+    .tb-summary-card{
+         width: 100%;
+    }
+    .tb-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        
+    }
+
+    .tb-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .tb-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .tb-summary {
+        order: -1; /* đẩy summary lên trên */
+    }
+
+    .custom-modal-content {
+        max-height: 96vh;
+        margin: 2vh auto;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .custom-modal-body {
+        max-height: 50vh; /* nhỏ hơn tí trên mobile */
+    }
+    .bill-table,
+    .bill-table thead,
+    .bill-table tbody,
+    .bill-table th,
+    .bill-table td,
+    .bill-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    /* ẩn header */
+    .bill-table thead {
+        display: none;
+    }
+
+    /* mỗi row thành card */
+    .bill-table tr {
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .bill-table td {
+        border: none;
+        padding: 6px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* label bên trái */
+    .bill-table td::before {
+        font-weight: 600;
+        color: #666;
+        margin-right: 10px;
+    }
+
+    /* label từng cột (sửa theo thứ tự table của bạn nếu khác) */
+    .bill-table td:nth-child(1)::before { content: "Bill ID"; }
+    .bill-table td:nth-child(2)::before { content: "Amount"; }
+    .bill-table td:nth-child(3)::before { content: "Date"; }
+    .bill-table td:nth-child(4)::before { content: "Status"; }
+    .bill-table td:nth-child(5)::before { content: "Payment"; }
+    .bill-table td:nth-child(6)::before { content: "Action"; }
+
+    .btn-view{
+        font-size:12px;
+        padding:5px 10px;
+    }
+
+}
+.payment-alert {
+    margin-top: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px 14px;
+}
+
+.payment-alert.alert-info {
+    background-color: #f4f8ff;
+    border: 1px solid #d6e4ff;
+    color: #2c5aa0;
+}
+
+.payment-alert.alert-warning {
+    background-color: #fff8e6;
+    border: 1px solid #ffe0a3;
+    color: #9a6b00;
+}
