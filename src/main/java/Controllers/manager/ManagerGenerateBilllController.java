@@ -11,7 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+    
 /**
  *
  * @author To Thi Thao Trang - CE191027
@@ -46,49 +46,56 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         String dueDateStr = request.getParameter("dueDate");
 
         // Convert
-        java.time.LocalDate billMonth = java.time.LocalDate.parse(billMonthStr + "-01");
-        java.time.LocalDate dueDate = java.time.LocalDate.parse(dueDateStr);
-        java.time.LocalDate now = java.time.LocalDate.now().withDayOfMonth(1);
-
-
-        // Bill month không được quá khứ
-        if (billMonth.isBefore(now)) {
-            loadRooms(request);
-            request.setAttribute("error", "Bill month cannot be in the past");
-            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
-            return;
-        }
-
-
-        //  Due date >= bill month
-        if (dueDate.isBefore(billMonth)) {
-            loadRooms(request);
-            request.setAttribute("error", "Due date must be after bill month");
-            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
-            return;
-        }
-
-        // cộng thêm 1 tháng
-        LocalDate nextMonth = billMonth.plusMonths(1);
-
-        // Due date phải là tháng trước khi tạo bill 1 tháng(true thì ko lỗi)
-        if (dueDate.getMonthValue() != nextMonth.getMonthValue()
-        || dueDate.getYear() != nextMonth.getYear()) {
-
-            loadRooms(request);
-            request.setAttribute("error", "Due date must be in the next month of bill month");
-            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
-            return;
-        }
-
-
-        //Không được trùng bill
-        BillDAO dao = new BillDAO();
+        LocalDate billMonth = LocalDate.parse(billMonthStr + "-01");
+        LocalDate dueDate = LocalDate.parse(dueDateStr);
+        LocalDate now = java.time.LocalDate.now().withDayOfMonth(1);
 
         String[] parts = billMonthStr.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);
 
+        int oldElectric = Integer.parseInt(request.getParameter("oldElectric"));
+        int newElectric = Integer.parseInt(request.getParameter("newElectric"));
+        int oldWater = Integer.parseInt(request.getParameter("oldWater"));
+        int newWater = Integer.parseInt(request.getParameter("newWater"));
+
+        // VALIDATE METER
+        if (newElectric <= oldElectric) {
+            request.setAttribute("error", "New electric meter must be greater than old meter.");
+            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
+            return;
+        }
+        if (newWater <= oldWater) {
+            request.setAttribute("error", "New water meter must be greater than old meter.");
+            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
+            return;
+        }
+
+       LocalDate firstDayCurrentMonth = LocalDate.now().withDayOfMonth(1);
+
+        if (billMonth.isAfter(firstDayCurrentMonth)) {
+            loadRooms(request);
+            request.setAttribute("error", "Cannot generate bill for future months.");
+            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
+            return;
+        }
+
+        LocalDate minDueDate = billMonth.plusMonths(1);          // 01 tháng sau
+        LocalDate maxDueDate = billMonth.plusMonths(1).plusDays(14); // 15 của tháng sau
+
+        //duedate thõa khi nằm trong 1 - 15 ngày của tháng sau
+        if (dueDate.isBefore(minDueDate) || dueDate.isAfter(maxDueDate)) {
+            loadRooms(request);
+            request.setAttribute("error",
+                "Due date must be between "
+                + minDueDate + " and "
+                + maxDueDate);
+            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
+            return;
+        }
+        BillDAO dao = new BillDAO();
+
+        // CHECK DUPLICATE BILL
         if (dao.isBillExist(roomId, month, year)) {
             loadRooms(request);
             request.setAttribute("error", "This room already has a bill for this month");
@@ -96,12 +103,13 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             return;
         }
 
-        // CREATE BILL
-        dao.createDraftBill(roomId, month, year, java.sql.Date.valueOf(dueDate));
+         // GENERATE BILL
+        dao.generateBill(roomId,java.sql.Date.valueOf(billMonth), java.sql.Date.valueOf(dueDate),oldElectric, newElectric, oldWater, newWater);
         response.sendRedirect(request.getContextPath() + "/manager/billing");
 
     } catch (Exception e) {
         e.printStackTrace();
+        loadRooms(request);
         request.setAttribute("error", "Generate bill failed");
         request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
     }
