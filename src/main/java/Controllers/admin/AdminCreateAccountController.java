@@ -33,7 +33,10 @@ public class AdminCreateAccountController extends HttpServlet {
             String address = request.getParameter("address");
             String dob = request.getParameter("dob");
 
-            int gender = Integer.parseInt(request.getParameter("gender"));
+            String genderParam = request.getParameter("gender");
+            int gender = (genderParam != null && !genderParam.isEmpty())
+                    ? Integer.parseInt(genderParam)
+                    : 0;
 
             String password = request.getParameter("password");
 

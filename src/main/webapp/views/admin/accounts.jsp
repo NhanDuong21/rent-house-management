@@ -28,8 +28,9 @@
         </div>
 
         <!-- ALERT (server-side, từ redirect) -->
+        <c:set var="success" value="${param.success}" />
         <c:if test="${not empty success}">
-            <div class="ma-alert ma-alert-success">
+            <div id="successAlert" class="ma-alert ma-alert-success">
                 <span class="ma-alert-ico">
                     <i class="bi bi-check-circle-fill"></i>
                 </span>
