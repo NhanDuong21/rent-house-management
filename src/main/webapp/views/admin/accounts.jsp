@@ -126,6 +126,7 @@
 
                                         <!-- TOGGLE STATUS -->
                                         <button type="button"
+                                                disabled
                                                 class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'} ma-open-toggle"
                                                 id="toggleBtn-${a.accountType}-${a.accountId}"
                                                 title="Toggle Active / Locked"
