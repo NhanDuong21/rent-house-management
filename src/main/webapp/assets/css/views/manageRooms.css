@@ -1,206 +1,369 @@
 .manage-room {
-  padding: 25px 35px;
+    padding: 25px 35px;
 }
 
 /* HEADER */
 .page-header h2 {
-  font-weight: 700;
-  margin-bottom: 5px;
+    font-weight: 700;
+    margin-bottom: 5px;
 }
 
 .page-header p {
-  color: #6b7280;
-  margin-bottom: 20px;
+    color: #6b7280;
+    margin-bottom: 20px;
 }
 
 /* SEARCH */
 .search-box {
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 12px 15px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 25px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 12px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
 .search-box i {
-  color: #6b7280;
+    color: #6b7280;
 }
 
 .search-box input {
-  border: none;
-  background: transparent;
-  outline: none;
-  width: 100%;
-  font-weight: 600;
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-weight: 600;
 }
 
 /* CARD */
 .room-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
 }
 
 .room-card h5 {
-  font-weight: 700;
-  margin-bottom: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
 }
 
 .room-table-wrap {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
 /* TABLE */
 .room-table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .room-table th {
-  padding: 12px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  font-weight: 700;
-  white-space: nowrap;
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .room-table td {
-  padding: 14px 10px;
-  border-bottom: 1px solid #f1f1f1;
-  vertical-align: middle;
+    padding: 14px 10px;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
 }
 
 /* ID mono */
 .room-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
 }
 
 /* PRICE */
 .price {
-  color: #16a34a;
-  font-weight: 700;
+    color: #16a34a;
+    font-weight: 700;
 }
 
 /* STATUS */
 .status {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
 .status.AVAILABLE {
-  background: #dcfce7;
-  color: #15803d;
+    background: #dcfce7;
+    color: #15803d;
 }
 
 .status.OCCUPIED {
-  background: #fee2e2;
-  color: #b91c1c;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .status.MAINTENANCE {
-  background: #fef9c3;
-  color: #a16207;
+    background: #fef9c3;
+    color: #a16207;
 }
 
 /* AC icon */
 .room-ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background: #eef2ff;
-  color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: #eef2ff;
+    color: #2563eb;
 }
 
 .room-ico-ac i {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* ACTION BTN (replace bootstrap btn to match your layout style) */
 .room-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
-  color: #111827;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 13px;
-  transition: 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    transition: 0.15s;
 }
 
 .room-action-btn:hover {
-  background: #e5e7eb;
+    background: #e5e7eb;
 }
 
 /* EMPTY */
 .room-empty {
-  text-align: center;
-  color: #6b7280;
-  padding: 22px;
+    text-align: center;
+    color: #6b7280;
+    padding: 22px;
 }
 
 /* PAGINATION */
 .pagination-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .pagination {
-  display: flex;
-  gap: 6px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .pagination li a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  height: 36px;
-  padding: 0 10px;
-  border-radius: 10px;
-  background: #f1f3f5;
-  text-decoration: none;
-  color: #111827;
-  font-weight: 700;
-  border: 1px solid #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 10px;
+    background: #f1f3f5;
+    text-decoration: none;
+    color: #111827;
+    font-weight: 700;
+    border: 1px solid #e5e7eb;
 }
 
 .pagination li a:hover {
-  background: #e5e7eb;
+    background: #e5e7eb;
 }
 
 .pagination li.active a {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: white;
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
 }
 
 .pagination li.disabled a {
-  opacity: 0.45;
-  pointer-events: none;
+    opacity: 0.45;
+    pointer-events: none;
 }
 .pagination .dots {
     padding: 6px 10px;
     color: #888;
 }
+.room-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
 
+.room-modal-box{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    width:320px;
+}
+/* ================= MODAL OVERLAY ================= */
+
+.room-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    backdrop-filter: blur(2px);
+}
+
+
+/* ================= MODAL BOX ================= */
+
+.room-modal-box {
+    background: #ffffff;
+    width: 420px;
+
+    padding: 32px 28px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 25px 50px rgba(0,0,0,0.12),
+        0 10px 20px rgba(0,0,0,0.06);
+
+    animation: modalFadeIn .25s ease;
+}
+
+
+/* ================= MODAL TITLE ================= */
+
+.room-modal-box h4{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+
+/* ================= STATUS OPTIONS ================= */
+
+.room-status-options{
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+}
+
+.room-status-options button{
+    border:none;
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    font-size:13px;
+    font-weight:700;
+
+    cursor:pointer;
+    transition:.15s;
+}
+
+
+/* AVAILABLE */
+
+.room-status-options .AVAILABLE{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.room-status-options .AVAILABLE:hover{
+    background:#bbf7d0;
+}
+
+
+/* MAINTENANCE */
+
+.room-status-options .MAINTENANCE{
+    background:#fef9c3;
+    color:#a16207;
+}
+
+.room-status-options .MAINTENANCE:hover{
+    background:#fef08a;
+}
+
+
+/* ================= ACTION BUTTONS ================= */
+
+.room-modal-actions{
+    display:flex;
+    gap:10px;
+}
+
+.room-modal-actions button{
+    padding:8px 16px;
+    border-radius:8px;
+    border:none;
+
+    font-weight:600;
+    cursor:pointer;
+}
+
+
+/* CANCEL BUTTON */
+
+#cancelBtn{
+    background:#f3f4f6;
+    color:#111827;
+}
+
+#cancelBtn:hover{
+    background:#e5e7eb;
+}
+
+
+/* SAVE BUTTON */
+
+#saveBtn{
+    background:#2563eb;
+    color:white;
+}
+
+#saveBtn:hover{
+    background:#2563eb;
+}
+
+
+/* ================= ANIMATION ================= */
+
+@keyframes modalFadeIn{
+    from{
+        opacity:0;
+        transform:translateY(12px) scale(.97);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+/* STATUS SELECTED */
+
+.room-status-options button:focus{
+    border:2px solid #111827;
+    transform:scale(1.03);
+}

@@ -461,6 +461,47 @@ public class TenantDAO extends DBContext {
     }
 
     /**
+     * Tự động đồng bộ status của tất cả tenant (trừ PENDING) dựa trên hợp đồng:
+     * - Có hợp đồng đang active (không phải ENDED/CANCELLED) → ACTIVE
+     * - Không có hợp đồng active → LOCKED
+     * Tenant ở trạng thái PENDING sẽ KHÔNG bị thay đổi.
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public void syncAllTenantStatuses() {
+        // Cập nhật ACTIVE cho tenant có ít nhất 1 contract đang active
+        String sqlActive = """
+            UPDATE TENANT
+            SET account_status = 'ACTIVE', updated_at = SYSDATETIME()
+            WHERE account_status <> 'PENDING'
+              AND EXISTS (
+                  SELECT 1 FROM CONTRACT
+                  WHERE CONTRACT.tenant_id = TENANT.tenant_id
+                    AND CONTRACT.status NOT IN ('ENDED', 'CANCELLED')
+              )
+        """;
+
+        // Cập nhật LOCKED cho tenant không có contract active nào
+        String sqlLocked = """
+            UPDATE TENANT
+            SET account_status = 'LOCKED', updated_at = SYSDATETIME()
+            WHERE account_status <> 'PENDING'
+              AND NOT EXISTS (
+                  SELECT 1 FROM CONTRACT
+                  WHERE CONTRACT.tenant_id = TENANT.tenant_id
+                    AND CONTRACT.status NOT IN ('ENDED', 'CANCELLED')
+              )
+        """;
+
+        try (PreparedStatement psActive = connection.prepareStatement(sqlActive);
+             PreparedStatement psLocked = connection.prepareStatement(sqlLocked)) {
+            psActive.executeUpdate();
+            psLocked.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Lấy danh sách tenant có phân trang (không tìm kiếm).
      *
      * @param page trang hiện tại (bắt đầu từ 1)
@@ -583,6 +624,21 @@ public class TenantDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public Integer findTenantIdByEmail(String email) {
+        String sql = "SELECT tenant_id FROM TENANT WHERE email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("tenant_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

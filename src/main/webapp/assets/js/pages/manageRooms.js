@@ -1,27 +1,46 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const input = document.querySelector(".searchRoom");
-    const tbody = document.getElementById("roomTable");
-    if (!input || !tbody)
-        return;
+let selectedRoomId = null;
+let selectedStatus = null;
 
-    function normalize(s) {
-        return (s || "").toString().trim().toLowerCase();
-    }
+const modal = document.getElementById("statusModal");
 
-    input.addEventListener("input", function () {
-        const keyword = normalize(input.value);
+document.querySelectorAll(".room-status-btn").forEach(btn => {
 
-        // Re-query rows each time in case pagination/DOM changes
-        const rows = tbody.querySelectorAll("tr");
+    btn.addEventListener("click", () => {
 
-        rows.forEach((row) => {
-            const roomCell = row.querySelector(".roomNumber");
-            if (!roomCell)
-                return;
+        selectedRoomId = btn.dataset.roomId;
+        selectedStatus = btn.dataset.status;
 
-            const roomNumber = normalize(roomCell.textContent);
-            row.style.display = roomNumber.includes(keyword) ? "" : "none";
-        });
+        modal.style.display = "flex";
+
     });
+
 });
 
+document.querySelectorAll(".room-status-options button").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        selectedStatus = btn.dataset.status;
+
+    });
+
+});
+
+document.getElementById("cancelBtn").onclick = () => {
+
+    modal.style.display = "none";
+
+};
+
+document.getElementById("saveBtn").onclick = () => {
+
+    fetch("rooms", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `roomId=${selectedRoomId}&status=${selectedStatus}`
+    })
+            .then(() => location.reload());
+
+};

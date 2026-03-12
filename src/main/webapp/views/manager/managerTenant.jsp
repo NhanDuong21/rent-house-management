@@ -10,28 +10,33 @@
     <!-- Page CSS -->
     <link rel="stylesheet" href="${ctx}/assets/css/views/managerTenant.css">
     <style>
-        .mt-alert {
-            display: flex;
+        /* ===== STATUS BADGE (tự động, chỉ đọc) ===== */
+        .mt-status-badge {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: default;
+            user-select: none;
         }
-        .mt-alert-error {
-            background-color: #fff0f0;
-            border: 1px solid #f5c2c2;
+        .mt-badge-active {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+        .mt-badge-locked {
+            background-color: #fee2e2;
             color: #b91c1c;
+            border: 1px solid #fca5a5;
         }
-        .mt-alert span { flex: 1; }
-        .mt-alert-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: inherit;
-            padding: 0 4px;
-            font-size: 0.85rem;
+        .mt-badge-pending {
+            background-color: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde047;
         }
     </style>
 
@@ -42,17 +47,6 @@
             <h2>Manage Tenants</h2>
             <p>View and manage all tenant information</p>
         </div>
-
-        <!-- LOCK ERROR ALERT -->
-        <c:if test="${not empty lockError}">
-            <div class="mt-alert mt-alert-error" id="lockErrorAlert">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>${lockError}</span>
-                <button type="button" class="mt-alert-close" onclick="this.parentElement.remove()">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-        </c:if>
 
         <!-- SEARCH -->
         <div class="mt-search-box">
@@ -105,18 +99,14 @@
                                     <fmt:formatDate value="${t.dateOfBirth}" pattern="yyyy-MM-dd"/>
                                 </td>
 
-                                <!-- STATUS BUTTON -->
+                                <!-- STATUS BADGE (tự động, không bấm tay) -->
                                 <td>
-                                    <button type="button"
-                                            class="mt-btn-status
-                                            <c:choose>
-                                                <c:when test="${t.accountStatus == 'ACTIVE'}">mt-btn-active</c:when>
-                                                <c:when test="${t.accountStatus == 'LOCKED'}">mt-btn-locked</c:when>
-                                                <c:otherwise>mt-btn-pending</c:otherwise>
-                                            </c:choose>"
-                                            data-tenant-id="${t.tenantId}"
-                                            data-current-status="${t.accountStatus}"
-                                            data-tenant-name="${t.fullName}">
+                                    <span class="mt-status-badge
+                                        <c:choose>
+                                            <c:when test="${t.accountStatus == 'ACTIVE'}">mt-badge-active</c:when>
+                                            <c:when test="${t.accountStatus == 'LOCKED'}">mt-badge-locked</c:when>
+                                            <c:otherwise>mt-badge-pending</c:otherwise>
+                                        </c:choose>">
                                         <c:choose>
                                             <c:when test="${t.accountStatus == 'ACTIVE'}">
                                                 <i class="bi bi-unlock-fill"></i> ACTIVE
@@ -128,7 +118,7 @@
                                                 <i class="bi bi-hourglass-split"></i> ${t.accountStatus}
                                             </c:otherwise>
                                         </c:choose>
-                                    </button>
+                                    </span>
                                 </td>
 
                                 <!-- ACTION: EDIT -->
@@ -175,8 +165,8 @@
                     <c:choose>
                         <c:when test="${currentPage <= 1}">
                             <span class="mt-page-btn mt-page-disabled"><i class="bi bi-chevron-left"></i></span>
-                            </c:when>
-                            <c:otherwise>
+                        </c:when>
+                        <c:otherwise>
                             <a class="mt-page-btn" href="${baseUrl}${currentPage - 1}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
@@ -212,8 +202,8 @@
                     <c:choose>
                         <c:when test="${currentPage >= totalPages}">
                             <span class="mt-page-btn mt-page-disabled"><i class="bi bi-chevron-right"></i></span>
-                            </c:when>
-                            <c:otherwise>
+                        </c:when>
+                        <c:otherwise>
                             <a class="mt-page-btn" href="${baseUrl}${currentPage + 1}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
@@ -341,25 +331,6 @@
                     <i class="bi bi-x-circle"></i> Cancel
                 </button>
                 <button type="button" class="confirm-btn-ok" id="confirmSaveBtn">
-                    <i class="bi bi-check2-circle"></i> OK
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== TOGGLE STATUS CONFIRM ===== -->
-    <div class="confirm-overlay" id="toggleStatusDialog" aria-hidden="true">
-        <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="toggleStatusTitle">
-            <div class="confirm-icon" id="toggleStatusIcon">
-                <i class="bi bi-arrow-repeat"></i>
-            </div>
-            <div class="confirm-title" id="toggleStatusTitle">Confirm status change</div>
-            <div class="confirm-subtitle" id="toggleStatusSubtitle"></div>
-            <div class="confirm-actions">
-                <button type="button" class="confirm-btn-cancel" data-close-toggle="1">
-                    <i class="bi bi-x-circle"></i> Cancel
-                </button>
-                <button type="button" class="confirm-btn-ok" id="toggleStatusOkBtn">
                     <i class="bi bi-check2-circle"></i> OK
                 </button>
             </div>

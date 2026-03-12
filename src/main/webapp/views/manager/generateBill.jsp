@@ -115,7 +115,43 @@
                         </div>
 
                     </div>
+                    <div class="tbg-meter-title">
+                        <i class="bi bi-speedometer2"></i>
+                        Meter Input
+                    </div>
+                    <div class="tbg-meter-grid">
 
+                        <!-- OLD ELECTRIC -->
+                        <div class="tbg-field">
+                            <label>Old Electric</label>
+                            <input type="number" id="oldElectric" name="oldElectric" required>
+                        </div>
+
+                        <!-- NEW ELECTRIC -->
+                        <div class="tbg-field">
+                            <label>New Electric</label>
+                            <input type="number" id="newElectric" name="newElectric" required>
+                        </div> 
+                        <!-- ELECTRIC USAGE -->
+                        <div class="tbg-field">
+                            <label>Electric Usage</label>
+                            <input type="number" id="electricUsage" readonly> </div>
+                        <!-- OLD WATER -->
+                        <div class="tbg-field">
+                            <label>Old Water</label>
+                            <input type="number" id="oldWater" name="oldWater" required>
+                        </div>
+                        <!-- NEW WATER -->
+                        <div class="tbg-field">
+                            <label>New Water</label>
+                            <input type="number" id="newWater" name="newWater" required>
+                        </div>
+                        <!-- WATER USAGE -->
+                        <div class="tbg-field">
+                            <label>Water Usage</label>
+                            <input type="number" id="waterUsage" readonly>
+                        </div>
+                    </div>
                     <!-- ACTION -->
                     <div class="tbg-actions">
 

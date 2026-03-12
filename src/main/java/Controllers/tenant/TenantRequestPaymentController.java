@@ -5,7 +5,9 @@
 package Controllers.tenant;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
+import DALs.Bill.PaymentConfirmBillDAO;
 import Models.authentication.AuthResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,9 +15,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import DALs.Bill.PaymentConfirmBillDAO;
-import java.math.BigDecimal;
 
 /**
  *
@@ -30,11 +29,7 @@ public class TenantRequestPaymentController extends HttpServlet {
         HttpSession session = request.getSession();
         AuthResult auth = (AuthResult) session.getAttribute("auth");
         PaymentConfirmBillDAO pm = new PaymentConfirmBillDAO();
-        if (auth == null || auth.getTenant() == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-        int tenant_id = auth.getTenant().getTenantId();
+
         int billId = Integer.parseInt(request.getParameter("billId"));
         BigDecimal amount = new BigDecimal(request.getParameter("amount"));
         String method = request.getParameter("method");

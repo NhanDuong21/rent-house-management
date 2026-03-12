@@ -524,3 +524,34 @@
   font-size: 14px;
   color: #6b7280;
 }
+/* ===== STATUS BADGE (tự động, chỉ đọc) ===== */
+.mt-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: default;
+    user-select: none;
+}
+
+.mt-badge-active {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+}
+
+.mt-badge-locked {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
+.mt-badge-pending {
+    background-color: #fef9c3;
+    color: #854d0e;
+    border: 1px solid #fde047;
+}

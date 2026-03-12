@@ -97,4 +97,46 @@ public class AuthService {
 
         return new AuthResult("TENANT", t, null);
     }
+
+    /**
+     * Hàm mới độc lập — dùng cho forgot password flow (cả Tenant lẫn Staff).
+     * Không đụng loginByOtp cũ.
+     *
+     * Tenant dùng purpose: RESET_PASSWORD
+     * Staff  dùng purpose: RESET_PASSWORD_STAFF
+     */
+    public AuthResult loginByResetOtp(String email, String otpPlain) {
+        if (email == null || otpPlain == null) return null;
+        email = email.trim();
+
+        // ── Thử Tenant ──────────────────────────────────────────────────────────
+        Tenant t = tenantDAO.findByEmail(email);
+        if (t != null) {
+            if ("LOCKED".equalsIgnoreCase(t.getAccountStatus())) return null;
+
+            OtpCode otp = otpDAO.findValidLatestOtp(t.getTenantId(), "RESET_PASSWORD");
+            if (otp == null) return null;
+
+            if (!HashUtil.md5(otpPlain).equalsIgnoreCase(otp.getOtpHash())) return null;
+
+            otpDAO.markUsed(otp.getOtpId());
+            return new AuthResult("TENANT", t, null);
+        }
+
+        // ── Thử Staff (Admin / Manager) ─────────────────────────────────────────
+        Staff s = staffDAO.findByEmail(email);
+        if (s != null) {
+            if (!"ACTIVE".equalsIgnoreCase(s.getStatus())) return null;
+
+            OtpCode otp = otpDAO.findValidLatestOtp(s.getStaffId(), "RESET_PASSWORD_STAFF");
+            if (otp == null) return null;
+
+            if (!HashUtil.md5(otpPlain).equalsIgnoreCase(otp.getOtpHash())) return null;
+
+            otpDAO.markUsed(otp.getOtpId());
+            return new AuthResult(s.getStaffRole(), null, s); // ADMIN hoặc MANAGER
+        }
+
+        return null;
+    }
 }
