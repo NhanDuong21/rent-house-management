@@ -219,10 +219,7 @@
                         <i class="bi bi-people-fill me-2"></i> Manage Accounts
                     </a>
 
-                    <a class="rh-link <%= "a_settings".equals(_active) ? "active" : ""%>"
-                       href="<%=ctx%>/admin/settings">
-                        <i class="bi bi-gear me-2"></i> Configure System Settings
-                    </a>
+
 
                     <a class="rh-link <%= "a_contracts".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/admin/contracts">

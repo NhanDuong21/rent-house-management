@@ -3,7 +3,8 @@ package Services.contract;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Random;
-
+import java.util.List;
+import Models.dto.ManagerContractRowDTO;
 import DALs.auth.OtpCodeDAO;
 import DALs.auth.TenantDAO;
 import DALs.contract.ContractDAO;
@@ -298,5 +299,19 @@ public class ContractService {
         }
 
         return "Lỗi SQL: " + e.getMessage();
+    }
+    //VIEW CONTRACT LIST
+
+    public int countContracts(String keyword, String status) {
+        return contractDAO.countManagerContracts(keyword, status);
+    }
+
+    public List<ManagerContractRowDTO> findContracts(
+            String keyword,
+            String status,
+            int page,
+            int pageSize
+    ) {
+        return contractDAO.findManagerContracts(keyword, status, page, pageSize);
     }
 }

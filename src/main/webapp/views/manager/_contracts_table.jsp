@@ -73,7 +73,7 @@
                     </td>
 
                     <td class="mc-actions">
-                        <a href="${pageContext.request.contextPath}/manager/contracts/detail?id=${c.contractId}"
+                        <a href="${pageContext.request.contextPath}/manager/contract-detail?id=${c.contractId}"
                            class="mc-view-btn">
                             👁 View
                         </a>
