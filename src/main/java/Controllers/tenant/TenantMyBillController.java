@@ -6,7 +6,6 @@ package Controllers.tenant;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import DALs.Bill.BillDAO;
@@ -49,24 +48,11 @@ public class TenantMyBillController extends HttpServlet {
         List<BillDetail> listBillDetail = null;
         String payment_qr = null;
         BigDecimal totalAmount = BigDecimal.ZERO;
-        boolean allowPayment = false;
         if (b != null) {
             pending = pd.getPendingPaymentByBillId(b.getBillId());
             listBillDetail = bd.getListBillDetailByBillId(b.getBillId());
             payment_qr = bd.getQRFromContractByBillId(b.getBillId());
             totalAmount = bd.totalAmount(b.getBillId());
-             //lay ngay tháng hien tai
-             //
-            LocalDate today = LocalDate.now();
-            // lay tháng bill
-            LocalDate billMonth = b.getBillMonth().toLocalDate();
-            
-            // tháng bill + 1 tháng
-            LocalDate nextMonth = billMonth.plusMonths(1);
-            
-            //month hien tai = month ke tiep moi cho chuyn
-            allowPayment = today.getMonthValue() == nextMonth.getMonthValue()
-                    && today.getYear() == nextMonth.getYear();
         }
 
         if (payment_qr == null) {
@@ -78,7 +64,7 @@ public class TenantMyBillController extends HttpServlet {
         
         List<ManagerBillRowDTO> listTenantBills = bd.listBillForTenant(tenant_id);
 
-        request.setAttribute("allowPayment", allowPayment);
+
         request.setAttribute("totalAmount", totalAmount);
         request.setAttribute("RoomNumber", RoomNumber);
         request.setAttribute("Bill", b);

@@ -892,4 +892,25 @@ FROM     CONTRACT INNER JOIN
         }
         return true;
     }
+
+    public int ActiveContracts() {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM CONTRACT
+        WHERE status = 'ACTIVE'
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

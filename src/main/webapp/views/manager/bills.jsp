@@ -133,30 +133,21 @@
 
                                 <!-- EDIT -->
                                 <c:choose>
-
-
                                     <c:when test="${b.status eq 'UNPAID' and b.paymentStatus ne 'PENDING'}">
-                                        <a href="${pageContext.request.contextPath}/manager/billing/input?billId=${b.billId}"
+                                        <a href="${pageContext.request.contextPath}/manager/billing/editBill?billId=${b.billId}"
                                            class="mb-edit-btn">
-                                            ✏ Input Meter
+                                            ✏ Edit Bill
                                         </a>
                                     </c:when>
 
 
                                     <c:otherwise>
                                         <button class="mb-edit-btn disabled" disabled>
-                                            ✏ Input Meter
+                                            ✏ Edit Bill
                                         </button>
                                     </c:otherwise>
 
                                 </c:choose>
-
-                                <!-- CANCEL -->
-                                <a href="${pageContext.request.contextPath}/manager/billing/cancel?billId=${b.billId}"
-                                   class="mb-cancel-btn"
-                                   onclick="return confirm('Are you sure to cancel this bill?')">
-                                    x Cancel
-                                </a>
 
                             </td>
                         </tr>

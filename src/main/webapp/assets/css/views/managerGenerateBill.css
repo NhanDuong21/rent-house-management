@@ -207,3 +207,36 @@ ERROR
     content:"⚠";
     font-size:16px;
 }
+/* METER BOX */
+
+.tbg-meter-box{
+    margin-top:25px;
+}
+
+.tbg-meter-title{
+    font-weight:600;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.tbg-meter-grid{
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:16px;
+}
+
+/* tablet */
+@media (max-width:900px){
+    .tbg-meter-grid{
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+/* mobile */
+@media (max-width:500px){
+    .tbg-meter-grid{
+        grid-template-columns:1fr;
+    }
+}

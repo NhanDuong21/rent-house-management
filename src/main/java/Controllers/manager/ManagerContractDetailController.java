@@ -17,6 +17,10 @@ import jakarta.servlet.http.HttpSession;
  *
  * @author Duong Thien Nhan - CE190741
  */
+
+import jakarta.servlet.annotation.WebServlet;
+
+@WebServlet("/manager/contract-detail")
 public class ManagerContractDetailController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
@@ -29,35 +33,28 @@ public class ManagerContractDetailController extends HttpServlet {
         HttpSession session = request.getSession(false);
         AuthResult auth = (session == null) ? null : (AuthResult) session.getAttribute("auth");
 
-        // Bạn chỉnh theo model auth của bạn: auth.getStaff() hoặc auth.getUser()...
         if (auth == null || auth.getStaff() == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        String role = auth.getStaff().getStaffRole(); // 'MANAGER' / 'ADMIN'
-        if (role == null || (!role.equals("MANAGER") && !role.equals("ADMIN"))) {
+        String role = auth.getStaff().getStaffRole();
+        if (!"MANAGER".equals(role) && !"ADMIN".equals(role)) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         String idRaw = request.getParameter("id");
         if (idRaw == null || idRaw.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/manager/contract");
+            response.sendRedirect(request.getContextPath() + "/manager/contracts");
             return;
         }
 
-        int contractId;
-        try {
-            contractId = Integer.parseInt(idRaw);
-        } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/manager/contract");
-            return;
-        }
+        int contractId = Integer.parseInt(idRaw);
 
         Contract c = contractDAO.findDetailForManager(contractId);
         if (c == null) {
-            response.sendRedirect(request.getContextPath() + "/manager/contract");
+            response.sendRedirect(request.getContextPath() + "/manager/contracts");
             return;
         }
 
@@ -66,6 +63,7 @@ public class ManagerContractDetailController extends HttpServlet {
         request.setAttribute("contract", c);
         request.setAttribute("latestPayment", latestPay);
 
-        request.getRequestDispatcher("/views/manager/contractDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/manager/contractDetail.jsp")
+               .forward(request, response);
     }
 }

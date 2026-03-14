@@ -246,4 +246,25 @@ public class MaintenanceRequestDAO extends DBContext {
             e.printStackTrace();
         }
     }
+
+    public int countPendingRequests() {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM MAINTENANCE_REQUEST
+        WHERE status = 'PENDING'
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

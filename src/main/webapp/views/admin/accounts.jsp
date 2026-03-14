@@ -28,8 +28,9 @@
         </div>
 
         <!-- ALERT (server-side, từ redirect) -->
+        <c:set var="success" value="${param.success}" />
         <c:if test="${not empty success}">
-            <div class="ma-alert ma-alert-success">
+            <div id="successAlert" class="ma-alert ma-alert-success">
                 <span class="ma-alert-ico">
                     <i class="bi bi-check-circle-fill"></i>
                 </span>
@@ -125,6 +126,7 @@
 
                                         <!-- TOGGLE STATUS -->
                                         <button type="button"
+                                                disabled
                                                 class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'} ma-open-toggle"
                                                 id="toggleBtn-${a.accountType}-${a.accountId}"
                                                 title="Toggle Active / Locked"
@@ -162,6 +164,19 @@
                                             </span>
                                             Reset Password
                                         </button>
+                                        <!--UpDate ManageAccount-->
+
+                                        <c:if test="${a.accountType == 'STAFF'}">
+                                            <button type="button"
+                                                    class="ma-action-btn primary"
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/admin/accounts/update?id=${a.accountId}'">
+
+                                                <span class="ma-action-ico">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </span>
+                                                Update
+                                            </button>
+                                        </c:if>
 
                                     </div>
                                 </td>

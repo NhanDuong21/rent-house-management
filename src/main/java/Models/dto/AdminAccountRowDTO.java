@@ -1,6 +1,7 @@
 package Models.dto;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Description
@@ -17,6 +18,11 @@ public class AdminAccountRowDTO {
     private String role;
     private String status;
     private Timestamp createdAt;
+
+    private String phone;
+    private String identityCode;
+    private Date dateOfBirth;
+    private int gender;
 
     public AdminAccountRowDTO() {
     }
@@ -86,6 +92,42 @@ public class AdminAccountRowDTO {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // PHONE
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+// IDENTITY CODE
+    public String getIdentityCode() {
+        return identityCode;
+    }
+
+    public void setIdentityCode(String identityCode) {
+        this.identityCode = identityCode;
+    }
+
+// DATE OF BIRTH
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+// GENDER
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
     }
 
 }

@@ -7,7 +7,6 @@ package Controllers.tenant;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import DALs.Bill.BillDAO;
@@ -51,19 +50,7 @@ public class TenantMyBillDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/tenant/bill");
             return;
         }
-        //lay ngay tháng hien tai
-        //LocalDate today = LocalDate.now();
-        LocalDate today = LocalDate.now();
-        // lay tháng bill
-        LocalDate billMonth = billDetail.getBillMonth().toLocalDate();
-        
-        // tháng bill + 1 tháng
-        LocalDate nextMonth = billMonth.plusMonths(1);
-        
-        //month hien tai = month ke tiep moi cho chuyn
-        boolean allowPayment = today.getMonthValue() == nextMonth.getMonthValue()
-                && today.getYear() == nextMonth.getYear();
-          
+
         List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(billId);
         Payment pendingPayment = pd.getPendingPaymentByBillId(billDetail.getBillId());
         BigDecimal totalAmount = bd.totalAmount(billId);
@@ -72,7 +59,6 @@ public class TenantMyBillDetailController extends HttpServlet {
         if (payment_qr == null) {
             payment_qr = "/assets/images/qr/myqr.png";
         }
-        request.setAttribute("allowPayment", allowPayment); 
         request.setAttribute("billDetail", billDetail);
         request.setAttribute("ListBillDetail", listBillDetail);
         request.setAttribute("totalAmount", totalAmount);

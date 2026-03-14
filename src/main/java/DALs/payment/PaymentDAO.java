@@ -140,4 +140,47 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
+    public double getMonthlyRevenue() {
+
+        String sql = """
+        SELECT SUM(amount)
+        FROM PAYMENT
+        WHERE status = 'CONFIRMED'
+          AND MONTH(paid_at) = MONTH(GETDATE())
+          AND YEAR(paid_at) = YEAR(GETDATE())
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public double getTotalRevenue() {
+
+        String sql = """
+        SELECT SUM(amount)
+        FROM PAYMENT
+        WHERE status = 'CONFIRMED'
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

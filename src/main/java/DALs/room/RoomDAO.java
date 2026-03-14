@@ -657,4 +657,56 @@ WHERE   ROOM.room_id = ?
 
         return -1;
     }
+
+    public int countAvailableRooms() {
+
+        String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'AVAILABLE'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int countOccupiedRooms() {
+
+        String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'OCCUPIED'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int countTotalRooms() {
+
+        String sql = "SELECT COUNT(*) FROM ROOM";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
 }
