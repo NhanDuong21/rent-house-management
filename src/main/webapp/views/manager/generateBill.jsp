@@ -81,7 +81,9 @@
                                             <c:forEach items="${listRoom}" var="r">
                                                 <option value="${r.roomId}"
                                                         data-tenant="${r.tenantName}"
-                                                        data-rent="${r.monthlyRent}">
+                                                        data-rent="${r.monthlyRent}"
+                                                        data-old-electric="${r.lastElectric}"
+                                                        data-old-water="${r.lastWater}">
                                                     Room ${r.roomNumber}
                                                 </option>
                                             </c:forEach>
@@ -124,7 +126,7 @@
                         <!-- OLD ELECTRIC -->
                         <div class="tbg-field">
                             <label>Old Electric</label>
-                            <input type="number" id="oldElectric" name="oldElectric" required>
+                            <input type="number" id="oldElectric" name="oldElectric" readonly>
                         </div>
 
                         <!-- NEW ELECTRIC -->
@@ -139,7 +141,7 @@
                         <!-- OLD WATER -->
                         <div class="tbg-field">
                             <label>Old Water</label>
-                            <input type="number" id="oldWater" name="oldWater" required>
+                            <input type="number" id="oldWater" name="oldWater" readonly>
                         </div>
                         <!-- NEW WATER -->
                         <div class="tbg-field">
