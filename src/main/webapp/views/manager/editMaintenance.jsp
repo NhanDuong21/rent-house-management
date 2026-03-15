@@ -8,6 +8,7 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -85,10 +86,12 @@
 
             <c:choose>
                 <c:when test="${not empty m.imageUrl}">
-                    <div class="em-image-wrap">
-                        <img class="em-image"
-                             src="${ctx}/assets/images/maintenance/${m.imageUrl}"
-                             alt="Maintenance Image">
+                    <div class="em-images">
+                        <c:forEach var="img" items="${fn:split(m.imageUrl, ',')}">
+                            <img class="em-image preview-image"
+                                 src="${ctx}/assets/images/maintenance/${img}"
+                                 alt="Maintenance Image">
+                        </c:forEach>
                     </div>
                 </c:when>
 
@@ -100,6 +103,11 @@
             </c:choose>
         </div>
 
+        <!-- IMAGE MODAL -->
+        <div id="imageModal" class="image-modal">
+            <span class="image-modal-close" id="closeImageModal">&times;</span>
+            <img class="image-modal-content" id="modalImage" alt="Preview">
+        </div>
         <!-- UPDATE STATUS -->
         <div class="em-card">
             <div class="em-card-title">Update Status</div>
