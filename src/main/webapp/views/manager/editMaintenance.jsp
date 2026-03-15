@@ -115,7 +115,10 @@
                                     ${m.status == 'PENDING' ? 'selected' : ''}>
                                 PENDING
                             </option>
-
+                            <option value="CANCELLED"
+                                    ${m.status == 'CANCELLED' ? 'selected' : ''}>
+                                CANCELLED
+                            </option>
                             <option value="IN_PROGRESS"
                                     ${m.status == 'IN_PROGRESS' ? 'selected' : ''}>
                                 IN PROGRESS
