@@ -119,11 +119,11 @@ public class AuthFilter implements Filter {
         }
 
         // ===== MANAGER =====
-        if (uri.startsWith(ctx + "/manager/") && !"MANAGER".equalsIgnoreCase(role)) {
+        if (uri.startsWith(ctx + "/manager/")
+                && !("MANAGER".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role))) {
             response.sendRedirect(ctx + "/home");
             return;
         }
-
         // ===== ADMIN =====
         if (uri.startsWith(ctx + "/admin/") && !"ADMIN".equalsIgnoreCase(role)) {
             response.sendRedirect(ctx + "/home");

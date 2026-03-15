@@ -5,6 +5,7 @@ import java.util.List;
 
 import DALs.contract.ContractDAO;
 import Models.dto.ManagerContractRowDTO;
+import Services.contract.ContractService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class ManagerContractsController extends HttpServlet {
 
-    private final ContractDAO contractDAO = new ContractDAO();
+    private final ContractService contractService = new ContractService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,7 +48,7 @@ public class ManagerContractsController extends HttpServlet {
             pageSize = 50;
         }
 
-        int total = contractDAO.countManagerContracts(q, status);
+        int total = contractService.countContracts(q, status);
         int totalPages = (int) Math.ceil(total / (double) pageSize);
         if (totalPages <= 0) {
             totalPages = 1;
@@ -57,7 +58,7 @@ public class ManagerContractsController extends HttpServlet {
         }
 
         List<ManagerContractRowDTO> list
-                = contractDAO.findManagerContracts(q, status, page, pageSize);
+                = contractService.findContracts(q, status, page, pageSize);
 
         request.setAttribute("contracts", list);
         request.setAttribute("total", total);

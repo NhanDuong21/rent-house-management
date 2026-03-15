@@ -59,6 +59,35 @@ public class ContractConfirmDAO extends DBContext {
             WHERE tenant_id = ?
         """;
 
+        String activateOccupants = """
+            UPDATE CONTRACT_OCCUPANT
+            SET status = 'ACTIVE',
+                updated_at = SYSDATETIME()
+            WHERE contract_id = ?
+              AND status = 'PENDING'
+        """;
+
+        String activateOccupantTenants = """
+            UPDATE t
+            SET t.account_status = 'ACTIVE',
+                t.updated_at = SYSDATETIME()
+            FROM TENANT t
+            JOIN CONTRACT_OCCUPANT co
+              ON co.tenant_id = t.tenant_id
+            WHERE co.contract_id = ?
+              AND co.status IN ('PENDING', 'ACTIVE')
+              AND t.account_status = 'PENDING'
+        """;
+
+        String endOldActiveOccupants = """
+            UPDATE CONTRACT_OCCUPANT
+            SET status = 'REMOVED',
+                move_out_date = CAST(GETDATE() AS date),
+                updated_at = SYSDATETIME()
+            WHERE contract_id = ?
+              AND status = 'ACTIVE'
+        """;
+
         String confirmPayment = """
             UPDATE PAYMENT
             SET status = 'CONFIRMED'
@@ -113,7 +142,13 @@ public class ContractConfirmDAO extends DBContext {
             if (oldActiveId != null) {
                 try (PreparedStatement ps = conn.prepareStatement(endOldActive)) {
                     ps.setInt(1, oldActiveId);
-                    ps.executeUpdate(); // nếu 0 rows cũng không sao
+                    ps.executeUpdate();
+                }
+
+                // occupant của contract cũ cũng kết thúc
+                try (PreparedStatement ps = conn.prepareStatement(endOldActiveOccupants)) {
+                    ps.setInt(1, oldActiveId);
+                    ps.executeUpdate();
                 }
             }
 
@@ -128,7 +163,7 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_CONTRACT_UPDATE", "Row affected=" + a1);
             }
 
-            // STEP 4: room -> occupied (idempotent)
+            // STEP 4: room -> occupied
             int a2;
             try (PreparedStatement ps = conn.prepareStatement(updateRoom)) {
                 ps.setInt(1, roomId);
@@ -139,7 +174,7 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_ROOM_UPDATE", "roomId=" + roomId);
             }
 
-            // STEP 5: tenant -> active (idempotent)
+            // STEP 5: tenant chính -> active
             int a3;
             try (PreparedStatement ps = conn.prepareStatement(updateTenant)) {
                 ps.setInt(1, tenantId);
@@ -150,7 +185,19 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_TENANT_UPDATE", "tenantId=" + tenantId);
             }
 
-            // STEP 6: payment confirm (optional)
+            // STEP 6: occupant pending -> active
+            try (PreparedStatement ps = conn.prepareStatement(activateOccupants)) {
+                ps.setInt(1, contractId);
+                ps.executeUpdate();
+            }
+
+            // STEP 7: tất cả tenant thuộc occupant của contract nếu đang PENDING -> ACTIVE
+            try (PreparedStatement ps = conn.prepareStatement(activateOccupantTenants)) {
+                ps.setInt(1, contractId);
+                ps.executeUpdate();
+            }
+
+            // STEP 8: payment confirm (optional)
             try (PreparedStatement ps = conn.prepareStatement(confirmPayment)) {
                 ps.setInt(1, contractId);
                 ps.executeUpdate();

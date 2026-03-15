@@ -1,11 +1,14 @@
 package Controllers.tenant;
 
 import java.io.IOException;
+import java.util.List;
 
 import DALs.contract.ContractDAO;
+import DALs.contract.ContractOccupantDAO;
 import DALs.payment.PaymentDAO;
 import Models.authentication.AuthResult;
 import Models.entity.Contract;
+import Models.entity.ContractOccupant;
 import Models.entity.Payment;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +23,7 @@ import jakarta.servlet.http.HttpSession;
 public class TenantContractDetailController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
+    private final ContractOccupantDAO contractOccupantDAO = new ContractOccupantDAO();
     private final PaymentDAO paymentDAO = new PaymentDAO();
 
     @Override
@@ -56,9 +60,11 @@ public class TenantContractDetailController extends HttpServlet {
         }
 
         Payment latestPay = paymentDAO.findLatestBankPaymentForContract(contractId);
+        List<ContractOccupant> occupants = contractOccupantDAO.findByContractId(contractId);
 
         request.setAttribute("contract", c);
         request.setAttribute("latestPayment", latestPay);
+        request.setAttribute("occupants", occupants);
 
         request.getRequestDispatcher("/views/tenant/contractDetail.jsp").forward(request, response);
     }

@@ -17,16 +17,20 @@ public class RoomTenantDTO {
     private String roomNumber;
     private String tenantName;
     private BigDecimal monthlyRent;
+    private int lastElectric;
+    private int lastWater;
 
     public RoomTenantDTO() {
     }
 
-    public RoomTenantDTO(int roomId, int contract_id, String roomNumber, String tenantName, BigDecimal monthlyRent) {
+    public RoomTenantDTO(int roomId, int contract_id, String roomNumber, String tenantName, BigDecimal monthlyRent, int lastElectric, int lastWater) {
         this.roomId = roomId;
         this.contract_id = contract_id;
         this.roomNumber = roomNumber;
         this.tenantName = tenantName;
         this.monthlyRent = monthlyRent;
+        this.lastElectric = lastElectric;
+        this.lastWater = lastWater;
     }
 
     public int getRoomId() {
@@ -68,5 +72,23 @@ public class RoomTenantDTO {
     public void setMonthlyRent(BigDecimal monthlyRent) {
         this.monthlyRent = monthlyRent;
     }
+
+    public int getLastElectric() {
+        return lastElectric;
+    }
+
+    public void setLastElectric(int lastElectric) {
+        this.lastElectric = lastElectric;
+    }
+
+    public int getLastWater() {
+        return lastWater;
+    }
+
+    public void setLastWater(int lastWater) {
+        this.lastWater = lastWater;
+    }
+
+    
 
 }

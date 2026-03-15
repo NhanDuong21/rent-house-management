@@ -2,12 +2,15 @@ package Services.contract;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
 
 import DALs.auth.OtpCodeDAO;
 import DALs.auth.TenantDAO;
 import DALs.contract.ContractDAO;
+import DALs.contract.ContractOccupantDAO;
 import Models.common.ServiceResult;
+import Models.dto.ManagerContractRowDTO;
 import Models.entity.Contract;
 import Models.entity.Tenant;
 import Utils.database.DBContext;
@@ -24,6 +27,7 @@ public class ContractService {
     private final TenantDAO tenantDAO = new TenantDAO();
     private final ContractDAO contractDAO = new ContractDAO();
     private final OtpCodeDAO otpDAO = new OtpCodeDAO();
+    private final ContractOccupantDAO contractOccupantDAO = new ContractOccupantDAO();
 
     //FLOW 1: CREATE CONTRACT + CREATE TENANT (NO ACCOUNT) + OTP
     @SuppressWarnings("UseSpecificCatch")
@@ -118,6 +122,13 @@ public class ContractService {
                 return ServiceResult.fail("Không tạo được contract (PENDING).");
             }
 
+            // 4.1) Insert PRIMARY occupant
+            int primaryOccupantId = contractOccupantDAO.insertPrimary(conn, contractId, tenantId, c.getStartDate(), "PENDING");
+            if (primaryOccupantId <= 0) {
+                conn.rollback();
+                return ServiceResult.fail("Không tạo được người ở chính cho hợp đồng.");
+            }
+
             // 5) Generate OTP + insert
             String otp = String.format("%06d", new Random().nextInt(1_000_000));
             otpDAO.insertFirstLoginOtp(conn, tenantId, email, otp);
@@ -183,6 +194,13 @@ public class ContractService {
             if (newId <= 0) {
                 conn.rollback();
                 return ServiceResult.fail("Không tạo được contract (PENDING).");
+            }
+
+            // 3.1) Insert PRIMARY occupant
+            int primaryOccupantId = contractOccupantDAO.insertPrimary(conn, newId, tenantId, c.getStartDate(), "PENDING");
+            if (primaryOccupantId <= 0) {
+                conn.rollback();
+                return ServiceResult.fail("Không tạo được người ở chính cho hợp đồng.");
             }
 
             conn.commit();
@@ -297,6 +315,28 @@ public class ContractService {
             return "Kết nối DB đã bị đóng. Vui lòng restart server hoặc kiểm tra DBContext.";
         }
 
+        if (m.contains("ux_contract_occupant_contract_tenant")) {
+            return "Người này đã tồn tại trong danh sách ở cùng của hợp đồng.";
+        }
+
+        if (m.contains("ux_contract_occupant_one_primary_per_contract")) {
+            return "Hợp đồng này đã có người ở chính.";
+        }
+
         return "Lỗi SQL: " + e.getMessage();
+    }
+    //VIEW CONTRACT LIST
+
+    public int countContracts(String keyword, String status) {
+        return contractDAO.countManagerContracts(keyword, status);
+    }
+
+    public List<ManagerContractRowDTO> findContracts(
+            String keyword,
+            String status,
+            int page,
+            int pageSize
+    ) {
+        return contractDAO.findManagerContracts(keyword, status, page, pageSize);
     }
 }

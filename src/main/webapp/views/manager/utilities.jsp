@@ -102,7 +102,7 @@
                                               type="number" groupingUsed="true"/> đ/${u.unit}
                         </td>
 
-                        <td>
+                        <td style="white-space: nowrap;">
                             <a href="${pageContext.request.contextPath}/manager/utilities?action=subscribers&id=${u.utilityId}&name=${u.utilityName}"
                                class="mb-view-btn">
                                 👁 View
@@ -171,10 +171,23 @@
                 </tr>
             </tbody>
         </table>
+        <!-- THÔNG BÁO -->
+        <c:if test="${successMsg != null}">
+            <div class="mb-alert mb-alert-success">
+                ✅ ${successMsg}
+                <button class="mb-alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+        </c:if>
+        <c:if test="${errorMsg != null}">
+            <div class="mb-alert mb-alert-error">
+                ❌ ${errorMsg}
+                <button class="mb-alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+        </c:if>
     </div>
-</div> <%-- đóng mb-container --%>
+</div> <!-- đóng mb-container -->
 
-<%-- Modal Subscribers --%>
+<!-- Modal Subscribers -->
 <c:if test="${subscribers != null}">
     <script>
         window.onload = function () {

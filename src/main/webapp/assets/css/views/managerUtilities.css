@@ -159,3 +159,100 @@
     color: #9ca3af;
 }
 
+/* ALERT THÔNG BÁO */
+.mb-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    position: relative;
+}
+.mb-alert-success {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+.mb-alert-error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+.mb-alert-close {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+}
+.mb-alert-close:hover {
+    opacity: 1;
+}
+
+/* SUBSCRIBERS MODAL */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+.modal-overlay.open {
+    display: flex !important;
+}
+.ms-modal-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.ms-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1.5rem;
+}
+.ms-modal-header h4 {
+    margin: 0;
+    font-weight: 700;
+}
+.ms-modal-header small {
+    color: gray;
+}
+.ms-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #666;
+    text-decoration: none;
+}
+.ms-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.ms-table th, .ms-table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+.ms-table th {
+    font-weight: 600;
+}
+.ms-empty {
+    text-align: center;
+    color: #9ca3af;
+}
