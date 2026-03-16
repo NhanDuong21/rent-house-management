@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Models.entity.Tenant;
 import Utils.database.DBContext;
@@ -639,6 +641,39 @@ public class TenantDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Lấy map tenantId -> roomNumber cho các tenant có contract đang active
+     * (status NOT IN ('ENDED', 'CANCELLED')).
+     * Nếu 1 tenant có nhiều contract active, lấy contract_id nhỏ nhất (hợp đồng cũ nhất còn hiệu lực).
+     *
+     * @return Map<tenantId, roomNumber>
+     */
+    @SuppressWarnings("CallToPrintStackTrace")
+    public Map<Integer, String> getActiveRoomMap() {
+        Map<Integer, String> map = new HashMap<>();
+        String sql = """
+            SELECT c.tenant_id, r.room_number
+            FROM CONTRACT c
+            JOIN ROOM r ON r.room_id = c.room_id
+            WHERE c.status NOT IN ('ENDED', 'CANCELLED')
+              AND c.contract_id = (
+                  SELECT MIN(c2.contract_id)
+                  FROM CONTRACT c2
+                  WHERE c2.tenant_id = c.tenant_id
+                    AND c2.status NOT IN ('ENDED', 'CANCELLED')
+              )
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                map.put(rs.getInt("tenant_id"), rs.getString("room_number"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
 }
