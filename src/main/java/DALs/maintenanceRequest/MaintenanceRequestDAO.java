@@ -145,25 +145,38 @@ public class MaintenanceRequestDAO extends DBContext {
         return 0;
     }
 
-    public void updateStatus(int id, String status) {
+    public boolean updateStatus(int id, String newStatus, Integer handledByStaffId) {
         String sql = """
         UPDATE MAINTENANCE_REQUEST
-        SET status=?,
-            completed_at =
-                CASE WHEN ?='DONE'
-                     THEN GETDATE()
-                     ELSE NULL
-                END
-        WHERE request_id=?
-        """;
+        SET status = ?,
+            handled_by_staff_id = ?,
+            completed_at = CASE
+                               WHEN ? IN ('DONE', 'CANCELLED') THEN GETDATE()
+                               ELSE NULL
+                           END
+        WHERE request_id = ?
+          AND status IN ('PENDING', 'IN_PROGRESS')
+          AND ? IN ('PENDING', 'IN_PROGRESS', 'DONE', 'CANCELLED')
+    """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setString(2, status);
-            ps.setInt(3, id);
-            ps.executeUpdate();
+            ps.setString(1, newStatus);
+
+            if (handledByStaffId != null) {
+                ps.setInt(2, handledByStaffId);
+            } else {
+                ps.setNull(2, java.sql.Types.INTEGER);
+            }
+
+            ps.setString(3, newStatus);
+            ps.setInt(4, id);
+            ps.setString(5, newStatus);
+
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public List<MaintenanceRequestDTO> getRequestsByTenantId(int tenantId, int page, int pageSize) {

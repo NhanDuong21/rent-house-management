@@ -19,6 +19,7 @@ public class MaintenanceRequestDTO {
     private String imageUrl;
     private Timestamp createdAt;
     private Timestamp completedAt;
+    private Integer handledByStaffId;
 
     public MaintenanceRequestDTO() {
     }
@@ -109,5 +110,13 @@ public class MaintenanceRequestDTO {
 
     public void setCompletedAt(Timestamp completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public Integer getHandledByStaffId() {
+        return handledByStaffId;
+    }
+
+    public void setHandledByStaffId(Integer handledByStaffId) {
+        this.handledByStaffId = handledByStaffId;
     }
 }
