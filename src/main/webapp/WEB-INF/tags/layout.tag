@@ -188,7 +188,7 @@
                     </a>
 
                     <div class="rh-spacer"></div>
-                    <a class="rh-dashboard manager" href="<%=ctx%>/manager/home">Manager Dashboard</a>
+                   
                     <% } %>
 
                     <% if (isAdmin) {%>

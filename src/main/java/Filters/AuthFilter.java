@@ -106,9 +106,9 @@ public class AuthFilter implements Filter {
 
                 boolean allowContract
                         = uri.equals(ctx + "/tenant/contract")
-                        || uri.startsWith(ctx + "/tenant/contract/");
+                        || uri.startsWith(ctx + "/tenant/contract/")
+                        || uri.equals(ctx + "/tenant/add-occupant");
 
-                // IMPORTANT: cho phép luôn /tenant/set-password (nếu bạn muốn pending vẫn set pass)
                 boolean allowSetPassword = uri.equals(ctx + "/tenant/set-password");
 
                 if (!allowContract && !allowSetPassword) {

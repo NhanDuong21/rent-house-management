@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.List;
 
 import DALs.contract.ContractDAO;
-import DALs.contract.ContractOccupantDAO;
+import DALs.contract.OccupantDAO;
 import DALs.payment.PaymentDAO;
 import Models.authentication.AuthResult;
 import Models.entity.Contract;
-import Models.entity.ContractOccupant;
+import Models.entity.Occupant;
 import Models.entity.Payment;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -16,14 +16,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- *
- * @author Duong Thien Nhan - CE190741
- */
 public class TenantContractDetailController extends HttpServlet {
 
     private final ContractDAO contractDAO = new ContractDAO();
-    private final ContractOccupantDAO contractOccupantDAO = new ContractOccupantDAO();
+    private final OccupantDAO occupantDAO = new OccupantDAO();
     private final PaymentDAO paymentDAO = new PaymentDAO();
 
     @Override
@@ -53,6 +49,7 @@ public class TenantContractDetailController extends HttpServlet {
         }
 
         int tenantId = auth.getTenant().getTenantId();
+
         Contract c = contractDAO.findDetailForTenant(contractId, tenantId);
         if (c == null) {
             response.sendRedirect(request.getContextPath() + "/tenant/contract");
@@ -60,7 +57,7 @@ public class TenantContractDetailController extends HttpServlet {
         }
 
         Payment latestPay = paymentDAO.findLatestBankPaymentForContract(contractId);
-        List<ContractOccupant> occupants = contractOccupantDAO.findByContractId(contractId);
+        List<Occupant> occupants = occupantDAO.findByContractId(contractId);
 
         request.setAttribute("contract", c);
         request.setAttribute("latestPayment", latestPay);
