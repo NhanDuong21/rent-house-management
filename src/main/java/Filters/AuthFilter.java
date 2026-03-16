@@ -80,7 +80,7 @@ public class AuthFilter implements Filter {
         // ===== TENANT ROUTE CHECK =====
         if (uri.startsWith(ctx + "/tenant/")) {
 
-            if (!"TENANT".equalsIgnoreCase(role)) {
+            if (!("TENANT".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role))) {
                 response.sendRedirect(ctx + "/home");
                 return;
             }

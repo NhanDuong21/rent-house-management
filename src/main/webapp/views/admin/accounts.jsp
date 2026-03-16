@@ -79,6 +79,13 @@
             <div class="ma-card-title">Accounts List</div>
 
             <div class="ma-table-wrap">
+                <c:if test="${not empty sessionScope.successMsg}">
+                    <div class="alert-success">
+                        ${sessionScope.successMsg}
+                    </div>
+
+                    <c:remove var="successMsg" scope="session"/>
+                </c:if>
                 <table class="ma-table">
                     <thead>
                         <tr>
@@ -126,10 +133,9 @@
 
                                         <!-- TOGGLE STATUS -->
                                         <button type="button"
-                                                disabled
                                                 class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'} ma-open-toggle"
                                                 id="toggleBtn-${a.accountType}-${a.accountId}"
-                                                title="Toggle Active / Locked"
+                                                title="Toggle status"
                                                 data-account-id="${a.accountId}"
                                                 data-account-type="${a.accountType}"
                                                 data-current-status="${a.status}"
@@ -144,12 +150,16 @@
                                                     <c:when test="${fn:toLowerCase(a.status) == 'active'}">
                                                         <i class="bi bi-unlock-fill"></i> Active
                                                     </c:when>
-                                                    <c:otherwise>
+                                                    <c:when test="${a.accountType == 'TENANT' && fn:toLowerCase(a.status) == 'locked'}">
                                                         <i class="bi bi-lock-fill"></i> Locked
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="bi bi-slash-circle-fill"></i> Inactive
                                                     </c:otherwise>
                                                 </c:choose>
                                             </span>
                                         </button>
+
 
                                         <!-- SET PASSWORD (OPEN MODAL) -->
                                         <button type="button"
@@ -177,6 +187,18 @@
                                                 Update
                                             </button>
                                         </c:if>
+                                        <c:if test="${a.accountType == 'TENANT'}">
+                                            <button type="button"
+                                                    class="ma-action-btn primary"
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/admin/accounts/update-tenant?id=${a.accountId}'">
+
+                                                <span class="ma-action-ico">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </span>
+                                                Update
+                                            </button>
+                                        </c:if>
+
 
                                     </div>
                                 </td>

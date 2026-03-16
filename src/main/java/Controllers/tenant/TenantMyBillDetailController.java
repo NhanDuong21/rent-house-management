@@ -42,6 +42,7 @@ public class TenantMyBillDetailController extends HttpServlet {
             return;
         }
         int tenant_id = auth.getTenant().getTenantId();
+        
         int billId = Integer.parseInt(request.getParameter("billId"));
         BillDAO bd = new BillDAO();
         PaymentConfirmBillDAO pd = new PaymentConfirmBillDAO();
@@ -50,7 +51,6 @@ public class TenantMyBillDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/tenant/bill");
             return;
         }
-
         List<BillDetail> listBillDetail = bd.getListBillDetailByBillId(billId);
         Payment pendingPayment = pd.getPendingPaymentByBillId(billDetail.getBillId());
         BigDecimal totalAmount = bd.totalAmount(billId);

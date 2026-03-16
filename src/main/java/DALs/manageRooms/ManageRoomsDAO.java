@@ -14,20 +14,43 @@ import Utils.database.DBContext;
  * @author Truong Hoang Khang - CE190729
  */
 public class ManageRoomsDAO extends DBContext {
-    public List<Room> fetchAllRoom(int pageIndex, int pageSize) {
+
+    public List<Room> fetchAllRoom(int pageIndex, int pageSize, String search, String status) {
         List<Room> list = new ArrayList<>();
-        String sql
-                = "SELECT r.*, b.block_name "
-                + "FROM Room r "
-                + "JOIN Block b ON r.block_id = b.block_id "
-                + "WHERE r.status IN ('AVAILABLE','MAINTENANCE') "
-                + "ORDER BY r.room_id "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT r.*, b.block_name
+            FROM Room r
+            JOIN Block b ON r.block_id = b.block_id
+            WHERE r.status IN ('AVAILABLE','MAINTENANCE')
+              AND r.room_number LIKE ?
+        """);
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND r.status = ? ");
+        }
+
+        sql.append("""
+            ORDER BY r.room_id
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+        """);
+
         int offset = (pageIndex - 1) * pageSize;
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, offset);
-            ps.setInt(2, pageSize);
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+
+            ps.setString(index++, "%" + search + "%");
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ps.setInt(index++, offset);
+            ps.setInt(index, pageSize);
+
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 Room r = new Room();
                 r.setRoomId(rs.getInt("room_id"));
@@ -47,10 +70,29 @@ public class ManageRoomsDAO extends DBContext {
         }
         return list;
     }
-    public int countRoom() {
-        String sql = "SELECT COUNT(*) FROM Room WHERE status IN ('AVAILABLE','MAINTENANCE')";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+
+    public int countRoom(String search, String status) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT COUNT(*)
+            FROM Room r
+            WHERE r.status IN ('AVAILABLE','MAINTENANCE')
+              AND r.room_number LIKE ?
+        """);
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND r.status = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+
+            ps.setString(index++, "%" + search + "%");
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -59,6 +101,7 @@ public class ManageRoomsDAO extends DBContext {
         }
         return 0;
     }
+
     public Room getRoomById(int id) {
         String sql = "SELECT room_id, status FROM Room WHERE room_id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -75,6 +118,7 @@ public class ManageRoomsDAO extends DBContext {
         }
         return null;
     }
+
     public boolean updateRoomStatus(int roomId, String status) {
         String sql = "UPDATE Room SET status=? WHERE room_id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

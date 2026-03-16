@@ -265,6 +265,87 @@
                 </div>
 
                 <div class="tcd-divider tcd-divider-soft"></div>
+                <!-- OCCUPANTS -->
+                <div class="tcd-article">
+                    <div class="tcd-article-title">
+                        <i class="bi bi-people"></i>
+                        OCCUPANTS
+                    </div>
+
+                    <c:choose>
+
+                        <c:when test="${empty occupants}">
+                            <div class="tcd-note">
+                                <i class="bi bi-info-circle"></i>
+                                <span>No occupants registered for this contract.</span>
+                            </div>
+                        </c:when>
+
+                        <c:otherwise>
+
+                            <div class="tcd-grid-2 tcd-grid-compact">
+
+                                <c:forEach var="o" items="${occupants}">
+
+                                    <div class="tcd-line">
+                                        <span class="tcd-label">
+                                            <i class="bi bi-person"></i>
+                                            Full Name
+                                        </span>
+
+                                        <span class="tcd-value">
+                                            <b><c:out value="${o.fullName}"/></b>
+
+                                            <span class="tcd-pill">
+                                                <c:out value="${o.occupantRole}"/>
+                                            </span>
+                                        </span>
+                                    </div>
+
+                                    <div class="tcd-line">
+                                        <span class="tcd-label">
+                                            <i class="bi bi-credit-card"></i>
+                                            Citizen ID
+                                        </span>
+
+                                        <span class="tcd-value">
+                                            <c:out value="${o.identityCode}"/>
+                                        </span>
+                                    </div>
+
+                                    <div class="tcd-line">
+                                        <span class="tcd-label">
+                                            <i class="bi bi-telephone"></i>
+                                            Phone
+                                        </span>
+
+                                        <span class="tcd-value">
+                                            <c:out value="${o.phoneNumber}"/>
+                                        </span>
+                                    </div>
+
+                                    <div class="tcd-line">
+                                        <span class="tcd-label">
+                                            <i class="bi bi-envelope"></i>
+                                            Email
+                                        </span>
+
+                                        <span class="tcd-value">
+                                            <c:out value="${o.email}"/>
+                                        </span>
+                                    </div>
+
+                                </c:forEach>
+
+                            </div>
+
+                        </c:otherwise>
+
+                    </c:choose>
+
+                </div>
+
+                <div class="tcd-divider tcd-divider-soft"></div>
 
                 <!-- ARTICLE 1 -->
                 <div class="tcd-article">
@@ -312,24 +393,24 @@
                                     <c:otherwise>-</c:otherwise>
                                 </c:choose>
                                 <c:if test="${c.isMezzanine}">, Mezzanine</c:if>
-                            </span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="tcd-divider tcd-divider-soft"></div>
+                    <div class="tcd-divider tcd-divider-soft"></div>
 
-                <!-- ARTICLE 2 -->
-                <div class="tcd-article">
-                    <div class="tcd-article-title">
-                        <i class="bi bi-calendar-range"></i>
-                        ARTICLE 2: RENTAL PERIOD
-                    </div>
+                    <!-- ARTICLE 2 -->
+                    <div class="tcd-article">
+                        <div class="tcd-article-title">
+                            <i class="bi bi-calendar-range"></i>
+                            ARTICLE 2: RENTAL PERIOD
+                        </div>
 
-                    <div class="tcd-grid-2 tcd-grid-compact">
-                        <div class="tcd-line">
-                            <span class="tcd-label"><i class="bi bi-calendar2-check"></i> Start Date</span>
-                            <span class="tcd-value"><fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/></span>
+                        <div class="tcd-grid-2 tcd-grid-compact">
+                            <div class="tcd-line">
+                                <span class="tcd-label"><i class="bi bi-calendar2-check"></i> Start Date</span>
+                                <span class="tcd-value"><fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/></span>
                         </div>
 
                         <div class="tcd-line">

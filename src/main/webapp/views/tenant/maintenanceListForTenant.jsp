@@ -16,7 +16,6 @@
 
     <div class="mlt-container">
 
-        <!-- HEADER -->
         <div class="mlt-header">
             <div>
                 <h2>My Maintenance Requests</h2>
@@ -31,13 +30,11 @@
             </a>
         </div>
 
-        <!-- CARD -->
         <div class="mlt-card">
             <div class="mlt-card-head">
                 <div class="mlt-card-title">My Requests (${totalRequest})</div>
             </div>
 
-            <!-- TABLE -->
             <div class="mlt-table-wrap">
                 <table class="mlt-table">
                     <thead>
@@ -84,7 +81,6 @@
                 </table>
             </div>
 
-            <!-- PAGINATION -->
             <c:if test="${totalPage > 1}">
                 <div class="mlt-pager">
                     <ul class="mlt-pagination">
@@ -108,7 +104,6 @@
                     </ul>
                 </div>
             </c:if>
-
         </div>
     </div>
 

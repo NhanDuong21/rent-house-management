@@ -48,7 +48,6 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         // Convert
         LocalDate billMonth = LocalDate.parse(billMonthStr + "-01");
         LocalDate dueDate = LocalDate.parse(dueDateStr);
-        LocalDate now = java.time.LocalDate.now().withDayOfMonth(1);
 
         String[] parts = billMonthStr.split("-");
         int year = Integer.parseInt(parts[0]);
@@ -61,21 +60,32 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 
         // VALIDATE METER
         if (newElectric <= oldElectric) {
+            loadRooms(request);
             request.setAttribute("error", "New electric meter must be greater than old meter.");
             request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
             return;
         }
         if (newWater <= oldWater) {
+            loadRooms(request);
             request.setAttribute("error", "New water meter must be greater than old meter.");
             request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
             return;
         }
-
+        //ngày đầu tiên của tháng hiện tại
        LocalDate firstDayCurrentMonth = LocalDate.now().withDayOfMonth(1);
 
         if (billMonth.isAfter(firstDayCurrentMonth)) {
             loadRooms(request);
             request.setAttribute("error", "Cannot generate bill for future months.");
+            request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
+            return;
+        }
+        LocalDate today = LocalDate.now();
+
+        // chỉ được tạo bill trong ngày 25 mỗi tháng
+        if( today.getDayOfMonth() < 25) {
+             loadRooms(request);
+            request.setAttribute("error","Bills for the current month can only be generated from day 25 onwards.");
             request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
             return;
         }

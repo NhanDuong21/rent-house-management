@@ -106,7 +106,7 @@ public class utilitiesDAO extends DBContext {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 Utility u = new Utility();
                 u.setUtilityId(rs.getInt("room_id"));
                 u.setUtilityName(rs.getString("room_number"));
@@ -146,6 +146,21 @@ public class utilitiesDAO extends DBContext {
             ps.setInt(2, id);
             int num = ps.executeUpdate();
             return num > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isUtilityUsedInBill(int id) {
+        String sql = "SELECT COUNT(*) FROM BILL_DETAIL WHERE utility_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

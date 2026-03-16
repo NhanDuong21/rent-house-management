@@ -31,11 +31,11 @@
                     All Requests (${totalRequest})
                 </div>
 
-                <!-- SEARCH -->
                 <form class="ml-search-form"
                       method="get"
                       action="${ctx}/manager/maintenance">
 
+                    <!-- SEARCH -->
                     <span class="ml-search-ico">
                         <i class="bi bi-search"></i>
                     </span>
@@ -46,6 +46,39 @@
                            placeholder="Search by room number..."
                            value="${param.search}"
                            autocomplete="off">
+
+                    <!-- NEW: STATUS FILTER -->
+                    <select name="status" id="mlStatus" class="form-select">
+
+                        <option value="">All Status</option>
+
+                        <option value="PENDING"
+                                ${param.status == 'PENDING' ? 'selected' : ''}>
+                            PENDING
+                        </option>
+
+                        <option value="IN_PROGRESS"
+                                ${param.status == 'IN_PROGRESS' ? 'selected' : ''}>
+                            IN PROGRESS
+                        </option>
+
+                        <option value="DONE"
+                                ${param.status == 'DONE' ? 'selected' : ''}>
+                            DONE
+                        </option>
+
+                        <option value="CANCELLED"
+                                ${param.status == 'CANCELLED' ? 'selected' : ''}>
+                            CANCELLED
+                        </option>
+
+                    </select>
+
+                    <!-- NEW: FILTER BUTTON -->
+                    <button type="submit" class="ml-action-btn">
+                        <i class="bi bi-funnel"></i>
+                        Filter
+                    </button>
 
                 </form>
             </div>
@@ -131,14 +164,14 @@
 
                     <c:forEach begin="1" end="${totalPage}" var="i">
                         <li class="${i == pageIndex ? 'active' : ''}">
-                            <a href="${ctx}/manager/maintenance?page=${i}&search=${param.search}">
+                            <a href="${ctx}/manager/maintenance?page=${i}&search=${param.search}&status=${param.status}">
                                 ${i}
                             </a>
                         </li>
                     </c:forEach>
 
                     <li class="${pageIndex == totalPage ? 'disabled' : ''}">
-                        <a href="${ctx}/manager/maintenance?page=${pageIndex + 1}&search=${param.search}">
+                        <a href="${ctx}/manager/maintenance?page=${pageIndex + 1}&search=${param.search}&status=${param.status}">
                             <i class="bi bi-chevron-right"></i>
                         </a>
                     </li>

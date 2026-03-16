@@ -9,12 +9,16 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <t:layout
     title="Maintenance Request Detail"
     active="maintenance"
     cssFile="${ctx}/assets/css/views/editMaintenance.css">
+
     <c:set var="m" value="${maintenance}" />
+
     <div class="em-container">
         <div class="em-header">
             <div>
@@ -58,6 +62,7 @@
                            readonly>
                 </div>
             </div>
+
             <div style="margin-top: 20px">
                 <label>Description</label>
                 <textarea class="form-control" rows="4" readonly>${m.description}</textarea>
@@ -70,7 +75,7 @@
                 <c:when test="${not empty m.imageUrl}">
                     <div class="em-images">
                         <c:forEach var="img" items="${fn:split(m.imageUrl, ',')}">
-                            <img class="em-image"
+                            <img class="em-image preview-image"
                                  src="${ctx}/assets/images/maintenance/${img}"
                                  alt="Maintenance Image">
                         </c:forEach>
@@ -81,5 +86,12 @@
                 </c:otherwise>
             </c:choose>
         </div>
+
+        <div id="imageModal" class="image-modal">
+            <span class="image-modal-close" id="closeImageModal">&times;</span>
+            <img class="image-modal-content" id="modalImage" alt="Preview">
+        </div>
     </div>
+
+    <script src="${ctx}/assets/js/pages/editMaintenance.js"></script>
 </t:layout>
