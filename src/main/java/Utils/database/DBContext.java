@@ -15,7 +15,7 @@ public class DBContext {
         String url = "jdbc:sqlserver://localhost:1433;"
                 + "databaseName=RentHouse;"
                 + "user=sa;"
-                + "password=123456;"
+                + "password=12345678;"
                 + "encrypt=true;"
                 + "trustServerCertificate=true;";
         try {
