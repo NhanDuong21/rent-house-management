@@ -1,11 +1,8 @@
 package Controllers.manager;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 import Models.entity.Tenant;
 import Services.tenant.TenantService;
+import Utils.security.HashUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -21,20 +18,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(urlPatterns = {"/manager/tenant/edit"})
 public class ManagerEditAndDeleteTenantController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -47,37 +34,42 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String action  = request.getParameter("action");
+        String page    = request.getParameter("page");
+        String keyword = request.getParameter("keyword");
+
+        // ── Nhánh Reset Password ───────────────────────────────────────────────
+        if ("resetPassword".equals(action)) {
+            handleResetPassword(request, response, page, keyword);
+            return;
+        }
+
+        // ── Nhánh Edit Tenant (mặc định) ──────────────────────────────────────
         int id = Integer.parseInt(request.getParameter("tenantId"));
         TenantService service = new TenantService();
         Tenant t = service.findById(id);
 
         if (t != null) {
+            // Kiểm tra có active contract không — chỉ cho phép edit khi có
+            if (!service.hasActiveContract(id)) {
+                // Không có active contract → redirect về kèm lỗi
+                StringBuilder redirectUrl = new StringBuilder(
+                        request.getContextPath() + "/manager/tenants?error="
+                        + java.net.URLEncoder.encode("Chỉ có thể chỉnh sửa tenant đang có hợp đồng active.", "UTF-8"));
+                appendPageKeyword(redirectUrl, page, keyword);
+                response.sendRedirect(redirectUrl.toString());
+                return;
+            }
+
             t.setFullName(request.getParameter("fullName"));
             t.setIdentityCode(request.getParameter("identityCode"));
             t.setPhoneNumber(request.getParameter("phoneNumber"));
@@ -99,45 +91,99 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
             try {
                 service.updateTenant(t);
             } catch (IllegalArgumentException ex) {
-                // Validation thất bại → redirect về kèm ?error=...
-                String page = request.getParameter("page");
-                String keyword = request.getParameter("keyword");
-                StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/manager/tenants?error="
+                StringBuilder redirectUrl = new StringBuilder(
+                        request.getContextPath() + "/manager/tenants?error="
                         + java.net.URLEncoder.encode(ex.getMessage(), "UTF-8"));
-                if (keyword != null && !keyword.isBlank()) {
-                    redirectUrl.append("&keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
-                }
-                if (page != null && !page.isBlank()) {
-                    redirectUrl.append("&page=").append(page);
-                }
+                appendPageKeyword(redirectUrl, page, keyword);
                 response.sendRedirect(redirectUrl.toString());
                 return;
             }
         }
 
         // Redirect về đúng trang sau khi edit thành công
-        String page = request.getParameter("page");
-        String keyword = request.getParameter("keyword");
         StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/manager/tenants");
-        boolean hasQuery = false;
-        if (keyword != null && !keyword.isBlank()) {
-            redirectUrl.append("?keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
-            hasQuery = true;
-        }
-        if (page != null && !page.isBlank()) {
-            redirectUrl.append(hasQuery ? "&" : "?").append("page=").append(page);
-        }
+        appendPageKeyword(redirectUrl, page, keyword);
         response.sendRedirect(redirectUrl.toString());
     }
 
     /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
+     * Xử lý reset password cho tenant.
+     * Chỉ cho phép khi tenant có active contract.
      */
+    private void handleResetPassword(HttpServletRequest request, HttpServletResponse response,
+                                     String page, String keyword) throws IOException {
+
+        int tenantId = Integer.parseInt(request.getParameter("tenantId"));
+        TenantService service = new TenantService();
+
+        // Kiểm tra active contract
+        if (!service.hasActiveContract(tenantId)) {
+            StringBuilder redirectUrl = new StringBuilder(
+                    request.getContextPath() + "/manager/tenants?error="
+                    + java.net.URLEncoder.encode("Chỉ có thể reset password cho tenant đang có hợp đồng active.", "UTF-8"));
+            appendPageKeyword(redirectUrl, page, keyword);
+            response.sendRedirect(redirectUrl.toString());
+            return;
+        }
+
+        String newPassword = request.getParameter("newPassword");
+        if (newPassword == null || newPassword.isBlank() || newPassword.length() < 6) {
+            StringBuilder redirectUrl = new StringBuilder(
+                    request.getContextPath() + "/manager/tenants?error="
+                    + java.net.URLEncoder.encode("Mật khẩu không hợp lệ (tối thiểu 6 ký tự).", "UTF-8"));
+            appendPageKeyword(redirectUrl, page, keyword);
+            response.sendRedirect(redirectUrl.toString());
+            return;
+        }
+
+        Tenant t = service.findById(tenantId);
+        if (t == null) {
+            StringBuilder redirectUrl = new StringBuilder(
+                    request.getContextPath() + "/manager/tenants?error="
+                    + java.net.URLEncoder.encode("Không tìm thấy tenant.", "UTF-8"));
+            appendPageKeyword(redirectUrl, page, keyword);
+            response.sendRedirect(redirectUrl.toString());
+            return;
+        }
+
+        String newHash = HashUtil.md5(newPassword);
+        // Cập nhật password qua DAO (dùng method sẵn có)
+        DALs.auth.TenantDAO tenantDAO = new DALs.auth.TenantDAO();
+        boolean ok = tenantDAO.adminResetPasswordForTenant(tenantId, newHash);
+
+        if (!ok) {
+            StringBuilder redirectUrl = new StringBuilder(
+                    request.getContextPath() + "/manager/tenants?error="
+                    + java.net.URLEncoder.encode("Reset password thất bại. Vui lòng thử lại.", "UTF-8"));
+            appendPageKeyword(redirectUrl, page, keyword);
+            response.sendRedirect(redirectUrl.toString());
+            return;
+        }
+
+        // Thành công
+        StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/manager/tenants?success=1");
+        appendPageKeyword(redirectUrl, page, keyword);
+        response.sendRedirect(redirectUrl.toString());
+    }
+
+    /**
+     * Helper: append page và keyword vào redirectUrl nếu có.
+     */
+    private void appendPageKeyword(StringBuilder url, String page, String keyword) throws java.io.UnsupportedEncodingException {
+        boolean hasQuery = url.indexOf("?") >= 0;
+        if (keyword != null && !keyword.isBlank()) {
+            url.append(hasQuery ? "&" : "?")
+               .append("keyword=")
+               .append(java.net.URLEncoder.encode(keyword, "UTF-8"));
+            hasQuery = true;
+        }
+        if (page != null && !page.isBlank()) {
+            url.append(hasQuery ? "&" : "?").append("page=").append(page);
+        }
+    }
+
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

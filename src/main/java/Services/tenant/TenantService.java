@@ -4,6 +4,7 @@ import DALs.auth.TenantDAO;
 import Models.common.ServiceResult;
 import Models.entity.Tenant;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description
@@ -172,6 +173,16 @@ public class TenantService {
 
     public boolean hasActiveContract(int id) {
         return tenantDAO.hasActiveContract(id);
+    }
+
+    /**
+     * Lấy map tenantId -> roomNumber cho các tenant có contract đang active.
+     * Tenant nào không có contract active sẽ không có entry trong map (hiện "—" ở JSP).
+     *
+     * @return Map<tenantId, roomNumber>
+     */
+    public Map<Integer, String> getActiveRoomMap() {
+        return tenantDAO.getActiveRoomMap();
     }
 
 }

@@ -8,6 +8,7 @@ import Models.entity.Tenant;
 import Services.tenant.TenantService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -89,7 +90,11 @@ public class ManagerViewListTenantController extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
 
+        // Map tenantId -> roomNumber cho contract đang active
+        Map<Integer, String> activeRoomMap = service.getActiveRoomMap();
+
         request.setAttribute("tenants", list);
+        request.setAttribute("activeRoomMap", activeRoomMap);
         request.setAttribute("keyword", keyword);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);

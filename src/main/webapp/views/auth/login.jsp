@@ -70,6 +70,10 @@
             }
             .fp-success-title { font-weight: 700; font-size: 1rem; color: #1e293b; }
             .fp-success-sub   { font-size: .85rem; color: #64748b; }
+
+            /* ── step panels bên trong forgotPanel ── */
+            .fp-step { display: none; }
+            .fp-step.is-active { display: block; }
         </style>
     </head>
 
@@ -153,46 +157,101 @@
                         </button>
 
                         <div class="login-head" style="margin-bottom:20px;">
-                            <div class="login-title">Quên mật khẩu</div>
-                            <div class="login-sub">Nhập email để nhận OTP xác thực</div>
+                            <div class="login-title" id="fpPanelTitle">Quên mật khẩu</div>
+                            <div class="login-sub" id="fpPanelSub">Nhập email để nhận OTP xác thực</div>
                         </div>
 
-                        <!-- Lỗi gửi OTP -->
+                        <!-- Thông báo lỗi dùng chung cho cả 3 bước -->
                         <div id="fpError" class="login-error" style="display:none;">
                             <i class="bi bi-x-circle-fill"></i>
                             <span id="fpErrorMsg"></span>
                         </div>
 
-                        <!-- FORM nhập email -->
-                        <form id="formForgot" class="login-form" style="margin-bottom:0;">
-                            <div class="field">
-                                <label class="field-label">Email đã đăng ký</label>
-                                <div class="field-control">
-                                    <span class="field-icon"><i class="bi bi-envelope"></i></span>
-                                    <input class="field-input"
-                                           type="email"
-                                           id="fpEmailInput"
-                                           placeholder="your.email@example.com"
-                                           autocomplete="email"
-                                           required>
+                        <!-- ── BƯỚC 1: Nhập email ── -->
+                        <div class="fp-step is-active" id="fpStep1">
+                            <form id="formForgot" class="login-form" style="margin-bottom:0;">
+                                <div class="field">
+                                    <label class="field-label">Email đã đăng ký</label>
+                                    <div class="field-control">
+                                        <span class="field-icon"><i class="bi bi-envelope"></i></span>
+                                        <input class="field-input"
+                                               type="email"
+                                               id="fpEmailInput"
+                                               placeholder="your.email@example.com"
+                                               autocomplete="email"
+                                               required>
+                                    </div>
                                 </div>
-                            </div>
+                                <button class="login-btn" type="submit" id="btnSendOtp">
+                                    <i class="bi bi-send"></i> Gửi OTP
+                                </button>
+                            </form>
+                        </div>
 
-                            <button class="login-btn" type="submit" id="btnSendOtp">
-                                <i class="bi bi-send"></i> Gửi OTP
-                            </button>
-                        </form>
+                        <!-- ── BƯỚC 2: Nhập OTP ── -->
+                        <div class="fp-step" id="fpStep2">
+                            <form id="formVerifyOtp" class="login-form" style="margin-bottom:0;">
+                                <div class="field">
+                                    <label class="field-label">Mã OTP</label>
+                                    <div class="field-control">
+                                        <span class="field-icon"><i class="bi bi-key-fill"></i></span>
+                                        <input class="field-input"
+                                               type="text"
+                                               id="fpOtpInput"
+                                               inputmode="numeric"
+                                               maxlength="6"
+                                               placeholder="Nhập OTP 6 số"
+                                               autocomplete="one-time-code"
+                                               required>
+                                    </div>
+                                </div>
+                                <button class="login-btn" type="submit" id="btnVerifyOtp">
+                                    <i class="bi bi-check-circle"></i> Xác nhận OTP
+                                </button>
+                                <div class="login-hint" style="margin-top:10px;">
+                                    Không nhận được OTP?
+                                    <a href="#" id="btnResendOtp" style="color:var(--primary,#6366f1);">Gửi lại</a>
+                                </div>
+                            </form>
+                        </div>
 
-                        <!-- Trạng thái gửi thành công -->
-                        <div class="fp-success" id="fpSuccess">
-                            <div class="fp-success-ico"><i class="bi bi-envelope-check-fill"></i></div>
-                            <div class="fp-success-title">OTP đã được gửi!</div>
-                            <div class="fp-success-sub" id="fpSuccessSub">
-                                Kiểm tra hộp thư của bạn, OTP có hiệu lực trong 10 phút.
-                            </div>
-                            <button class="login-btn" type="button" id="btnGoToOtp" style="margin-top:8px;">
-                                <i class="bi bi-key"></i> Nhập OTP ngay
-                            </button>
+                        <!-- ── BƯỚC 3: Đặt mật khẩu mới ── -->
+                        <div class="fp-step" id="fpStep3">
+                            <form id="formResetPassword" class="login-form" style="margin-bottom:0;">
+                                <div class="field">
+                                    <label class="field-label">Mật khẩu mới</label>
+                                    <div class="field-control">
+                                        <span class="field-icon"><i class="bi bi-shield-lock"></i></span>
+                                        <input class="field-input"
+                                               type="password"
+                                               id="fpNewPassword"
+                                               placeholder="Tối thiểu 6 ký tự"
+                                               autocomplete="new-password"
+                                               required>
+                                        <button class="field-suffix-btn" type="button" id="toggleFpNew" aria-label="Show/Hide">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Xác nhận mật khẩu</label>
+                                    <div class="field-control">
+                                        <span class="field-icon"><i class="bi bi-shield-lock"></i></span>
+                                        <input class="field-input"
+                                               type="password"
+                                               id="fpConfirmPassword"
+                                               placeholder="Nhập lại mật khẩu mới"
+                                               autocomplete="new-password"
+                                               required>
+                                        <button class="field-suffix-btn" type="button" id="toggleFpConfirm" aria-label="Show/Hide">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="login-btn" type="submit" id="btnResetPassword">
+                                    <i class="bi bi-check2-circle"></i> Đặt mật khẩu mới
+                                </button>
+                            </form>
                         </div>
 
                     </div>
@@ -357,14 +416,13 @@
         <script src="<%=request.getContextPath()%>/assets/js/pages/login.js"></script>
         <script>
             // ── Forgot Password inline panel ─────────────────────────────────────
-            const forgotPanel   = document.getElementById('forgotPanel');
-            const loginContent  = document.getElementById('loginContent');
-            const fpError       = document.getElementById('fpError');
-            const fpErrorMsg    = document.getElementById('fpErrorMsg');
-            const fpSuccess     = document.getElementById('fpSuccess');
-            const fpSuccessSub  = document.getElementById('fpSuccessSub');
-            const fpEmailInput  = document.getElementById('fpEmailInput');
-            const btnSendOtp    = document.getElementById('btnSendOtp');
+            const forgotPanel  = document.getElementById('forgotPanel');
+            const fpError      = document.getElementById('fpError');
+            const fpErrorMsg   = document.getElementById('fpErrorMsg');
+            const fpEmailInput = document.getElementById('fpEmailInput');
+            const fpPanelTitle = document.getElementById('fpPanelTitle');
+            const fpPanelSub   = document.getElementById('fpPanelSub');
+            const btnSendOtp   = document.getElementById('btnSendOtp');
 
             // Mở panel forgot
             document.getElementById('linkForgotPassword').addEventListener('click', e => {
@@ -378,44 +436,63 @@
             });
 
             function openForgotPanel() {
-                fpError.style.display   = 'none';
-                fpSuccess.classList.remove('is-show');
-                document.getElementById('formForgot').style.display = '';
+                hideFpError();
+                showStep(1);
                 forgotPanel.classList.add('is-open');
                 fpEmailInput.focus();
             }
 
             function closeForgotPanel() {
                 forgotPanel.classList.remove('is-open');
+                // Reset về bước 1
                 fpEmailInput.value = '';
+                document.getElementById('fpOtpInput').value = '';
+                document.getElementById('fpNewPassword').value = '';
+                document.getElementById('fpConfirmPassword').value = '';
+                hideFpError();
+                showStep(1);
+                fpPanelTitle.textContent = 'Quên mật khẩu';
+                fpPanelSub.textContent   = 'Nhập email để nhận OTP xác thực';
             }
 
-            // Submit gửi OTP qua AJAX
+            function showStep(n) {
+                document.querySelectorAll('.fp-step').forEach(el => el.classList.remove('is-active'));
+                document.getElementById('fpStep' + n).classList.add('is-active');
+            }
+
+            function showFpError(msg) {
+                fpErrorMsg.textContent = msg;
+                fpError.style.display = 'flex';
+            }
+
+            function hideFpError() {
+                fpError.style.display = 'none';
+            }
+
+            // ── Bước 1: Submit gửi OTP ───────────────────────────────────────────
             document.getElementById('formForgot').addEventListener('submit', async e => {
                 e.preventDefault();
                 const email = fpEmailInput.value.trim();
                 if (!email) return;
 
-                // Loading state
                 btnSendOtp.disabled = true;
                 btnSendOtp.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang gửi…';
-                fpError.style.display = 'none';
+                hideFpError();
 
                 try {
-                    const res = await fetch('<%=request.getContextPath()%>/forgot-password', {
-                        method: 'POST',
+                    const res  = await fetch('<%=request.getContextPath()%>/forgot-password', {
+                        method : 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'step=email&email=' + encodeURIComponent(email)
+                        body   : 'step=email&email=' + encodeURIComponent(email)
                     });
-
                     const data = await res.json();
 
                     if (data.success) {
-                        // Ẩn form, hiện success
-                        document.getElementById('formForgot').style.display = 'none';
-                        fpSuccessSub.textContent =
-                            'OTP đã gửi đến ' + maskEmail(email) + '. Có hiệu lực trong 10 phút.';
-                        fpSuccess.classList.add('is-show');
+                        // Chuyển sang bước 2
+                        fpPanelTitle.textContent = 'Nhập mã OTP';
+                        fpPanelSub.textContent   = 'OTP đã gửi đến ' + maskEmail(email) + '. Có hiệu lực trong 10 phút.';
+                        showStep(2);
+                        document.getElementById('fpOtpInput').focus();
                     } else {
                         showFpError(data.message || 'Email không tồn tại trong hệ thống.');
                     }
@@ -427,27 +504,125 @@
                 }
             });
 
-            // Nút "Nhập OTP ngay" → đóng panel, chuyển sang tab OTP, điền sẵn email
-            document.getElementById('btnGoToOtp').addEventListener('click', () => {
-                const email = fpEmailInput.value.trim();
+            // ── Bước 2: Xác nhận OTP ────────────────────────────────────────────
+            document.getElementById('formVerifyOtp').addEventListener('submit', async e => {
+                e.preventDefault();
+                const otp = document.getElementById('fpOtpInput').value.trim();
+                if (!otp) return;
 
-                // Điền email vào ô email của tab OTP
-                document.getElementById('otpEmailInput').value = email;
+                const btnVerify = document.getElementById('btnVerifyOtp');
+                btnVerify.disabled = true;
+                btnVerify.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang xác nhận…';
+                hideFpError();
 
-                // Focus vào ô OTP
-                document.getElementById('otpCodeInput').focus();
+                try {
+                    const res  = await fetch('<%=request.getContextPath()%>/forgot-password', {
+                        method : 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body   : 'step=verifyOtp&otp=' + encodeURIComponent(otp)
+                    });
+                    const data = await res.json();
 
-                // Đóng panel
-                closeForgotPanel();
-
-                // Kích hoạt tab OTP (dùng lại logic của login.js)
-                document.getElementById('tabOtp').click();
+                    if (data.success) {
+                        // Chuyển sang bước 3
+                        fpPanelTitle.textContent = 'Đặt mật khẩu mới';
+                        fpPanelSub.textContent   = 'Nhập mật khẩu mới cho tài khoản của bạn';
+                        showStep(3);
+                        document.getElementById('fpNewPassword').focus();
+                    } else {
+                        showFpError(data.message || 'OTP không đúng hoặc đã hết hạn.');
+                    }
+                } catch (err) {
+                    showFpError('Có lỗi xảy ra, vui lòng thử lại.');
+                } finally {
+                    btnVerify.disabled = false;
+                    btnVerify.innerHTML = '<i class="bi bi-check-circle"></i> Xác nhận OTP';
+                }
             });
 
-            function showFpError(msg) {
-                fpErrorMsg.textContent = msg;
-                fpError.style.display = 'flex';
-            }
+            // ── Bước 3: Đặt mật khẩu mới ────────────────────────────────────────
+            document.getElementById('formResetPassword').addEventListener('submit', async e => {
+                e.preventDefault();
+                const newPwd     = document.getElementById('fpNewPassword').value;
+                const confirmPwd = document.getElementById('fpConfirmPassword').value;
+
+                if (newPwd.length < 6) {
+                    showFpError('Mật khẩu phải từ 6 ký tự trở lên.');
+                    return;
+                }
+                if (newPwd !== confirmPwd) {
+                    showFpError('Xác nhận mật khẩu không khớp.');
+                    return;
+                }
+
+                const btnReset = document.getElementById('btnResetPassword');
+                btnReset.disabled = true;
+                btnReset.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang xử lý…';
+                hideFpError();
+
+                try {
+                    const res  = await fetch('<%=request.getContextPath()%>/forgot-password', {
+                        method : 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body   : 'step=resetPassword'
+                             + '&newPassword='     + encodeURIComponent(newPwd)
+                             + '&confirmPassword=' + encodeURIComponent(confirmPwd)
+                    });
+                    const data = await res.json();
+
+                    if (data.success && data.redirect) {
+                        // Đổi pass thành công → tự động vào trang luôn
+                        window.location.href = data.redirect;
+                    } else {
+                        showFpError(data.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+                        btnReset.disabled = false;
+                        btnReset.innerHTML = '<i class="bi bi-check2-circle"></i> Đặt mật khẩu mới';
+                    }
+                } catch (err) {
+                    showFpError('Có lỗi xảy ra, vui lòng thử lại.');
+                    btnReset.disabled = false;
+                    btnReset.innerHTML = '<i class="bi bi-check2-circle"></i> Đặt mật khẩu mới';
+                }
+            });
+
+            // ── Gửi lại OTP ──────────────────────────────────────────────────────
+            document.getElementById('btnResendOtp').addEventListener('click', async e => {
+                e.preventDefault();
+                const email = fpEmailInput.value.trim();
+                if (!email) { showStep(1); return; }
+
+                hideFpError();
+                try {
+                    const res  = await fetch('<%=request.getContextPath()%>/forgot-password', {
+                        method : 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body   : 'step=email&email=' + encodeURIComponent(email)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        document.getElementById('fpOtpInput').value = '';
+                        fpPanelSub.textContent = 'OTP mới đã gửi đến ' + maskEmail(email) + '. Có hiệu lực trong 10 phút.';
+                    } else {
+                        showFpError(data.message || 'Không thể gửi lại OTP.');
+                    }
+                } catch (err) {
+                    showFpError('Có lỗi xảy ra, vui lòng thử lại.');
+                }
+            });
+
+            // ── Toggle show/hide password bước 3 ────────────────────────────────
+            document.getElementById('toggleFpNew').addEventListener('click', () => {
+                const inp = document.getElementById('fpNewPassword');
+                const ico = document.querySelector('#toggleFpNew i');
+                if (inp.type === 'password') { inp.type = 'text';     ico.className = 'bi bi-eye-slash'; }
+                else                         { inp.type = 'password'; ico.className = 'bi bi-eye'; }
+            });
+            document.getElementById('toggleFpConfirm').addEventListener('click', () => {
+                const inp = document.getElementById('fpConfirmPassword');
+                const ico = document.querySelector('#toggleFpConfirm i');
+                if (inp.type === 'password') { inp.type = 'text';     ico.className = 'bi bi-eye-slash'; }
+                else                         { inp.type = 'password'; ico.className = 'bi bi-eye'; }
+            });
 
             function maskEmail(email) {
                 const at = email.indexOf('@');
