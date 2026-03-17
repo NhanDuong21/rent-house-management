@@ -68,23 +68,38 @@ public class ManagerUtilitiesController extends HttpServlet {
         }
         switch (action) {
             case "all":
+                request.setAttribute("successMsg", request.getSession().getAttribute("successMsg"));
+                request.setAttribute("errorMsg", request.getSession().getAttribute("errorMsg"));
+                request.getSession().removeAttribute("successMsg");
+                request.getSession().removeAttribute("errorMsg");
+
                 List<Utility> listU = dao.getManagerUntilities();
                 request.setAttribute("utilities", listU);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
-                
+
             case "add":
                 List<Utility> listAdd = dao.getManagerUntilities();
                 request.setAttribute("utilities", listAdd);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
-                
+
             case "delete":
                 int idDelete = Integer.parseInt(request.getParameter("id"));
-                dao.deleteUtilities(idDelete);
+                if (dao.isUtilityUsedInBill(idDelete)) {
+                    request.getSession().setAttribute("errorMsg", "Không thể xóa! Tiện ích này đang được sử dụng trong hóa đơn.");
+                } else {
+                    boolean deleted = dao.deleteUtilities(idDelete);
+
+                    if (deleted) {
+                        request.getSession().setAttribute("successMsg", "Xóa tiện ích thành công!");
+                    } else {
+                        request.getSession().setAttribute("errorMsg", "Xóa thất bại, vui lòng thử lại!");
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");
                 break;
-                
+
             case "edit":
                 int idEdit = Integer.parseInt(request.getParameter("id"));
                 Utility uEdit = dao.getUtilityById(idEdit);
@@ -92,8 +107,8 @@ public class ManagerUtilitiesController extends HttpServlet {
                 request.setAttribute("utilities", listEdit);
                 request.setAttribute("editUtility", uEdit);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
-                break; 
-                
+                break;
+
             case "subscribers":
                 int idSub = Integer.parseInt(request.getParameter("id"));
                 String nameSub = request.getParameter("name");
@@ -104,8 +119,7 @@ public class ManagerUtilitiesController extends HttpServlet {
                 request.setAttribute("utilityName", nameSub);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
-           
-                
+
         }
     }
 
@@ -126,7 +140,7 @@ public class ManagerUtilitiesController extends HttpServlet {
             action = "all";
         }
         switch (action) {
-            case "add": 
+            case "add":
                 String utilityName = request.getParameter("utilityName");
                 BigDecimal price = new BigDecimal(request.getParameter("price"));
                 String unit = request.getParameter("unit");
@@ -134,19 +148,30 @@ public class ManagerUtilitiesController extends HttpServlet {
                 Boolean result = dao.addUtility(utilityName, price, unit);
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");
                 break;
-            
-            case "delete": 
+
+            case "delete":
                 int id = Integer.parseInt(request.getParameter("id"));
-                Boolean resDelete = dao.deleteUtilities(id);
+
+                if (dao.isUtilityUsedInBill(id)) {
+                    request.getSession().setAttribute("errorMsg",
+                            "Không thể xóa! Tiện ích này đang được sử dụng trong hóa đơn.");
+                } else {
+                    Boolean resDelete = dao.deleteUtilities(id);
+                    if (resDelete) {
+                        request.getSession().setAttribute("successMsg", "Xóa tiện ích thành công!");
+                    } else {
+                        request.getSession().setAttribute("errorMsg", "Xóa thất bại, vui lòng thử lại!");
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");
                 break;
-            
-            case "edit": 
-               int idU = Integer.parseInt(request.getParameter("id"));
-               BigDecimal priceU = new BigDecimal(request.getParameter("price"));
-               Boolean resUpdate = dao.updateUtilities(idU, priceU);
-               response.sendRedirect(request.getContextPath()+"/manager/utilities");
-               break;
+
+            case "edit":
+                int idU = Integer.parseInt(request.getParameter("id"));
+                BigDecimal priceU = new BigDecimal(request.getParameter("price"));
+                Boolean resUpdate = dao.updateUtilities(idU, priceU);
+                response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                break;
         }
     }
 

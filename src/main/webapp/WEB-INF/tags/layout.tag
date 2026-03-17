@@ -154,27 +154,27 @@
 
                     <a class="rh-link <%= "m_profile".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/profile">
-                        <i class="bi bi-person-badge me-2"></i> Manager Profile
+                        <i class="bi bi-person-badge me-2"></i> My Profile
                     </a>
 
                     <a class="rh-link <%= "m_rooms".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/manager/rooms">
-                        <i class="bi bi-building me-2"></i> Manager Rooms
+                        <i class="bi bi-building me-2"></i> Manage Rooms
                     </a>
 
                     <a class="rh-link <%= "m_tenants".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/manager/tenants">
-                        <i class="bi bi-people me-2"></i> Manager Tenants
+                        <i class="bi bi-people me-2"></i> Manage Tenants
                     </a>
 
                     <a class="rh-link <%= "m_utilities".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/manager/utilities">
-                        <i class="bi bi-lightning me-2"></i> Utilities
+                        <i class="bi bi-lightning me-2"></i> Manage Utilities
                     </a>
 
                     <a class="rh-link <%= "m_contracts".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/manager/contracts">
-                        <i class="bi bi-file-earmark-check me-2"></i> Manager Contracts
+                        <i class="bi bi-file-earmark-check me-2"></i> Manage Contracts
                     </a>
 
                     <a class="rh-link <%= "m_billing".equals(_active) ? "active" : ""%>"
@@ -185,11 +185,6 @@
                     <a class="rh-link <%= "m_maintenance".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/manager/maintenance">
                         <i class="bi bi-wrench-adjustable me-2"></i> Manage Maintenance
-                    </a>
-
-                    <a class="rh-link <%= "m_accounts".equals(_active) ? "active" : ""%>"
-                       href="<%=ctx%>/manager/accounts">
-                        <i class="bi bi-person-gear me-2"></i> Manage Accounts
                     </a>
 
                     <div class="rh-spacer"></div>

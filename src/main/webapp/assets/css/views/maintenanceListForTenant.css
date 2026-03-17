@@ -6,6 +6,7 @@
 }
 
 /* HEADER */
+
 .mlt-header {
   display: flex;
   justify-content: space-between;
@@ -29,6 +30,7 @@
 }
 
 /* PRIMARY BUTTON */
+
 .mlt-primary-btn {
   background: #2563eb;
   color: white;
@@ -63,6 +65,7 @@
 }
 
 /* CARD */
+
 .mlt-card {
   background: white;
   border-radius: 12px;
@@ -85,6 +88,7 @@
 }
 
 /* TABLE */
+
 .mlt-table-wrap {
   overflow-x: auto;
 }
@@ -120,6 +124,7 @@
 }
 
 /* TEXT */
+
 .mlt-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 800;
@@ -137,6 +142,7 @@
 }
 
 /* BADGE */
+
 .mlt-badge {
   padding: 5px 12px;
   border-radius: 20px;
@@ -159,11 +165,12 @@
   background: #16a34a;
 }
 
-.mlt-badge.status-REJECTED {
+.mlt-badge.status-CANCELLED {
   background: #ef4444;
 }
 
 /* ACTION BUTTON */
+
 .mlt-action-btn {
   padding: 6px 12px;
   border-radius: 8px;
@@ -186,22 +193,19 @@
 }
 
 /* PAGINATION */
+
 .mlt-pager {
-  margin-top: 16px;
+  margin-top: 18px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .mlt-pagination {
   list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
 }
 
 .mlt-pagination li {
@@ -211,15 +215,15 @@
 .mlt-pagination li a {
   padding: 8px 12px;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 8px;
   text-decoration: none;
   color: #111827;
-  font-weight: 800;
+  font-weight: 700;
   background: #fff;
   min-width: 40px;
-  justify-content: center;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 }
 
 .mlt-pagination li a:hover {
@@ -228,17 +232,17 @@
 
 .mlt-pagination li.active a {
   background: #111827;
-  color: #fff;
+  color: white;
   border-color: #111827;
 }
 
 .mlt-pagination li.disabled a {
-  opacity: 0.55;
-  cursor: not-allowed;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 /* MOBILE */
+
 @media (max-width: 576px) {
   .mlt-container {
     padding: 20px;

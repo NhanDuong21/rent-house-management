@@ -135,7 +135,7 @@
                                         <button type="button"
                                                 class="ma-switch ${fn:toLowerCase(a.status) == 'active' ? 'on' : 'off'} ma-open-toggle"
                                                 id="toggleBtn-${a.accountType}-${a.accountId}"
-                                                title="Toggle Active / Locked"
+                                                title="Toggle status"
                                                 data-account-id="${a.accountId}"
                                                 data-account-type="${a.accountType}"
                                                 data-current-status="${a.status}"
@@ -150,12 +150,16 @@
                                                     <c:when test="${fn:toLowerCase(a.status) == 'active'}">
                                                         <i class="bi bi-unlock-fill"></i> Active
                                                     </c:when>
-                                                    <c:otherwise>
+                                                    <c:when test="${a.accountType == 'TENANT' && fn:toLowerCase(a.status) == 'locked'}">
                                                         <i class="bi bi-lock-fill"></i> Locked
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="bi bi-slash-circle-fill"></i> Inactive
                                                     </c:otherwise>
                                                 </c:choose>
                                             </span>
                                         </button>
+
 
                                         <!-- SET PASSWORD (OPEN MODAL) -->
                                         <button type="button"

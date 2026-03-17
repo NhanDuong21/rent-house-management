@@ -19,9 +19,10 @@ import Utils.database.DBContext;
  */
 public class MaintenanceRequestDAO extends DBContext {
 
-    public List<MaintenanceRequestDTO> getAllRequests(int page, int pageSize, String search) {
+    public List<MaintenanceRequestDTO> getAllRequests(int page, int pageSize, String search, String status) {
         List<MaintenanceRequestDTO> list = new ArrayList<>();
-        String sql = """
+
+        StringBuilder sql = new StringBuilder("""
         SELECT
             mr.request_id,
             mr.tenant_id,
@@ -34,13 +35,28 @@ public class MaintenanceRequestDAO extends DBContext {
         JOIN ROOM r ON mr.room_id = r.room_id
         JOIN TENANT t ON mr.tenant_id = t.tenant_id
         WHERE r.room_number LIKE ?
+    """);
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND mr.status = ? ");
+        }
+
+        sql.append("""
         ORDER BY mr.created_at DESC
         OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-    """;
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + search + "%");
-            ps.setInt(2, (page - 1) * pageSize);
-            ps.setInt(3, pageSize);
+    """);
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            ps.setString(index++, "%" + search + "%");
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
+            ps.setInt(index++, (page - 1) * pageSize);
+            ps.setInt(index, pageSize);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 MaintenanceRequestDTO dto = new MaintenanceRequestDTO();
@@ -99,12 +115,26 @@ public class MaintenanceRequestDAO extends DBContext {
         return null;
     }
 
-    public int countRequest(String search) {
-        String sql = "SELECT COUNT(*) FROM MAINTENANCE_REQUEST mr "
-                + "JOIN ROOM r ON mr.room_id = r.room_id "
-                + "WHERE r.room_number LIKE ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + search + "%");
+    public int countRequest(String search, String status) {
+        StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(*)
+        FROM MAINTENANCE_REQUEST mr
+        JOIN ROOM r ON mr.room_id = r.room_id
+        WHERE r.room_number LIKE ?
+    """);
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND mr.status = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            ps.setString(index++, "%" + search + "%");
+
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(index++, status);
+            }
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);

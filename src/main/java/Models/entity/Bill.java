@@ -15,7 +15,7 @@ public class Bill {
 
     private Date billMonth;
     private Date dueDate;
-    private String status;  // UNPAID/PAID/OVERDUE/CANCELLED
+    private String status;  // UNPAID/PAID/CANCELLED
     private String note;
 
     private Integer oldElectricNumber;
