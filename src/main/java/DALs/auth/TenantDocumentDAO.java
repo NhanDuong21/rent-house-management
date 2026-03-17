@@ -21,10 +21,10 @@ public class TenantDocumentDAO extends DBContext {
 
     public int insertDocument(Connection conn, int tenantId, String documentType, String fileUrl) throws SQLException {
         String sql = """
-            INSERT INTO TENANT_DOCUMENT
-                (tenant_id, document_type, file_url)
-            VALUES
-                (?, ?, ?)
+        INSERT INTO TENANT_DOCUMENT
+            (tenant_id, document_type, file_url, status)
+        VALUES
+            (?, ?, ?, 'ACTIVE')
         """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

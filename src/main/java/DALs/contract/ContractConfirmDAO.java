@@ -9,10 +9,8 @@ import Models.dto.TxResult;
 import Utils.database.DBContext;
 
 /**
- * Description
  *
  * @author Duong Thien Nhan - CE190741
- * @since 2026-02-13
  */
 public class ContractConfirmDAO extends DBContext {
 
@@ -25,7 +23,6 @@ public class ContractConfirmDAO extends DBContext {
             WHERE contract_id = ?
         """;
 
-        // find old ACTIVE in same room (excluding current)
         String findOldActive = """
             SELECT TOP 1 contract_id
             FROM CONTRACT
@@ -60,29 +57,16 @@ public class ContractConfirmDAO extends DBContext {
         """;
 
         String activateOccupants = """
-            UPDATE CONTRACT_OCCUPANT
+            UPDATE OCCUPANT
             SET status = 'ACTIVE',
                 updated_at = SYSDATETIME()
             WHERE contract_id = ?
               AND status = 'PENDING'
         """;
 
-        String activateOccupantTenants = """
-            UPDATE t
-            SET t.account_status = 'ACTIVE',
-                t.updated_at = SYSDATETIME()
-            FROM TENANT t
-            JOIN CONTRACT_OCCUPANT co
-              ON co.tenant_id = t.tenant_id
-            WHERE co.contract_id = ?
-              AND co.status IN ('PENDING', 'ACTIVE')
-              AND t.account_status = 'PENDING'
-        """;
-
         String endOldActiveOccupants = """
-            UPDATE CONTRACT_OCCUPANT
+            UPDATE OCCUPANT
             SET status = 'REMOVED',
-                move_out_date = CAST(GETDATE() AS date),
                 updated_at = SYSDATETIME()
             WHERE contract_id = ?
               AND status = 'ACTIVE'
@@ -108,7 +92,6 @@ public class ContractConfirmDAO extends DBContext {
             int tenantId;
             String status;
 
-            // STEP 1: load contract
             try (PreparedStatement ps = conn.prepareStatement(getSql)) {
                 ps.setInt(1, contractId);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -127,7 +110,6 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "NOT_PENDING", "Current status=" + status);
             }
 
-            // STEP 2: if renew -> END old ACTIVE contract (same room)
             Integer oldActiveId = null;
             try (PreparedStatement ps = conn.prepareStatement(findOldActive)) {
                 ps.setInt(1, roomId);
@@ -145,14 +127,12 @@ public class ContractConfirmDAO extends DBContext {
                     ps.executeUpdate();
                 }
 
-                // occupant của contract cũ cũng kết thúc
                 try (PreparedStatement ps = conn.prepareStatement(endOldActiveOccupants)) {
                     ps.setInt(1, oldActiveId);
                     ps.executeUpdate();
                 }
             }
 
-            // STEP 3: contract pending -> active
             int a1;
             try (PreparedStatement ps = conn.prepareStatement(updateContract)) {
                 ps.setInt(1, contractId);
@@ -163,7 +143,6 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_CONTRACT_UPDATE", "Row affected=" + a1);
             }
 
-            // STEP 4: room -> occupied
             int a2;
             try (PreparedStatement ps = conn.prepareStatement(updateRoom)) {
                 ps.setInt(1, roomId);
@@ -174,7 +153,6 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_ROOM_UPDATE", "roomId=" + roomId);
             }
 
-            // STEP 5: tenant chính -> active
             int a3;
             try (PreparedStatement ps = conn.prepareStatement(updateTenant)) {
                 ps.setInt(1, tenantId);
@@ -185,19 +163,11 @@ public class ContractConfirmDAO extends DBContext {
                 return new TxResult(false, "FAIL_TENANT_UPDATE", "tenantId=" + tenantId);
             }
 
-            // STEP 6: occupant pending -> active
             try (PreparedStatement ps = conn.prepareStatement(activateOccupants)) {
                 ps.setInt(1, contractId);
                 ps.executeUpdate();
             }
 
-            // STEP 7: tất cả tenant thuộc occupant của contract nếu đang PENDING -> ACTIVE
-            try (PreparedStatement ps = conn.prepareStatement(activateOccupantTenants)) {
-                ps.setInt(1, contractId);
-                ps.executeUpdate();
-            }
-
-            // STEP 8: payment confirm (optional)
             try (PreparedStatement ps = conn.prepareStatement(confirmPayment)) {
                 ps.setInt(1, contractId);
                 ps.executeUpdate();
@@ -212,7 +182,6 @@ public class ContractConfirmDAO extends DBContext {
         }
     }
 
-    // giữ hàm cũ để code khác không vỡ
     public boolean confirmContract(int contractId) {
         return confirmContractWithDebug(contractId).isOk();
     }

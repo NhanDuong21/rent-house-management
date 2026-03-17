@@ -19,6 +19,71 @@
 
         <c:set var="c" value="${contract}"/>
 
+        <!-- Add occupant alerts -->
+        <c:if test="${param.added == '1'}">
+            <div class="tcd-alert tcd-alert-success">
+                <i class="bi bi-check-circle me-2"></i>
+                Thêm người ở cùng thành công.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'max'}">
+            <div class="tcd-alert tcd-alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Phòng đã đạt số lượng người tối đa.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'document'}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Lỗi lưu CCCD của người ở cùng.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'occupant'}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Không tạo được người ở cùng.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'notpending'}">
+            <div class="tcd-alert tcd-alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Chỉ được thêm người ở cùng khi hợp đồng đang PENDING.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'contractNotFound'}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Không tìm thấy hợp đồng.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'missingContractId'}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Thiếu mã hợp đồng.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == 'badContractId'}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Mã hợp đồng không hợp lệ.
+            </div>
+        </c:if>
+
+        <c:if test="${param.err == '1' and not empty param.msg}">
+            <div class="tcd-alert tcd-alert-danger">
+                <i class="bi bi-x-circle me-2"></i>
+                Có lỗi xảy ra:
+                <c:out value="${param.msg}"/>
+            </div>
+        </c:if>
+
         <div class="tcd-card">
             <div class="tcd-card-body">
 
@@ -43,7 +108,7 @@
                         </c:when>
                         <c:otherwise>
                             <span class="tcd-badge tcd-badge-pending">
-                                <i class="bi bi-clock-history me-1"></i> ${c.status}
+                                <i class="bi bi-clock-history me-1"></i> <c:out value="${c.status}"/>
                             </span>
                         </c:otherwise>
                     </c:choose>
@@ -56,13 +121,21 @@
                     <i class="bi bi-journal-text me-2"></i>
                     ROOM RENTAL AGREEMENT
                 </div>
+
                 <div class="tcd-doc-meta">
                     <i class="bi bi-hash me-1"></i>
                     Contract No: <fmt:formatNumber value="${c.contractId}" pattern="000000"/>
                 </div>
+
                 <div class="tcd-doc-meta tcd-doc-meta-2">
                     <i class="bi bi-calendar-event me-1"></i>
-                    Dated: <fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/>
+                    Dated:
+                    <c:choose>
+                        <c:when test="${empty c.startDate}">-</c:when>
+                        <c:otherwise>
+                            <fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <div class="tcd-divider tcd-divider-soft"></div>
@@ -77,34 +150,54 @@
                             PARTY A (LANDLORD)
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-person me-1"></i> Full Name:</span>
-                            <span class="tcd-value"><c:out value="${empty c.landlordFullName ? '-' : c.landlordFullName}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-person me-1"></i> Full Name:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.landlordFullName ? '-' : c.landlordFullName}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-calendar me-1"></i> Date of Birth:</span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-calendar me-1"></i> Date of Birth:
+                            </span>
                             <span class="tcd-value">
                                 <c:choose>
                                     <c:when test="${empty c.landlordDateOfBirth}">-</c:when>
-                                    <c:otherwise><fmt:formatDate value="${c.landlordDateOfBirth}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                    <c:otherwise>
+                                        <fmt:formatDate value="${c.landlordDateOfBirth}" pattern="dd/MM/yyyy"/>
+                                    </c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-credit-card me-1"></i> Citizen ID:</span>
-                            <span class="tcd-value"><c:out value="${empty c.landlordIdentityCode ? '-' : c.landlordIdentityCode}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-credit-card me-1"></i> Citizen ID:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.landlordIdentityCode ? '-' : c.landlordIdentityCode}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-telephone me-1"></i> Phone:</span>
-                            <span class="tcd-value"><c:out value="${empty c.landlordPhoneNumber ? '-' : c.landlordPhoneNumber}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-telephone me-1"></i> Phone:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.landlordPhoneNumber ? '-' : c.landlordPhoneNumber}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-envelope me-1"></i> Email:</span>
-                            <span class="tcd-value"><c:out value="${empty c.landlordEmail ? '-' : c.landlordEmail}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-envelope me-1"></i> Email:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.landlordEmail ? '-' : c.landlordEmail}"/>
+                            </span>
                         </div>
                     </div>
 
@@ -115,45 +208,69 @@
                             PARTY B (TENANT)
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-person me-1"></i> Full Name:</span>
-                            <span class="tcd-value"><c:out value="${empty c.tenantName ? '-' : c.tenantName}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-person me-1"></i> Full Name:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.tenantName ? '-' : c.tenantName}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-calendar me-1"></i> Date of Birth:</span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-calendar me-1"></i> Date of Birth:
+                            </span>
                             <span class="tcd-value">
                                 <c:choose>
                                     <c:when test="${empty c.tenantDateOfBirth}">-</c:when>
-                                    <c:otherwise><fmt:formatDate value="${c.tenantDateOfBirth}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                    <c:otherwise>
+                                        <fmt:formatDate value="${c.tenantDateOfBirth}" pattern="dd/MM/yyyy"/>
+                                    </c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-credit-card me-1"></i> Citizen ID:</span>
-                            <span class="tcd-value"><c:out value="${empty c.tenantIdentityCode ? '-' : c.tenantIdentityCode}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-credit-card me-1"></i> Citizen ID:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.tenantIdentityCode ? '-' : c.tenantIdentityCode}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-telephone me-1"></i> Phone:</span>
-                            <span class="tcd-value"><c:out value="${empty c.tenantPhoneNumber ? '-' : c.tenantPhoneNumber}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-telephone me-1"></i> Phone:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.tenantPhoneNumber ? '-' : c.tenantPhoneNumber}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-envelope me-1"></i> Email:</span>
-                            <span class="tcd-value"><c:out value="${empty c.tenantEmail ? '-' : c.tenantEmail}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-envelope me-1"></i> Email:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.tenantEmail ? '-' : c.tenantEmail}"/>
+                            </span>
                         </div>
 
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-geo-alt me-1"></i> Address:</span>
-                            <span class="tcd-value"><c:out value="${empty c.tenantAddress ? '-' : c.tenantAddress}"/></span>
+                        <div class="tcd-line">
+                            <span class="tcd-label">
+                                <i class="bi bi-geo-alt me-1"></i> Address:
+                            </span>
+                            <span class="tcd-value">
+                                <c:out value="${empty c.tenantAddress ? '-' : c.tenantAddress}"/>
+                            </span>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="tcd-divider tcd-divider-soft"></div>
+
                 <!-- OCCUPANTS -->
                 <div class="tcd-article">
                     <div class="tcd-article-title">
@@ -171,6 +288,7 @@
 
                         <c:otherwise>
                             <c:forEach var="o" items="${occupants}" varStatus="loop">
+
                                 <div class="tcd-line">
                                     <span class="tcd-label">
                                         <i class="bi bi-person me-1"></i>
@@ -179,7 +297,7 @@
                                     <span class="tcd-value">
                                         <strong><c:out value="${o.fullName}"/></strong>
                                         -
-                                        <c:out value="${o.occupantRole}"/>
+                                        ROOMMATE
                                         -
                                         <c:out value="${o.status}"/>
                                     </span>
@@ -282,19 +400,18 @@
                     </c:choose>
                 </div>
 
+                <!-- Add roommate -->
                 <c:if test="${c.status eq 'PENDING'}">
-
                     <div class="tcd-divider"></div>
 
                     <div class="tcd-article">
-
                         <div class="tcd-article-title">
                             <i class="bi bi-person-plus me-2"></i>
                             Add Roommate
                         </div>
 
                         <form method="post"
-                              action="${pageContext.request.contextPath}/tenant/add-occupant"
+                              action="${pageContext.request.contextPath}/tenant/add-occupant?contractId=${c.contractId}"
                               enctype="multipart/form-data">
 
                             <input type="hidden" name="contractId" value="${c.contractId}"/>
@@ -331,7 +448,8 @@
 
                             <div class="tcd-line">
                                 <span class="tcd-label">Gender</span>
-                                <select name="gender">
+                                <select name="gender" required>
+                                    <option value="">-- Select --</option>
                                     <option value="1">Male</option>
                                     <option value="0">Female</option>
                                 </select>
@@ -339,25 +457,21 @@
 
                             <div class="tcd-line">
                                 <span class="tcd-label">CCCD Front</span>
-                                <input type="file" name="cccdFront" required/>
+                                <input type="file" name="cccdFront" accept=".jpg,.jpeg,.png,.webp,image/*" required/>
                             </div>
 
                             <div class="tcd-line">
                                 <span class="tcd-label">CCCD Back</span>
-                                <input type="file" name="cccdBack" required/>
+                                <input type="file" name="cccdBack" accept=".jpg,.jpeg,.png,.webp,image/*" required/>
                             </div>
 
                             <button class="tcd-btn" type="submit">
                                 <i class="bi bi-plus-circle"></i>
                                 Add Occupant
                             </button>
-
                         </form>
-
                     </div>
-
                 </c:if>
-
 
                 <div class="tcd-divider tcd-divider-soft"></div>
 
@@ -368,23 +482,37 @@
                         ARTICLE 1: RENTAL PROPERTY
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-door-open me-1"></i> Room Number:</span>
-                        <span class="tcd-value"><c:out value="${empty c.roomNumber ? '-' : c.roomNumber}"/></span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-door-open me-1"></i> Room Number:
+                        </span>
+                        <span class="tcd-value">
+                            <c:out value="${empty c.roomNumber ? '-' : c.roomNumber}"/>
+                        </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-building me-1"></i> Block:</span>
-                        <span class="tcd-value"><c:out value="${empty c.blockName ? '-' : c.blockName}"/></span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-building me-1"></i> Block:
+                        </span>
+                        <span class="tcd-value">
+                            <c:out value="${empty c.blockName ? '-' : c.blockName}"/>
+                        </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-layers me-1"></i> Floor:</span>
-                        <span class="tcd-value"><c:out value="${empty c.floor ? '-' : c.floor}"/></span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-layers me-1"></i> Floor:
+                        </span>
+                        <span class="tcd-value">
+                            <c:out value="${empty c.floor ? '-' : c.floor}"/>
+                        </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-aspect-ratio me-1"></i> Area:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-aspect-ratio me-1"></i> Area:
+                        </span>
                         <span class="tcd-value">
                             <c:choose>
                                 <c:when test="${empty c.area}">-</c:when>
@@ -393,43 +521,62 @@
                         </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-people me-1"></i> Maximum Occupants:</span>
-                        <span class="tcd-value"><c:out value="${empty c.maxTenants ? '-' : c.maxTenants}"/></span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-people me-1"></i> Maximum Occupants:
+                        </span>
+                        <span class="tcd-value">
+                            <c:out value="${empty c.maxTenants ? '-' : c.maxTenants}"/>
+                        </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-stars me-1"></i> Amenities:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-stars me-1"></i> Amenities:
+                        </span>
                         <span class="tcd-value">
                             <c:choose>
                                 <c:when test="${c.hasAirConditioning}">Air Conditioning</c:when>
                                 <c:otherwise>-</c:otherwise>
                             </c:choose>
                             <c:if test="${c.isMezzanine}">, Mezzanine</c:if>
-                            </span>
-                        </div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="tcd-divider tcd-divider-soft"></div>
+
+                <!-- ARTICLE 2 -->
+                <div class="tcd-article">
+                    <div class="tcd-article-title">
+                        <i class="bi bi-calendar-range me-2"></i>
+                        ARTICLE 2: RENTAL PERIOD
                     </div>
 
-                    <div class="tcd-divider tcd-divider-soft"></div>
-
-                    <!-- ARTICLE 2 -->
-                    <div class="tcd-article">
-                        <div class="tcd-article-title">
-                            <i class="bi bi-calendar-range me-2"></i>
-                            ARTICLE 2: RENTAL PERIOD
-                        </div>
-
-                        <div class="tcd-line"><span class="tcd-label">
-                                <i class="bi bi-calendar-check me-1"></i> Start Date:</span>
-                            <span class="tcd-value"><fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/></span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-calendar-check me-1"></i> Start Date:
+                        </span>
+                        <span class="tcd-value">
+                            <c:choose>
+                                <c:when test="${empty c.startDate}">-</c:when>
+                                <c:otherwise>
+                                    <fmt:formatDate value="${c.startDate}" pattern="dd/MM/yyyy"/>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-calendar-x me-1"></i> End Date:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-calendar-x me-1"></i> End Date:
+                        </span>
                         <span class="tcd-value">
                             <c:choose>
                                 <c:when test="${empty c.endDate}">-</c:when>
-                                <c:otherwise><fmt:formatDate value="${c.endDate}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                <c:otherwise>
+                                    <fmt:formatDate value="${c.endDate}" pattern="dd/MM/yyyy"/>
+                                </c:otherwise>
                             </c:choose>
                         </span>
                     </div>
@@ -444,22 +591,28 @@
                         ARTICLE 3: RENTAL FEE AND PAYMENT
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-wallet2 me-1"></i> Monthly Rent:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-wallet2 me-1"></i> Monthly Rent:
+                        </span>
                         <span class="tcd-value">
                             <fmt:formatNumber value="${c.monthlyRent}" type="number" groupingUsed="true"/> ₫
                         </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-safe2 me-1"></i> Security Deposit:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-safe2 me-1"></i> Security Deposit:
+                        </span>
                         <span class="tcd-value">
                             <fmt:formatNumber value="${c.deposit}" type="number" groupingUsed="true"/> ₫
                         </span>
                     </div>
 
-                    <div class="tcd-line"><span class="tcd-label">
-                            <i class="bi bi-bank me-1"></i> Payment Method:</span>
+                    <div class="tcd-line">
+                        <span class="tcd-label">
+                            <i class="bi bi-bank me-1"></i> Payment Method:
+                        </span>
                         <span class="tcd-value">Bank transfer or cash</span>
                     </div>
 
@@ -469,7 +622,7 @@
                     </div>
                 </div>
 
-                <!-- Alerts -->
+                <!-- Payment alerts -->
                 <c:if test="${param.sent == '1'}">
                     <div class="tcd-alert tcd-alert-success">
                         <i class="bi bi-check-circle me-2"></i>
@@ -484,7 +637,7 @@
                     </div>
                 </c:if>
 
-                <c:if test="${param.err == '1'}">
+                <c:if test="${param.err == '1' and empty param.msg}">
                     <div class="tcd-alert tcd-alert-danger">
                         <i class="bi bi-x-circle me-2"></i>
                         Lỗi khi xác nhận chuyển khoản. Thử lại sau.
@@ -501,6 +654,7 @@
                                 <i class="bi bi-qr-code me-2"></i>
                                 Payment QR
                             </div>
+
                             <div class="tcd-pay-sub">
                                 Quét QR để chuyển khoản tiền cọc (deposit).
                             </div>
@@ -525,7 +679,7 @@
                                 <div class="tcd-pay-latest">
                                     <i class="bi bi-arrow-repeat me-2"></i>
                                     Latest transfer status:
-                                    <span class="tcd-pill">${latestPayment.status}</span>
+                                    <span class="tcd-pill"><c:out value="${latestPayment.status}"/></span>
                                 </div>
                             </c:if>
                         </div>
@@ -535,6 +689,7 @@
                                 <i class="bi bi-shield-check me-2"></i>
                                 Confirm transfer
                             </div>
+
                             <div class="tcd-pay-sub">
                                 Sau khi chuyển khoản, bấm xác nhận để manager kiểm tra và duyệt hợp đồng.
                             </div>

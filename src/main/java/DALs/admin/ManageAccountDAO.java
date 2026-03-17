@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Models.dto.AdminAccountRowDTO;
+import Models.entity.Tenant;
 import Utils.database.DBContext;
 
 /**
@@ -231,6 +232,16 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Create Account Tenant
+     *
+     * @param fullName
+     * @param identityCode
+     * @param phoneNumber
+     * @param email
+     * @param address
+     * @param dob
+     * @param gender
+     * @param passwordHash
+     * @return
      */
     @SuppressWarnings("CallToPrintStackTrace")
     public boolean insertTenant(String fullName,
@@ -243,16 +254,16 @@ public class ManageAccountDAO extends DBContext {
             String passwordHash) {
 
         String sql = """
-        INSERT INTO TENANT
-        (full_name, identity_code, phone_number, email,
-         address, date_of_birth, gender, avatar,
-         account_status, password_hash,
-         must_set_password, created_at, updated_at, token)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 
-                'assets/images/avatar/avDefault.png',
-                'ACTIVE', ?, 
-                1, GETDATE(), GETDATE(), NULL)
-    """;
+INSERT INTO TENANT
+(full_name, identity_code, phone_number, email,
+ address, date_of_birth, gender, avatar,
+ account_status, password_hash,
+ must_set_password, created_at, updated_at, token)
+VALUES (?, ?, ?, ?, ?, ?, ?, 
+        'assets/images/avatar/avDefault.png',
+        'ACTIVE', ?, 
+        1, GETDATE(), GETDATE(), NULL)
+""";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -383,22 +394,113 @@ public class ManageAccountDAO extends DBContext {
         return null;
     }
 
-    public boolean updateManager(int id, String name, String email) {
+    /*
+    Hàm update Manager
+     */
+    public boolean updateManager(int id, String name, String email,
+            String phone, int gender, String dob, String identity, String status) {
 
         String sql = """
         UPDATE STAFF
         SET full_name = ?,
             email = ?,
+            phone_number = ?,
+            gender = ?,
+            date_of_birth = ?,
+            identity_code = ?,
+            status = ?,
             updated_at = GETDATE()
         WHERE staff_id = ?
         AND staff_role = 'MANAGER'
-    """;
+        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
             ps.setString(2, email);
-            ps.setInt(3, id);
+            ps.setString(3, phone);
+            ps.setInt(4, gender);
+            ps.setDate(5, java.sql.Date.valueOf(dob));
+            ps.setString(6, identity);
+            ps.setString(7, status);
+            ps.setInt(8, id);
+
+            int rows = ps.executeUpdate();
+            System.out.println("Rows updated = " + rows);
+
+            return rows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public Tenant getTenantById(int id) {
+
+        String sql = "SELECT * FROM TENANT WHERE tenant_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Tenant t = new Tenant();
+
+                t.setTenantId(rs.getInt("tenant_id"));
+                t.setFullName(rs.getString("full_name"));
+                t.setIdentityCode(rs.getString("identity_code"));
+                t.setPhoneNumber(rs.getString("phone_number"));
+                t.setEmail(rs.getString("email"));
+                t.setAddress(rs.getString("address"));
+                t.setDateOfBirth(rs.getDate("date_of_birth"));
+                t.setGender(rs.getInt("gender"));
+                t.setAccountStatus(rs.getString("account_status"));
+
+                return t;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /*
+     Update Tenant
+     */
+    public boolean updateTenant(Tenant t) {
+
+        String sql = """
+        UPDATE TENANT
+        SET full_name = ?,
+            identity_code = ?,
+            phone_number = ?,
+            email = ?,
+            address = ?,
+            date_of_birth = ?,
+            gender = ?,
+            account_status = ?,
+            updated_at = GETDATE()
+        WHERE tenant_id = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, t.getFullName());
+            ps.setString(2, t.getIdentityCode());
+            ps.setString(3, t.getPhoneNumber());
+            ps.setString(4, t.getEmail());
+            ps.setString(5, t.getAddress());
+            ps.setDate(6, t.getDateOfBirth());
+            ps.setObject(7, t.getGender());
+            ps.setString(8, t.getAccountStatus());
+            ps.setInt(9, t.getTenantId());
 
             return ps.executeUpdate() > 0;
 

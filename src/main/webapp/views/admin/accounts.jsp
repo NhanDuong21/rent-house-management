@@ -79,6 +79,13 @@
             <div class="ma-card-title">Accounts List</div>
 
             <div class="ma-table-wrap">
+                <c:if test="${not empty sessionScope.successMsg}">
+                    <div class="alert-success">
+                        ${sessionScope.successMsg}
+                    </div>
+
+                    <c:remove var="successMsg" scope="session"/>
+                </c:if>
                 <table class="ma-table">
                     <thead>
                         <tr>
@@ -180,6 +187,18 @@
                                                 Update
                                             </button>
                                         </c:if>
+                                        <c:if test="${a.accountType == 'TENANT'}">
+                                            <button type="button"
+                                                    class="ma-action-btn primary"
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/admin/accounts/update-tenant?id=${a.accountId}'">
+
+                                                <span class="ma-action-ico">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </span>
+                                                Update
+                                            </button>
+                                        </c:if>
+
 
                                     </div>
                                 </td>

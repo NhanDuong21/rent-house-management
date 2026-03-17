@@ -39,8 +39,17 @@ public class ManageRoomsController extends HttpServlet {
             }
         }
 
-        int totalRoom = dao.countRoom();
+        String search = request.getParameter("search");
+        if (search == null) {
+            search = "";
+        }
 
+        String status = request.getParameter("status");
+        if (status == null) {
+            status = "";
+        }
+
+        int totalRoom = dao.countRoom(search, status);
         int totalPage = (int) Math.ceil((double) totalRoom / pageSize);
 
         if (totalPage == 0) {
@@ -55,7 +64,7 @@ public class ManageRoomsController extends HttpServlet {
             pageIndex = totalPage;
         }
 
-        List<Room> rooms = dao.fetchAllRoom(pageIndex, pageSize);
+        List<Room> rooms = dao.fetchAllRoom(pageIndex, pageSize, search, status);
 
         request.setAttribute("Rooms", rooms);
         request.setAttribute("totalRoom", totalRoom);
@@ -73,7 +82,6 @@ public class ManageRoomsController extends HttpServlet {
         ManageRoomsDAO dao = new ManageRoomsDAO();
 
         try {
-
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             String status = request.getParameter("status");
 
