@@ -331,14 +331,15 @@ FROM     CONTRACT INNER JOIN
         LEFT JOIN BLOCK b ON r.block_id = b.block_id
         JOIN TENANT t ON c.tenant_id = t.tenant_id
 
-        CROSS APPLY (
+        OUTER APPLY (
             SELECT TOP 1 *
             FROM STAFF
             WHERE staff_role = 'ADMIN' AND [status] = 'ACTIVE'
             ORDER BY staff_id ASC
         ) a
 
-        WHERE c.contract_id = ? AND c.tenant_id = ?
+        WHERE c.contract_id = ?
+          AND c.tenant_id = ?
     """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -347,12 +348,13 @@ FROM     CONTRACT INNER JOIN
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
+                    System.out.println("findDetailForTenant => no row, contractId=" + contractId + ", tenantId=" + tenantId);
                     return null;
                 }
 
                 Contract c = new Contract();
 
-                //contract
+                // contract
                 c.setContractId(rs.getInt("contract_id"));
                 c.setRoomId(rs.getInt("room_id"));
                 c.setTenantId(rs.getInt("tenant_id"));
@@ -366,7 +368,7 @@ FROM     CONTRACT INNER JOIN
                 c.setCreatedAt(rs.getTimestamp("created_at"));
                 c.setUpdatedAt(rs.getTimestamp("updated_at"));
 
-                //room && block
+                // room && block
                 c.setRoomNumber(rs.getString("room_number"));
                 c.setBlockName(rs.getString("block_name"));
                 c.setFloor((Integer) rs.getObject("floor"));
@@ -376,7 +378,7 @@ FROM     CONTRACT INNER JOIN
                 c.setHasAirConditioning((Boolean) rs.getObject("has_air_conditioning"));
                 c.setRoomDescription(rs.getString("room_description"));
 
-                //party B
+                // party B
                 c.setTenantName(rs.getString("tenant_name"));
                 c.setTenantEmail(rs.getString("tenant_email"));
                 c.setTenantPhoneNumber(rs.getString("tenant_phone"));
@@ -384,12 +386,16 @@ FROM     CONTRACT INNER JOIN
                 c.setTenantDateOfBirth(rs.getDate("tenant_dob"));
                 c.setTenantAddress(rs.getString("tenant_address"));
 
-                //party A
+                // party A
                 c.setLandlordFullName(rs.getString("landlord_name"));
                 c.setLandlordPhoneNumber(rs.getString("landlord_phone"));
                 c.setLandlordEmail(rs.getString("landlord_email"));
                 c.setLandlordIdentityCode(rs.getString("landlord_identity"));
                 c.setLandlordDateOfBirth(rs.getDate("landlord_dob"));
+
+                System.out.println("findDetailForTenant => found contractId=" + c.getContractId()
+                        + ", tenantId=" + c.getTenantId()
+                        + ", status=" + c.getStatus());
 
                 return c;
             }

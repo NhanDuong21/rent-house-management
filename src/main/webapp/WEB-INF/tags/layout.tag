@@ -11,6 +11,7 @@
 <%@attribute name="title" required="false" type="java.lang.String"%>
 <%@attribute name="active" required="false" type="java.lang.String"%>
 <%@attribute name="cssFile" required="false" type="java.lang.String"%>
+<%@attribute name="jsFile" required="false" type="java.lang.String"%>
 
 <%
     String ctx = request.getContextPath();
@@ -19,14 +20,12 @@
     Tenant tenant = (auth == null) ? null : auth.getTenant();
     Staff staff = (auth == null) ? null : auth.getStaff();
 
-    // ===== ROLE fallback (fix OTP login role null => Guest) =====
     String role;
     if (auth == null) {
         role = "GUEST";
     } else if (auth.getRole() != null && !auth.getRole().isBlank()) {
         role = auth.getRole();
     } else if (staff != null) {
-        // staffRole: MANAGER/ADMIN
         role = (staff.getStaffRole() == null || staff.getStaffRole().isBlank()) ? "STAFF" : staff.getStaffRole();
     } else if (tenant != null) {
         role = "TENANT";
@@ -52,14 +51,13 @@
     String _title = (title == null || title.isBlank()) ? "RentHouse" : title;
     String _active = (active == null) ? "" : active;
 
-    // cssFile optional (page css)
     String pageCss = (cssFile == null || cssFile.isBlank()) ? null : cssFile;
+    String pageJs = (jsFile == null || jsFile.isBlank()) ? null : jsFile;
 
     boolean isTenant = "TENANT".equalsIgnoreCase(role);
     boolean isManager = "MANAGER".equalsIgnoreCase(role);
     boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
 
-    // label show in header
     String roleLabel = role;
     if (isTenant && tenantStatus != null) {
         roleLabel = "TENANT • " + tenantStatus.toUpperCase();
@@ -74,14 +72,13 @@
         <title><%=_title%></title>
         <link rel="icon" type="image/png"
               href="${pageContext.request.contextPath}/assets/images/logo/favicon_logo.png">
-
+        <link rel="stylesheet" href="<%=ctx%>/assets/css/base/bootstrap.min.css">
         <link rel="stylesheet" href="<%=ctx%>/assets/css/layout/layout.css">
-        <!-- only added: bootstrap icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-        <% if (pageCss != null) {%>
+        <% if (pageCss != null) { %>
         <link rel="stylesheet" href="<%=pageCss%>">
-        <% }%>
+        <% } %>
     </head>
 
     <body>
@@ -107,14 +104,12 @@
                     <% if (isTenant) { %>
                     <div class="rh-section">Tenant</div>
 
-                    <% if (isTenantPending) {%>
-                    <!-- PENDING: chỉ được xem hợp đồng để chuyển khoản + xác nhận -->
+                    <% if (isTenantPending) { %>
                     <a class="rh-link <%= "t_contract".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/tenant/contract">
                         <i class="bi bi-file-earmark-text me-2"></i> My Contract
                     </a>
-                    <% } else {%>
-                    <!-- ACTIVE: đầy đủ -->
+                    <% } else { %>
                     <a class="rh-link <%= "t_room".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/tenant/room">
                         <i class="bi bi-door-open me-2"></i> My Room
@@ -147,9 +142,7 @@
                     <% } %>
                     <% } %>
 
-                    <%-- STAFF / MANAGER / ADMIN --%>
-
-                    <% if (isManager) {%>
+                    <% if (isManager) { %>
                     <div class="rh-section">Manager</div>
 
                     <a class="rh-link <%= "m_profile".equals(_active) ? "active" : ""%>"
@@ -188,10 +181,9 @@
                     </a>
 
                     <div class="rh-spacer"></div>
-                    <a class="rh-dashboard manager" href="<%=ctx%>/manager/home">Manager Dashboard</a>
                     <% } %>
 
-                    <% if (isAdmin) {%>
+                    <% if (isAdmin) { %>
                     <div class="rh-section">Admin</div>
 
                     <a class="rh-link <%= "a_home".equals(_active) ? "active" : ""%>"
@@ -214,8 +206,6 @@
                         <i class="bi bi-people-fill me-2"></i> Manage Accounts
                     </a>
 
-
-
                     <a class="rh-link <%= "a_contracts".equals(_active) ? "active" : ""%>"
                        href="<%=ctx%>/admin/contracts">
                         <i class="bi bi-file-earmark-text me-2"></i> View All Contracts
@@ -228,8 +218,7 @@
 
                     <div class="rh-spacer"></div>
                     <a class="rh-dashboard admin" href="<%=ctx%>/admin/home">Admin Dashboard</a>
-                    <% }%>
-
+                    <% } %>
                 </nav>
             </aside>
 
@@ -241,7 +230,6 @@
                     <div class="rh-topbar-left">
                         <button class="rh-icon-btn" type="button" id="rhToggleSidebar">☰</button>
 
-                        <!-- TOP NAV (all roles) -->
                         <nav class="rh-topnav" aria-label="Main navigation">
                             <a class="rh-topnav-link <%= "home".equals(_active) ? "active" : ""%>"
                                href="<%=ctx%>/home">HOME</a>
@@ -261,8 +249,6 @@
                     </div>
 
                     <div class="rh-topbar-right">
-                        <!-- ❌ removed rhOpenFilter button -->
-
                         <div class="rh-user">
                             <div class="rh-avatar">
                                 <img src="<%=ctx%>/assets/images/avatar/avtDefault.png" alt="Avatar">
@@ -272,11 +258,11 @@
                                 <div class="rh-user-role"><%=roleLabel%></div>
                             </div>
 
-                            <% if (auth == null) {%>
+                            <% if (auth == null) { %>
                             <a class="rh-btn primary" href="<%=ctx%>/login">Login</a>
-                            <% } else {%>
+                            <% } else { %>
                             <a class="rh-btn outline js-logout" href="<%=ctx%>/logout">Logout</a>
-                            <% }%>
+                            <% } %>
                         </div>
                     </div>
                 </header>
@@ -298,5 +284,10 @@
         </div>
 
         <script src="<%=ctx%>/assets/js/core/layout.js"></script>
+        <script src="<%=ctx%>/assets/js/vendor/bootstrap.bundle.min.js"></script>
+
+        <% if (pageJs != null) { %>
+        <script src="<%=pageJs%>"></script>
+        <% } %>
     </body>
 </html>

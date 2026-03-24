@@ -27,7 +27,7 @@
 
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <input type="text" value="${manager.phone}" readonly/>
+                        <input type="text" name="phone" value="${manager.phone}" required/>
                     </div>
 
                     <div class="form-group">
@@ -37,39 +37,35 @@
 
                     <div class="form-group">
                         <label>Gender</label>
-                        <input type="text"
-                               value="${manager.gender == 1 ? 'Male' : 'Female'}"
-                               readonly/>
+                        <select name="gender">
+                            <option value="1" ${manager.gender == 1 ? 'selected' : ''}>Male</option>
+                            <option value="0" ${manager.gender == 0 ? 'selected' : ''}>Female</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
                         <label>Date of Birth</label>
-                        <input type="text" value="${manager.dateOfBirth}" readonly/>
+                        <input type="date" name="dateOfBirth" value="${manager.dateOfBirth}"/>
                     </div>
 
                     <div class="form-group">
                         <label>Citizen ID</label>
-                        <input type="text" value="${manager.identityCode}" readonly/>
+                        <input type="text" name="identityCode" value="${manager.identityCode}"/>
                     </div>
 
                     <div class="form-group full">
                         <label>Status</label>
-                        <input type="text" value="${manager.status}" readonly/>
+                        <select name="status">
+                            <option value="ACTIVE" ${manager.status == 'ACTIVE' ? 'selected' : ''}>Active</option>
+                            <option value="INACTIVE" ${manager.status == 'INACTIVE' ? 'selected' : ''}>Inactive</option>
+                        </select>
                     </div>
 
                 </div>
 
                 <div class="form-actions">
-
-                    <button type="submit" class="btn-save">
-                        Save
-                    </button>
-
-                    <a href="${pageContext.request.contextPath}/admin/accounts"
-                       class="btn-cancel">
-                        Cancel
-                    </a>
-
+                    <button type="submit" class="btn-save">Save</button>
+                    <a href="${pageContext.request.contextPath}/admin/accounts" class="btn-cancel">Cancel</a>
                 </div>
 
             </form>

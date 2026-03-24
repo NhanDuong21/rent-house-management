@@ -152,6 +152,7 @@ public class utilitiesDAO extends DBContext {
         return false;
     }
 
+    //delete
     public boolean isUtilityUsedInBill(int id) {
         String sql = "SELECT COUNT(*) FROM BILL_DETAIL WHERE utility_id = ?";
         try {

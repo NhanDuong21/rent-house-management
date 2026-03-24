@@ -41,9 +41,22 @@ public class AdminUpdateManagerController extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         String name = request.getParameter("fullName");
         String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        int gender = Integer.parseInt(request.getParameter("gender"));
+        String dob = request.getParameter("dateOfBirth");
+        String identity = request.getParameter("identityCode");
+        String status = request.getParameter("status");
 
-        dao.updateManager(id, name, email);
+        boolean updated = dao.updateManager(id, name, email, phone, gender, dob, identity, status);
 
-        response.sendRedirect(request.getContextPath() + "/admin/accounts");
+        if (updated) {
+            response.sendRedirect(
+                    request.getContextPath() + "/admin/accounts?success=Manager updated successfully"
+            );
+        } else {
+            response.sendRedirect(
+                    request.getContextPath() + "/admin/accounts?error=Update manager failed"
+            );
+        }
     }
 }

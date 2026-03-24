@@ -1,91 +1,128 @@
-/* WRAPPER */
+/* ===== WRAPPER ===== */
 .update-wrapper{
-    padding:30px;
+    padding:40px;
     display:flex;
     justify-content:center;
+    background:#f5f7fb;
+    min-height:100vh;
 }
 
-/* CARD */
+/* ===== CARD ===== */
 .update-card{
-    width:750px;
-    background:#fff;
-    border-radius:12px;
+    width:780px;
+    background:#ffffff;
+    border-radius:14px;
+    padding:35px 40px;
     border:1px solid #e5e7eb;
-    padding:30px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
 }
 
-/* TITLE */
+/* ===== TITLE ===== */
 .update-title{
-    font-size:22px;
+    font-size:24px;
     font-weight:600;
-    margin-bottom:25px;
+    margin-bottom:30px;
+    color:#111827;
 }
 
-/* GRID */
+/* ===== GRID ===== */
 .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:20px;
+    gap:22px;
 }
 
-/* FULL WIDTH */
+/* FULL WIDTH FIELD */
 .form-group.full{
     grid-column:span 2;
 }
 
-/* LABEL */
+/* ===== FORM GROUP ===== */
 .form-group{
     display:flex;
     flex-direction:column;
 }
 
+/* LABEL */
 .form-group label{
-    font-size:14px;
+    font-size:13px;
+    font-weight:500;
     margin-bottom:6px;
-    color:#374151;
+    color:#6b7280;
 }
 
-/* INPUT */
-.form-group input{
+/* ===== INPUT ===== */
+.update-card input{
+    width:100%;
+    height:42px;
     padding:10px 12px;
+
     border-radius:8px;
     border:1px solid #d1d5db;
-    font-size:14px;
+
     background:#f9fafb;
-    transition:0.2s;
+    font-size:14px;
+    font-family:inherit;
+
+    transition:0.15s ease;
 }
 
-/* INPUT FOCUS */
-.form-group input:focus{
+/* ===== SELECT ===== */
+.rh-content .update-card select{
+    width:100%;
+    height:42px;
+    padding:10px 12px;
+
+    border-radius:8px;
+    border:1px solid #d1d5db;
+
+    background:#f9fafb;
+    font-size:14px;
+    font-family:inherit;
+
+    cursor:pointer;
+
+    /* remove browser style */
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+
+    /* custom arrow */
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%236b7280'%3E%3Cpath d='M5 7l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 10px center;
+    background-size:14px;
+
+    transition:0.15s ease;
+}
+
+/* ===== FOCUS ===== */
+.update-card input:focus,
+.update-card select:focus{
     outline:none;
     border-color:#2563eb;
-    background:#fff;
+    background:#ffffff;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.1);
 }
 
-/* READONLY */
-.form-group input[readonly]{
-    background:#f3f4f6;
-    color:#555;
-}
-
-/* ACTION BUTTONS */
+/* ===== ACTION BUTTONS ===== */
 .form-actions{
-    margin-top:30px;
+    margin-top:35px;
     display:flex;
-    gap:12px;
+    gap:14px;
 }
 
 /* SAVE BUTTON */
 .btn-save{
-    padding:10px 20px;
+    padding:11px 22px;
     border:none;
     border-radius:8px;
     background:#2563eb;
     color:white;
     font-size:14px;
+    font-weight:500;
     cursor:pointer;
-    transition:0.2s;
+    transition:0.15s ease;
 }
 
 .btn-save:hover{
@@ -94,15 +131,16 @@
 
 /* CANCEL BUTTON */
 .btn-cancel{
-    padding:10px 20px;
+    padding:11px 22px;
     border-radius:8px;
-    background:#e5e7eb;
+    background:#eef2f7;
     color:#374151;
     text-decoration:none;
     font-size:14px;
-    transition:0.2s;
+    font-weight:500;
+    transition:0.15s ease;
 }
 
 .btn-cancel:hover{
-    background:#d1d5db;
+    background:#e5e7eb;
 }

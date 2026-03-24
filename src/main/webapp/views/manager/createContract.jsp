@@ -11,7 +11,6 @@
 
     <div class="mcc-wrap">
 
-        <!-- Page header -->
         <div class="mcc-pagehead">
             <div class="mcc-pagehead-left">
                 <div class="mcc-title">
@@ -45,7 +44,6 @@
             </div>
         </div>
 
-        <!-- Card -->
         <div class="mcc-card">
 
             <c:if test="${not empty param.error}">
@@ -58,7 +56,10 @@
                 </div>
             </c:if>
 
-            <form method="post" action="${pageContext.request.contextPath}/manager/contracts/create" class="mcc-form">
+            <form method="post"
+                  action="${pageContext.request.contextPath}/manager/contracts/create"
+                  class="mcc-form"
+                  enctype="multipart/form-data">
 
                 <!-- Room -->
                 <div class="mcc-section">
@@ -184,6 +185,36 @@
                                     <option value="0">Female</option>
                                     <option value="1">Male</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mcc-grid-2">
+                        <div class="mcc-field">
+                            <label class="mcc-label">
+                                <i class="bi bi-image"></i>
+                                CCCD Front
+                            </label>
+                            <div class="mcc-control">
+                                <input type="file"
+                                       name="cccdFront"
+                                       accept=".jpg,.jpeg,.png,.webp,image/*"
+                                       class="form-control mcc-control-input"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mcc-field">
+                            <label class="mcc-label">
+                                <i class="bi bi-image"></i>
+                                CCCD Back
+                            </label>
+                            <div class="mcc-control">
+                                <input type="file"
+                                       name="cccdBack"
+                                       accept=".jpg,.jpeg,.png,.webp,image/*"
+                                       class="form-control mcc-control-input"
+                                       required>
                             </div>
                         </div>
                     </div>

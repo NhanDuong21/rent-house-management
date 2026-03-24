@@ -7,6 +7,7 @@ import java.util.Random;
 
 import DALs.auth.OtpCodeDAO;
 import DALs.auth.TenantDAO;
+import DALs.auth.TenantDocumentDAO;
 import DALs.contract.ContractDAO;
 import DALs.contract.ContractOccupantDAO;
 import Models.common.ServiceResult;
@@ -27,13 +28,13 @@ public class ContractService {
     private final TenantDAO tenantDAO = new TenantDAO();
     private final ContractDAO contractDAO = new ContractDAO();
     private final OtpCodeDAO otpDAO = new OtpCodeDAO();
+    private final TenantDocumentDAO tenantDocumentDAO = new TenantDocumentDAO();
     private final ContractOccupantDAO contractOccupantDAO = new ContractOccupantDAO();
 
     //FLOW 1: CREATE CONTRACT + CREATE TENANT (NO ACCOUNT) + OTP
-    @SuppressWarnings("UseSpecificCatch")
-    public ServiceResult createContractAndTenant(Contract c, Tenant t) {
+    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
+    public ServiceResult createContractAndTenant(Contract c, Tenant t, String cccdFrontUrl, String cccdBackUrl) {
 
-        //1) Validate: Tenant
         if (t == null) {
             return ServiceResult.fail("Tenant không hợp lệ.");
         }
@@ -75,7 +76,10 @@ public class ContractService {
             return ServiceResult.fail("Avatar tenant không được để trống.");
         }
 
-        // normalize
+        if (safe(cccdFrontUrl).isBlank() || safe(cccdBackUrl).isBlank()) {
+            return ServiceResult.fail("Thiếu ảnh CCCD tenant chính.");
+        }
+
         t.setFullName(name);
         t.setIdentityCode(identity);
         t.setPhoneNumber(phone);
@@ -83,57 +87,51 @@ public class ContractService {
         t.setAddress(address);
         t.setAvatar(avatar);
 
-        //2) Validate: Contract
         ServiceResult vc = validateContractCommon(c);
         if (!vc.isOk()) {
             return vc;
         }
 
-        //3) Transaction
         try (Connection conn = new DBContext().getConnection()) {
 
             conn.setAutoCommit(false);
 
-            // 1) Check email tồn tại (phone rely DB UNIQUE)
             if (tenantDAO.findByEmail(email) != null) {
                 conn.rollback();
                 return ServiceResult.fail("Email tenant đã tồn tại trong hệ thống.");
             }
 
-            // 2) Insert tenant PENDING (full fields)
             int tenantId = tenantDAO.insertPendingTenant(conn, t);
+            System.out.println("tenantId = " + tenantId);
             if (tenantId <= 0) {
                 conn.rollback();
                 return ServiceResult.fail("Không tạo được tenant (PENDING).");
             }
 
-            // 3) Business rule: tenant chỉ có tối đa 1 ACTIVE/PENDING
-            // (luồng no-account: tenant mới tạo nên chắc chắn chưa có, nhưng check luôn cho chắc)
             if (existsActiveOrPendingByTenant(conn, tenantId)) {
                 conn.rollback();
                 return ServiceResult.fail("Tenant này đang có hợp đồng ACTIVE/PENDING. Không thể tạo thêm.");
             }
 
-            // 4) Insert contract PENDING
             c.setTenantId(tenantId);
             int contractId = contractDAO.insertPendingContract(conn, c);
+            System.out.println("contractId = " + contractId);
             if (contractId <= 0) {
                 conn.rollback();
                 return ServiceResult.fail("Không tạo được contract (PENDING).");
             }
 
-            // 4.1) Insert PRIMARY occupant
-            int primaryOccupantId = contractOccupantDAO.insertPrimary(conn, contractId, tenantId, c.getStartDate(), "PENDING");
-            if (primaryOccupantId <= 0) {
+            int frontDocId = tenantDocumentDAO.insertDocument(conn, tenantId, "CCCD_FRONT", cccdFrontUrl);
+            int backDocId = tenantDocumentDAO.insertDocument(conn, tenantId, "CCCD_BACK", cccdBackUrl);
+            System.out.println("frontDocId = " + frontDocId + ", backDocId = " + backDocId);
+            if (frontDocId <= 0 || backDocId <= 0) {
                 conn.rollback();
-                return ServiceResult.fail("Không tạo được người ở chính cho hợp đồng.");
+                return ServiceResult.fail("Không lưu được CCCD tenant chính.");
             }
 
-            // 5) Generate OTP + insert
             String otp = String.format("%06d", new Random().nextInt(1_000_000));
             otpDAO.insertFirstLoginOtp(conn, tenantId, email, otp);
 
-            // 6) Send mail
             boolean mailOk = MailUtil.sendOtp(email, otp);
             if (!mailOk) {
                 conn.rollback();
@@ -141,11 +139,13 @@ public class ContractService {
             }
 
             conn.commit();
-            return ServiceResult.ok("Tạo contract + tenant PENDING và gửi OTP thành công.");
+            return ServiceResult.ok("Tạo contract pending + tenant primary + CCCD + gửi OTP thành công.");
 
         } catch (SQLException e) {
+            e.printStackTrace();
             return ServiceResult.fail(mapSqlErrorToUi(e));
         } catch (Exception e) {
+            e.printStackTrace();
             return ServiceResult.fail("Lỗi hệ thống: " + (e.getMessage() == null ? "UNKNOWN" : e.getMessage()));
         }
     }

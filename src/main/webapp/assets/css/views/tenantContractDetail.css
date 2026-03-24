@@ -1,9 +1,3 @@
-/* ==============================
-   contractDetail.css (Tenant)
-   Vibe: giống managerBills / managerCreateContracts
-   Font: Segoe UI
-   ============================== */
-
 @import url("../base/bootstrap.min.css");
 
 /* Page wrap */
@@ -72,7 +66,7 @@
   font-weight: 500;
 }
 
-/* Badge (giống bills) */
+/* Badge */
 .tcd-badge {
   padding: 6px 12px;
   border-radius: 999px;
@@ -100,6 +94,7 @@
   background: rgba(0, 0, 0, 0.08);
   margin: 18px 0;
 }
+
 .tcd-divider-soft {
   opacity: 0.6;
 }
@@ -117,6 +112,7 @@
   font-size: 14px;
   font-weight: 500;
 }
+
 .tcd-doc-meta-2 {
   margin-top: 4px;
 }
@@ -137,7 +133,7 @@
   gap: 18px;
 }
 
-/* Blocks (Party A/B) – tạo cảm giác giống "section" */
+/* Blocks (Party A/B) */
 .tcd-grid-2 > div {
   background: #f3f4f6;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -177,7 +173,7 @@
   font-weight: 500;
 }
 
-/* Alerts (bootstrap-like) */
+/* Alerts */
 .tcd-alert {
   padding: 12px 14px;
   border-radius: 12px;
@@ -202,6 +198,152 @@
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.22);
   color: #991b1b;
+}
+
+/* Add Roommate Form */
+.tcd-form-note {
+  margin-top: -2px;
+  margin-bottom: 14px;
+}
+
+.tcd-roommate-form {
+  margin-top: 10px;
+}
+
+.tcd-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.tcd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.tcd-field-span-2 {
+  grid-column: 1 / -1;
+}
+
+.tcd-field-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.tcd-roommate-form input[type="text"],
+.tcd-roommate-form input[type="email"],
+.tcd-roommate-form input[type="date"],
+.tcd-roommate-form select,
+.tcd-roommate-form input[type="file"] {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+  box-sizing: border-box;
+}
+
+.tcd-roommate-form input[type="text"]:focus,
+.tcd-roommate-form input[type="email"]:focus,
+.tcd-roommate-form input[type="date"]:focus,
+.tcd-roommate-form select:focus,
+.tcd-roommate-form input[type="file"]:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.tcd-roommate-form input[type="file"] {
+  padding: 9px 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tcd-roommate-form input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tcd-roommate-form input[type="file"]::file-selector-button:hover {
+  background: #1f2937;
+}
+
+.tcd-roommate-form select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
+    linear-gradient(135deg, #6b7280 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px);
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+.tcd-form-actions {
+  margin-top: 16px;
+}
+
+/* Link button for image preview */
+.tcd-link-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tcd-link-btn:hover {
+  color: #1d4ed8;
+}
+
+/* Modal preview */
+.tcd-modal-content {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.tcd-modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.tcd-modal-body {
+  padding: 16px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.tcd-preview-img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
 }
 
 /* Payment section */
@@ -265,7 +407,7 @@
   color: #111827;
 }
 
-/* Confirm form button – dùng vibe giống manager/bills */
+/* Buttons */
 .tcd-form {
   margin-top: 6px;
 }
@@ -302,9 +444,19 @@
   .tcd-grid-2 {
     grid-template-columns: 1fr;
   }
+
   .tcd-pay-wrap {
     grid-template-columns: 1fr;
   }
+
+  .tcd-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tcd-field-span-2 {
+    grid-column: auto;
+  }
+
   .tcd-qr-img {
     width: 220px;
     height: 220px;
@@ -321,6 +473,7 @@
   width: 16px;
   text-align: center;
 }
+
 .tcd-section-title i,
 .tcd-article-title i {
   opacity: 0.85;
