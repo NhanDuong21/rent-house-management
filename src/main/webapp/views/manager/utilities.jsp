@@ -21,7 +21,8 @@
                 <p>Manage utility services and view subscribers</p>
             </div>
 
-            <button onclick="document.getElementById('addModal').style.display = 'flex'"
+            <button type="button" 
+                    onclick="document.getElementById('addModal').style.display = 'flex'"
                     class="mb-generate-btn">
                 + Add Utility
             </button>
@@ -45,7 +46,7 @@
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label style="display:block; font-weight:500; margin-bottom:6px;">Price (VND)</label>
-                            <input type="number" name="price" value="0" min="0"
+                            <input type="number" name="price" value="0"
                                    style="width:100%; padding:10px 14px; border:none; background:#f3f4f6; border-radius:8px; box-sizing:border-box; font-size:14px;"/>
                         </div>
                         <div style="margin-bottom:2rem;">
@@ -149,7 +150,7 @@
                                 </div>
                             </div>
 
-                            <%-- tự mở modal nếu có editUtility --%>
+                            <!-- tự mở modal nếu có editUtility -->
                             <c:if test="${editUtility != null}">
                                 <script>
                                     document.getElementById('editModal').style.display = 'flex';
@@ -185,55 +186,54 @@
             </div>
         </c:if>
     </div>
-</div> <!-- đóng mb-container -->
 
-<!-- Modal Subscribers -->
-<c:if test="${subscribers != null}">
-    <script>
-        window.onload = function () {
-            document.getElementById('subscribersModal').style.display = 'flex';
-        }
-    </script>
-</c:if>
+    <!-- Modal Subscribers -->
+    <c:if test="${subscribers != null}">
+        <script>
+            window.onload = function () {
+                document.getElementById('subscribersModal').style.display = 'flex';
+            }
+        </script>
+    </c:if>
 
-<div id="subscribersModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-     background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:16px; width:600px; max-height:80vh; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1.5rem;">
-            <div>
-                <h4 style="margin:0; font-weight:700;">Subscribers - ${utilityName}</h4>
-                <small style="color:gray;">List of tenants subscribed to this utility service</small>
+    <div id="subscribersModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+         background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:2rem; border-radius:16px; width:600px; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1.5rem;">
+                <div>
+                    <h4 style="margin:0; font-weight:700;">Subscribers - ${utilityName}</h4>
+                    <small style="color:gray;">List of tenants subscribed to this utility service</small>
+                </div>
+                <a href="${pageContext.request.contextPath}/manager/utilities"
+                   style="background:none; border:1px solid #ddd; border-radius:8px; width:30px; height:30px;
+                   cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+                   text-decoration:none; color:#333;">×</a>
             </div>
-            <a href="${pageContext.request.contextPath}/manager/utilities"
-               style="background:none; border:1px solid #ddd; border-radius:8px; width:30px; height:30px;
-               cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
-               text-decoration:none; color:#333;">×</a>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Room ID</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Room Number</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Tenant Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="s" items="${subscribers}">
+                        <tr>
+                            <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.utilityId}</td>
+                            <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.utilityName}</td>
+                            <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.unit}</td>
+                        </tr>
+                    </c:forEach>
+                    <c:if test="${empty subscribers}">
+                        <tr>
+                            <td colspan="3" style="text-align:center; padding:20px; color:#9ca3af;">No subscribers found.</td>
+                        </tr>
+                    </c:if>
+                </tbody>
+            </table>
         </div>
-        <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Room ID</th>
-                    <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Room Number</th>
-                    <th style="text-align:left; padding:10px; border-bottom:2px solid #e5e7eb; font-weight:600;">Tenant Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="s" items="${subscribers}">
-                    <tr>
-                        <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.utilityId}</td>
-                        <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.utilityName}</td>
-                        <td style="padding:12px 10px; border-bottom:1px solid #e5e7eb;">${s.unit}</td>
-                    </tr>
-                </c:forEach>
-                <c:if test="${empty subscribers}">
-                    <tr>
-                        <td colspan="3" style="text-align:center; padding:20px; color:#9ca3af;">No subscribers found.</td>
-                    </tr>
-                </c:if>
-            </tbody>
-        </table>
     </div>
-</div>
 
-<script src="${pageContext.request.contextPath}/assets/js/pages/managerUtilities.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/pages/managerUtilities.js"></script>
 </layout:layout>

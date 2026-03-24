@@ -73,13 +73,13 @@ public class ManagerUtilitiesController extends HttpServlet {
                 request.getSession().removeAttribute("successMsg");
                 request.getSession().removeAttribute("errorMsg");
 
-                List<Utility> listU = dao.getManagerUntilities();
+                List<Utility> listU = dao.getManagerUtilities();
                 request.setAttribute("utilities", listU);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
 
             case "add":
-                List<Utility> listAdd = dao.getManagerUntilities();
+                List<Utility> listAdd = dao.getManagerUtilities();
                 request.setAttribute("utilities", listAdd);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
@@ -87,14 +87,14 @@ public class ManagerUtilitiesController extends HttpServlet {
             case "delete":
                 int idDelete = Integer.parseInt(request.getParameter("id"));
                 if (dao.isUtilityUsedInBill(idDelete)) {
-                    request.getSession().setAttribute("errorMsg", "Không thể xóa! Tiện ích này đang được sử dụng trong hóa đơn.");
+                    request.getSession().setAttribute("errorMsg", "Cannot be deleted! This utility is being used in the invoice.");
                 } else {
                     boolean deleted = dao.deleteUtilities(idDelete);
 
                     if (deleted) {
-                        request.getSession().setAttribute("successMsg", "Xóa tiện ích thành công!");
+                        request.getSession().setAttribute("successMsg", "Extension successfully removed!");
                     } else {
-                        request.getSession().setAttribute("errorMsg", "Xóa thất bại, vui lòng thử lại!");
+                        request.getSession().setAttribute("errorMsg", "Clear failure, please try again!");
                     }
                 }
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");
@@ -103,7 +103,7 @@ public class ManagerUtilitiesController extends HttpServlet {
             case "edit":
                 int idEdit = Integer.parseInt(request.getParameter("id"));
                 Utility uEdit = dao.getUtilityById(idEdit);
-                List<Utility> listEdit = dao.getManagerUntilities();
+                List<Utility> listEdit = dao.getManagerUtilities();
                 request.setAttribute("utilities", listEdit);
                 request.setAttribute("editUtility", uEdit);
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
@@ -113,7 +113,7 @@ public class ManagerUtilitiesController extends HttpServlet {
                 int idSub = Integer.parseInt(request.getParameter("id"));
                 String nameSub = request.getParameter("name");
                 List<Utility> subscribers = dao.getSubscribersByUtilityId(idSub);
-                List<Utility> listSub = dao.getManagerUntilities();
+                List<Utility> listSub = dao.getManagerUtilities();
                 request.setAttribute("utilities", listSub);
                 request.setAttribute("subscribers", subscribers);
                 request.setAttribute("utilityName", nameSub);
@@ -142,10 +142,69 @@ public class ManagerUtilitiesController extends HttpServlet {
         switch (action) {
             case "add":
                 String utilityName = request.getParameter("utilityName");
-                BigDecimal price = new BigDecimal(request.getParameter("price"));
+                String priceAdd = new String(request.getParameter("price"));
                 String unit = request.getParameter("unit");
 
-                Boolean result = dao.addUtility(utilityName, price, unit);
+                // Validate rỗng
+                if (utilityName == null || utilityName.trim().isEmpty()) {
+                    request.getSession().setAttribute("errorMsg", "Utility name cannot be empty!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+                if (unit == null || unit.trim().isEmpty()) {
+                    request.getSession().setAttribute("errorMsg", "Unit cannot be empty!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+
+                // Validate số thuần
+                if (utilityName.trim().matches("\\d+")) {
+                    request.getSession().setAttribute("errorMsg", "Utility name cannot be numbers only!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+                if (unit.trim().matches("\\d+")) {
+                    request.getSession().setAttribute("errorMsg", "Unit cannot be numbers only!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+
+                // Validate price
+                BigDecimal price = BigDecimal.ZERO;  // khởi tạo mặc định trước
+                try {
+                    price = new BigDecimal(priceAdd);
+                    if (price.compareTo(BigDecimal.ZERO) < 0) {
+                        request.getSession().setAttribute("errorMsg", "Price cannot be negative!");
+                        response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                        break;
+                    }
+                } catch (NumberFormatException e) {
+                    request.getSession().setAttribute("errorMsg", "Invalid price!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+
+                // Validate trùng tên
+                if (dao.isUtilityNameExists(utilityName.trim())) {
+                    request.getSession().setAttribute("errorMsg", "Utility name already exists!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+
+                //check giá k lớn hơn 10tr
+                if (price.compareTo(new BigDecimal("10000000")) > 0) {
+                    request.getSession().setAttribute("errorMsg", "Price cannot exceed 10,000,000 VND!");
+                    response.sendRedirect(request.getContextPath() + "/manager/utilities");
+                    break;
+                }
+                
+                // Pass hết thì add
+                boolean result = dao.addUtility(utilityName.trim(), price, unit.trim());
+                if (result) {
+                    request.getSession().setAttribute("successMsg", "Utility added successfully!");
+                } else {
+                    request.getSession().setAttribute("errorMsg", "Failed to add utility. Please try again!");
+                }
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");
                 break;
 
@@ -154,13 +213,13 @@ public class ManagerUtilitiesController extends HttpServlet {
 
                 if (dao.isUtilityUsedInBill(id)) {
                     request.getSession().setAttribute("errorMsg",
-                            "Không thể xóa! Tiện ích này đang được sử dụng trong hóa đơn.");
+                            "Cannot be deleted! This utility is being used in the invoice.");
                 } else {
                     Boolean resDelete = dao.deleteUtilities(id);
                     if (resDelete) {
-                        request.getSession().setAttribute("successMsg", "Xóa tiện ích thành công!");
+                        request.getSession().setAttribute("successMsg", "Extension successfully removed!");
                     } else {
-                        request.getSession().setAttribute("errorMsg", "Xóa thất bại, vui lòng thử lại!");
+                        request.getSession().setAttribute("errorMsg", "Clear failure, please try again!");
                     }
                 }
                 response.sendRedirect(request.getContextPath() + "/manager/utilities");

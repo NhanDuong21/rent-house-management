@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class utilitiesDAO extends DBContext {
 
-    public List<Utility> getManagerUntilities() {
+    public List<Utility> getManagerUtilities() {
         List<Utility> listUntilities = new ArrayList<>();
         String sql = "SELECT utility_id, utility_name, unit, standard_price, is_active, status, created_at, updated_at\n"
                 + "FROM     UTILITY\n"
@@ -195,5 +195,21 @@ public class utilitiesDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+// tránh bị trùng tên utility name
+    public boolean isUtilityNameExists(String name) {
+        String sql = "SELECT COUNT(*) FROM UTILITY WHERE LOWER(utility_name) = LOWER(?)";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
