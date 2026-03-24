@@ -46,7 +46,7 @@
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label style="display:block; font-weight:500; margin-bottom:6px;">Price (VND)</label>
-                            <input type="number" name="price" value="0" min="0"
+                            <input type="number" name="price" value="0"
                                    style="width:100%; padding:10px 14px; border:none; background:#f3f4f6; border-radius:8px; box-sizing:border-box; font-size:14px;"/>
                         </div>
                         <div style="margin-bottom:2rem;">
