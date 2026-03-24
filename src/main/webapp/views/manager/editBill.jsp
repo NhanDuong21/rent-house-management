@@ -101,7 +101,7 @@
 
                         <div class="tbg-field">
                             <label>Old Electric</label>
-                            <input type="number" id="oldElectric"  name="oldElectric" value="${bill.oldElectricNumber}" required>
+                            <input type="number" id="oldElectric"  name="oldElectric" value="${bill.oldElectricNumber}" readonly>
                         </div>
 
                         <div class="tbg-field">
@@ -116,7 +116,7 @@
 
                         <div class="tbg-field">
                             <label>Old Water</label>
-                            <input type="number" id="oldWater"  name="oldWater" value="${bill.oldWaterNumber}"  required>
+                            <input type="number" id="oldWater"  name="oldWater" value="${bill.oldWaterNumber}"  readonly>
                         </div>
 
                         <div class="tbg-field">

@@ -80,15 +80,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
             return;
         }
-        // LocalDate today = LocalDate.now();
 
-        // // chỉ được tạo bill trong ngày 25 mỗi tháng
-        // if( today.getDayOfMonth() < 25) {
-        //      loadRooms(request);
-        //     request.setAttribute("error","Bills for the current month can only be generated from day 25 onwards.");
-        //     request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
-        //     return;
-        // }
 
         LocalDate minDueDate = billMonth.plusMonths(1);          // 01 tháng sau
         LocalDate maxDueDate = billMonth.plusMonths(1).plusDays(14); // 15 của tháng sau
