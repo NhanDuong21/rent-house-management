@@ -78,13 +78,13 @@ public class ManagerGenerateBilllController extends HttpServlet {
 
 
             // VALIDATE METER
-            if (newElectric <= oldElectric) {
+            if (newElectric < oldElectric) {
                 loadRooms(request);
                 request.setAttribute("error", "New electric meter must be greater than old meter.");
                 request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
                 return;
             }
-            if (newWater <= oldWater) {
+            if (newWater < oldWater) {
                 loadRooms(request);
                 request.setAttribute("error", "New water meter must be greater than old meter.");
                 request.getRequestDispatcher("/views/manager/generateBill.jsp").forward(request, response);
