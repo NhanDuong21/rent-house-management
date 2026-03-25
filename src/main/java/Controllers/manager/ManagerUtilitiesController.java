@@ -4,6 +4,7 @@
  */
 package Controllers.manager;
 
+import DALs.utilities.Utilities_UsageDAO;
 import DALs.utilities.utilitiesDAO;
 import Models.entity.Utility;
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class ManagerUtilitiesController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         utilitiesDAO dao = new utilitiesDAO();
+        Utilities_UsageDAO usdao = new Utilities_UsageDAO();
         if (action == null) {
             action = "all";
         }
@@ -112,11 +114,38 @@ public class ManagerUtilitiesController extends HttpServlet {
             case "subscribers":
                 int idSub = Integer.parseInt(request.getParameter("id"));
                 String nameSub = request.getParameter("name");
-                List<Utility> subscribers = dao.getSubscribersByUtilityId(idSub);
-                List<Utility> listSub = dao.getManagerUtilities();
-                request.setAttribute("utilities", listSub);
+
+                int page = 1;
+                int pageSize = 10;
+
+                String pageParam = request.getParameter("page");
+                if (pageParam != null) {
+                    try {
+                        page = Integer.parseInt(pageParam);
+                        if (page < 1) {
+                            page = 1;
+                        }
+                    } catch (NumberFormatException e) {
+                        page = 1;
+                    }
+                }
+
+                int totalRecords = usdao.countSubscribersByUtilityId(idSub);
+                int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+                if (page > totalPages && totalPages > 0) {
+                    page = totalPages;
+                }
+
+                List<Utility> subscribers = usdao.getSubscribersByUtilityIdPaging(idSub, page, pageSize);
+
                 request.setAttribute("subscribers", subscribers);
                 request.setAttribute("utilityName", nameSub);
+                request.setAttribute("utilityId", idSub);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalRecords", totalRecords);
+
                 request.getRequestDispatcher("/views/manager/utilitySubscribers.jsp").forward(request, response);
                 break;
 
@@ -197,7 +226,7 @@ public class ManagerUtilitiesController extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/manager/utilities");
                     break;
                 }
-                
+
                 // Pass hết thì add
                 boolean result = dao.addUtility(utilityName.trim(), price, unit.trim());
                 if (result) {

@@ -41,10 +41,9 @@
         <!-- TABLE TITLE -->
         <div class="ms-card">
             <div class="ms-card-title">
-                All Subscribers (<c:out value="${empty subscribers ? 0 : subscribers.size()}"/>)
+                All Subscribers (<c:out value="${totalRecords}"/>)
             </div>
 
-            <!-- TABLE -->
             <c:choose>
                 <c:when test="${empty subscribers}">
                     <div class="ms-empty-state">
@@ -77,36 +76,95 @@
                                 </tr>
                             </c:forEach>
                             <tr id="notFoundSub" style="display:none;">
-                                <td colspan="3">No results found.</td>
+                                <td colspan="4">No results found.</td>
                             </tr>
                         </tbody>
                     </table>
+
+                    <c:if test="${totalPages > 1}">
+                        <div class="ms-pagination">
+                            <c:set var="baseUrl"
+                                   value="${pageContext.request.contextPath}/manager/utilities?action=subscribers&id=${utilityId}&amp;name=${utilityName}&amp;page="/>
+
+                            <!-- Prev -->
+                            <c:choose>
+                                <c:when test="${currentPage <= 1}">
+                                    <span class="ms-page-btn ms-page-disabled">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="ms-page-btn" href="${baseUrl}${currentPage - 1}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
+
+                            <!-- Page numbers -->
+                            <c:forEach var="i" begin="1" end="${totalPages}">
+                                <c:choose>
+                                    <c:when test="${i == currentPage}">
+                                        <span class="ms-page-btn ms-page-active">${i}</span>
+                                    </c:when>
+
+                                    <c:when test="${i >= currentPage - 2 && i <= currentPage + 2}">
+                                        <a class="ms-page-btn" href="${baseUrl}${i}">${i}</a>
+                                    </c:when>
+
+                                    <c:when test="${i == 1 || i == totalPages}">
+                                        <a class="ms-page-btn" href="${baseUrl}${i}">${i}</a>
+                                    </c:when>
+
+                                    <c:when test="${i == totalPages - 1 && currentPage < totalPages - 3}">
+                                        <span class="ms-page-ellipsis">...</span>
+                                    </c:when>
+
+                                    <c:when test="${i == 2 && currentPage > 4}">
+                                        <span class="ms-page-ellipsis">...</span>
+                                    </c:when>
+                                </c:choose>
+                            </c:forEach>
+
+                            <!-- Next -->
+                            <c:choose>
+                                <c:when test="${currentPage >= totalPages}">
+                                    <span class="ms-page-btn ms-page-disabled">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="ms-page-btn" href="${baseUrl}${currentPage + 1}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </c:if>
                 </c:otherwise>
             </c:choose>
         </div>
-    </div>
 
-    <script>
-        const subSearchInput = document.getElementById('subSearchInput');
-        if (subSearchInput) {
-            subSearchInput.addEventListener('input', function () {
-                const keyword = this.value.toLowerCase();
-                const rows = document.querySelectorAll('#subscriberTable tr:not(#notFoundSub)');
-                let hasResult = false;
-                rows.forEach(row => {
-                    const text = row.innerText.toLowerCase();
-                    if (text.includes(keyword)) {
-                        row.style.display = '';
-                        hasResult = true;
-                    } else {
-                        row.style.display = 'none';
-                    }
+        <script>
+            const subSearchInput = document.getElementById('subSearchInput');
+            if (subSearchInput) {
+                subSearchInput.addEventListener('input', function () {
+                    const keyword = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#subscriberTable tr:not(#notFoundSub)');
+                    let hasResult = false;
+                    rows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
+                        if (text.includes(keyword)) {
+                            row.style.display = '';
+                            hasResult = true;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                    const notFound = document.getElementById('notFoundSub');
+                    if (notFound)
+                        notFound.style.display = hasResult ? 'none' : '';
                 });
-                const notFound = document.getElementById('notFoundSub');
-                if (notFound)
-                    notFound.style.display = hasResult ? 'none' : '';
-            });
-        }
-    </script>
+            }
+        </script>
 
-</layout:layout>
+    </layout:layout>

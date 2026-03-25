@@ -4,6 +4,7 @@
  */
 package DALs.utilities;
 
+import Models.entity.Utility;
 import Utils.database.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +16,74 @@ import java.util.List;
  * @author Bui Nhu Y
  */
 public class Utilities_UsageDAO extends DBContext {
+
+    public List<Utility> getSubscribersByUtilityIdPaging(int id, int page, int pageSize) {
+        List<Utility> list = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT "
+                + "    r.room_id, "
+                + "    r.room_number, "
+                + "    t.full_name, "
+                + "    ut.usage_date "
+                + "FROM BILL_DETAIL bd "
+                + "JOIN BILL b ON bd.bill_id = b.bill_id "
+                + "JOIN CONTRACT c ON b.contract_id = c.contract_id "
+                + "JOIN ROOM r ON c.room_id = r.room_id "
+                + "JOIN TENANT t ON c.tenant_id = t.tenant_id "
+                + "JOIN UTILITY_USAGE ut ON c.contract_id = ut.contract_id "
+                + "WHERE bd.utility_id = ? "
+                + "ORDER BY r.room_id "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Utility u = new Utility();
+                u.setUtilityId(rs.getInt("room_id"));
+                u.setUtilityName(rs.getString("room_number"));
+                u.setUnit(rs.getString("full_name"));
+                u.setStatus(rs.getString("usage_date"));
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countSubscribersByUtilityId(int id) {
+        String sql = "SELECT COUNT(*) FROM ( "
+                + "    SELECT DISTINCT "
+                + "        r.room_id, "
+                + "        r.room_number, "
+                + "        t.full_name, "
+                + "        ut.usage_date "
+                + "    FROM BILL_DETAIL bd "
+                + "    JOIN BILL b ON bd.bill_id = b.bill_id "
+                + "    JOIN CONTRACT c ON b.contract_id = c.contract_id "
+                + "    JOIN ROOM r ON c.room_id = r.room_id "
+                + "    JOIN TENANT t ON c.tenant_id = t.tenant_id "
+                + "    JOIN UTILITY_USAGE ut ON c.contract_id = ut.contract_id "
+                + "    WHERE bd.utility_id = ? "
+                + ") AS x";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     public int getActiveContractIdByTenantId(int tenantId) {
         String sql = "SELECT TOP 1 contract_id FROM CONTRACT "
