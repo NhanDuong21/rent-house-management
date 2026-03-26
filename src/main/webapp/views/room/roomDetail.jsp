@@ -50,8 +50,11 @@
             <div class="rd-gallery-card rd-reveal">
                 <div class="rd-image-wrap">
                     <div class="rd-image">
-    <div class="rd-fade rd-fade-left"></div>
-    <div class="rd-fade rd-fade-right"></div>
+                        <div class="rd-fade rd-fade-left"></div>
+                        <div class="rd-fade rd-fade-right"></div>
+                        <div class="rd-image-orb rd-image-orb--one"></div>
+                        <div class="rd-image-orb rd-image-orb--two"></div>
+
                         <c:choose>
                             <c:when test="${not empty r.images}">
                                 <img id="mainImg"
@@ -62,12 +65,12 @@
                                 <div class="rd-badge status-${fn:toLowerCase(r.status)}">${r.status}</div>
 
                                 <button type="button" class="rd-gallery-nav rd-gallery-prev" id="rdPrevBtn">
-    <i class="bi bi-chevron-left"></i>
-</button>
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
 
-<button type="button" class="rd-gallery-nav rd-gallery-next" id="rdNextBtn">
-    <i class="bi bi-chevron-right"></i>
-</button>
+                                <button type="button" class="rd-gallery-nav rd-gallery-next" id="rdNextBtn">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
 
                                 <button type="button" class="rd-zoom-btn" id="rdZoomBtn" aria-label="Zoom image">
                                     <i class="bi bi-arrows-fullscreen"></i>

@@ -71,6 +71,8 @@
         <!-- HERO -->
         <section class="home-hero" id="homeHero" aria-label="Hero Banner">
             <div class="home-hero__overlay"></div>
+            <div class="home-hero__mesh"></div>
+            <div class="home-hero__shine"></div>
 
             <div class="hero-track">
                 <div class="hero-slide is-active">
@@ -82,7 +84,7 @@
             </div>
 
             <div class="home-hero__content">
-                <div class="home-hero__text">
+                <div class="home-hero__text hero-reveal">
                     <span class="home-badge">
                         <i class="bi bi-buildings-fill"></i>
                         Rental House Management
@@ -117,7 +119,7 @@
                     </div>
                 </div>
 
-                <div class="home-hero__stats">
+                <div class="home-hero__stats hero-reveal hero-reveal--delay">
                     <div class="hero-stat hero-stat--main">
                         <div class="hero-stat__icon"><i class="bi bi-house-door-fill"></i></div>
                         <div class="hero-stat__value">${empty rooms ? 0 : totalItems}</div>
@@ -146,6 +148,10 @@
             <div class="hero-dots" aria-label="Hero dots">
                 <button type="button" class="dot is-active" data-index="0" aria-label="Slide 1"></button>
                 <button type="button" class="dot" data-index="1" aria-label="Slide 2"></button>
+            </div>
+
+            <div class="hero-scroll-indicator">
+                <span></span>
             </div>
         </section>
 
@@ -194,8 +200,9 @@
             <c:otherwise>
                 <div class="room-grid">
                     <c:forEach var="r" items="${rooms}">
-                        <div class="room-card">
+                        <div class="room-card room-reveal">
                             <div class="room-card__glow"></div>
+                            <div class="room-card__shine"></div>
 
                             <div class="room-img">
                                 <c:choose>
@@ -414,14 +421,27 @@
     </div>
 
     <!-- ROOM DETAIL MODAL -->
-    <div class="rh-modal" id="roomDetailModal" aria-hidden="true">
-        <div class="rh-modal-backdrop" id="roomDetailBackdrop"></div>
+    <div class="rh-modal rh-modal--detail" id="roomDetailModal" aria-hidden="true">
+        <div class="rh-modal-backdrop rh-modal-backdrop--detail" id="roomDetailBackdrop"></div>
 
-        <div class="rh-modal-dialog room-detail-dialog" role="dialog" aria-modal="true">
-            <button class="rh-modal-close rh-modal-close-floating" type="button" id="roomDetailClose">✕</button>
+        <div class="rh-modal-dialog room-detail-dialog room-detail-shell" role="dialog" aria-modal="true">
+            <div class="room-detail-shell__topbar">
+                <div class="room-detail-shell__label">
+                    <i class="bi bi-stars"></i>
+                    Premium Room Preview
+                </div>
 
-            <div id="roomDetailBody" class="room-detail-body">
-                <div class="room-detail-loading">Loading...</div>
+                <button class="rh-modal-close rh-modal-close-floating room-detail-shell__close" type="button" id="roomDetailClose">✕</button>
+            </div>
+
+            <div class="room-detail-shell__body">
+                <div id="roomDetailBody" class="room-detail-body">
+                    <div class="room-detail-loading room-detail-loading--fancy">
+                        <div class="rd-loading-spinner"></div>
+                        <div class="rd-loading-text">Loading room details...</div>
+                        <div class="rd-loading-sub">Please wait a moment</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

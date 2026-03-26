@@ -24,6 +24,7 @@
   --rd-radius-xl: 28px;
   --rd-radius-lg: 22px;
   --rd-radius-md: 18px;
+  --rd-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .rh-fragment {
@@ -64,20 +65,21 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.08);
 }
 
 .rd-title {
   margin: 0;
-  font-size: clamp(28px, 3vw, 36px);
+  font-size: clamp(28px, 3vw, 38px);
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.06;
   letter-spacing: -0.03em;
   color: var(--rd-text);
 }
 
 .rd-sub {
   color: var(--rd-muted);
-  line-height: 1.7;
+  line-height: 1.75;
   font-size: 14px;
   max-width: 760px;
 }
@@ -98,8 +100,9 @@
   font-weight: 700;
   padding: 9px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
 }
 
 .rd-status-chip {
@@ -111,6 +114,7 @@
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
 }
 
 .rd-status-chip.status-available {
@@ -147,25 +151,64 @@
 }
 
 /* IMAGE */
+.rd-image-wrap {
+  position: relative;
+}
+
 .rd-image {
   position: relative;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 30px;
   overflow: hidden;
   box-shadow: var(--rd-shadow-lg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+}
+
+.rd-image-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+.rd-image-orb--one {
+  top: 16px;
+  right: 56px;
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.4), transparent 70%);
+}
+
+.rd-image-orb--two {
+  bottom: 78px;
+  left: 14px;
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.24),
+    transparent 70%
+  );
 }
 
 .rd-main {
   width: 100%;
-  height: 440px;
+  height: 460px;
   object-fit: cover;
   display: block;
   background: #f1f5f9;
   transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
+    opacity 0.28s ease,
+    transform 0.5s var(--rd-ease),
+    filter 0.4s ease;
+}
+
+.rd-image:hover .rd-main {
+  transform: scale(1.03);
+  filter: saturate(1.04);
 }
 
 .rd-main.is-switching {
@@ -175,7 +218,7 @@
 
 .rd-image-placeholder {
   width: 100%;
-  height: 440px;
+  height: 460px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,13 +233,14 @@
   top: 14px;
   left: 14px;
   z-index: 7;
-  padding: 7px 12px;
+  padding: 8px 12px;
   border-radius: 999px;
   color: #ffffff;
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
 }
 
 .rd-badge.status-available {
@@ -224,7 +268,7 @@
   z-index: 4;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.26s ease;
 }
 
 .rd-fade-left {
@@ -260,10 +304,10 @@
 .rd-gallery-nav {
   top: 50%;
   transform: translateY(-50%) scale(0.92);
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   color: #0f172a;
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow:
@@ -271,10 +315,10 @@
     0 2px 6px rgba(15, 23, 42, 0.08);
   opacity: 0;
   transition:
-    opacity 0.22s ease,
-    transform 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease;
+    opacity 0.24s ease,
+    transform 0.24s var(--rd-ease),
+    background 0.24s ease,
+    box-shadow 0.24s ease;
 }
 
 .rd-gallery-prev {
@@ -298,7 +342,7 @@
 
 .rd-gallery-nav:hover {
   background: #ffffff;
-  transform: translateY(-50%) scale(1.06);
+  transform: translateY(-50%) scale(1.08);
   box-shadow:
     0 14px 28px rgba(15, 23, 42, 0.18),
     0 4px 10px rgba(15, 23, 42, 0.1);
@@ -317,23 +361,25 @@
 .rd-zoom-btn {
   top: 14px;
   right: 14px;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   background: rgba(17, 24, 39, 0.78);
   color: #ffffff;
   backdrop-filter: blur(8px);
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    transform 0.22s var(--rd-ease),
+    background 0.22s ease;
 }
 
 .rd-zoom-btn:hover {
-  transform: scale(1.06);
-  background: rgba(17, 24, 39, 0.9);
+  transform: scale(1.08);
+  background: rgba(17, 24, 39, 0.92);
 }
 
 .rd-image-bottom {
+  position: relative;
+  z-index: 2;
   padding: 14px;
   background: rgba(255, 255, 255, 0.96);
 }
@@ -356,28 +402,30 @@
 }
 
 .rd-thumb {
-  width: 76px;
-  height: 56px;
+  width: 78px;
+  height: 58px;
   object-fit: cover;
   border-radius: 12px;
   cursor: pointer;
   flex: 0 0 auto;
   border: 2px solid transparent;
   transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    opacity 0.18s ease;
+    transform 0.22s var(--rd-ease),
+    border-color 0.22s var(--rd-ease),
+    opacity 0.18s ease,
+    box-shadow 0.22s ease;
   opacity: 0.92;
 }
 
 .rd-thumb:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
   opacity: 1;
 }
 
 .rd-thumb.is-active {
   border-color: var(--rd-primary);
   opacity: 1;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14);
 }
 
 /* SIDE */
@@ -392,20 +440,32 @@
 .rd-card,
 .rd-desc-wrap,
 .rd-action-card {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.58);
   box-shadow: var(--rd-shadow);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 }
 
 .rd-price-card {
   border-radius: 24px;
   padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rd-price-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -25% auto;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.12), transparent 70%);
+  pointer-events: none;
 }
 
 .rd-price-card__icon {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 16px;
   display: grid;
   place-items: center;
@@ -413,6 +473,7 @@
   color: var(--rd-primary);
   font-size: 22px;
   margin-bottom: 12px;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
 }
 
 .rd-price-card__label {
@@ -425,7 +486,7 @@
 
 .rd-price-value {
   margin-top: 8px;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 900;
   color: var(--rd-text);
   letter-spacing: -0.03em;
@@ -464,6 +525,14 @@
 .rd-quick-card {
   padding: 18px;
   border-radius: 20px;
+  transition:
+    transform 0.26s var(--rd-ease),
+    box-shadow 0.26s var(--rd-ease);
+}
+
+.rd-quick-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
 }
 
 .rd-quick-card i {
@@ -500,6 +569,7 @@
   color: var(--rd-primary);
   font-size: 22px;
   margin-bottom: 12px;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
 }
 
 .rd-action-card h3 {
@@ -512,7 +582,7 @@
 .rd-action-card p {
   margin: 0;
   color: var(--rd-muted);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .rd-action-buttons {
@@ -534,9 +604,10 @@
   border: none;
   cursor: pointer;
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    transform 0.24s var(--rd-ease),
+    box-shadow 0.24s var(--rd-ease),
+    background 0.24s ease,
+    color 0.24s ease;
 }
 
 .rd-action-btn--primary {
@@ -552,7 +623,7 @@
 }
 
 .rd-action-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 /* INFO GRID */
@@ -645,7 +716,7 @@
 
 .rd-desc {
   padding: 18px 20px 20px;
-  line-height: 1.8;
+  line-height: 1.85;
   color: #334155;
   font-size: 14px;
 }
@@ -665,8 +736,10 @@
 .rd-lightbox__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(2, 6, 23, 0.84);
-  backdrop-filter: blur(6px);
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.14), transparent 25%),
+    rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(8px);
 }
 
 .rd-lightbox__dialog {
@@ -684,7 +757,8 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 18px;
+  border-radius: 20px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.3);
 }
 
 .rd-lightbox__close {
@@ -703,12 +777,12 @@
 
 /* MODAL */
 .room-detail-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 24px;
+  width: 100%;
+  min-height: 100%;
+  overflow: visible;
+  padding: 0;
   box-sizing: border-box;
-  background: var(--rd-bg);
+  background: transparent;
 }
 
 /* RESPONSIVE */
@@ -731,7 +805,7 @@
 
   .rd-main,
   .rd-image-placeholder {
-    height: 260px;
+    height: 270px;
   }
 
   .rd-row {
@@ -751,5 +825,31 @@
 
   .rd-meta-line {
     gap: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .rd-title {
+    font-size: 26px;
+  }
+
+  .rd-main,
+  .rd-image-placeholder {
+    height: 230px;
+  }
+
+  .rd-image,
+  .rd-price-card,
+  .rd-action-card,
+  .rd-card,
+  .rd-desc-wrap {
+    border-radius: 22px;
+  }
+
+  .rd-action-btn--secondary.is-copied {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: #fff;
+    border-color: #15803d;
+    box-shadow: 0 14px 28px rgba(22, 163, 74, 0.22);
   }
 }

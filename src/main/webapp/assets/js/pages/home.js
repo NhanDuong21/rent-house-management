@@ -1,6 +1,9 @@
 (function () {
   const init = window.RH_INIT || {};
   const ctx = init.ctx || "";
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   function qs(selector, root = document) {
     return root.querySelector(selector);
@@ -144,6 +147,16 @@
   const detailClose = qs("#roomDetailClose");
   const detailBody = qs("#roomDetailBody");
 
+  function fancyLoadingHtml() {
+    return `
+      <div class="room-detail-loading room-detail-loading--fancy">
+        <div class="rd-loading-spinner"></div>
+        <div class="rd-loading-text">Loading room details...</div>
+        <div class="rd-loading-sub">Please wait a moment</div>
+      </div>
+    `;
+  }
+
   function openRoomModal() {
     if (!detailModal) return;
     detailModal.classList.add("show");
@@ -176,7 +189,8 @@
     openRoomModal();
 
     if (detailBody) {
-      detailBody.innerHTML = `<div class="room-detail-loading">Loading...</div>`;
+      detailBody.innerHTML = fancyLoadingHtml();
+      detailBody.scrollTop = 0;
     }
 
     try {
@@ -200,14 +214,40 @@
         if (typeof window.initRoomDetail === "function") {
           window.initRoomDetail(detailBody);
         }
+
+        injectRoomDetailReveal(detailBody);
       }
     } catch (err) {
       if (detailBody) {
-        detailBody.innerHTML = `<div class="room-detail-error">Không load được chi tiết phòng.</div>`;
+        detailBody.innerHTML = `
+          <div class="room-detail-error">
+            Không load được chi tiết phòng.
+          </div>
+        `;
       }
       console.error("detail error:", err);
     }
   });
+
+  function injectRoomDetailReveal(root) {
+    if (!root || reduceMotion) return;
+    const items = qsa(".rd-reveal", root);
+
+    items.forEach((el, index) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(18px) scale(0.985)";
+      el.style.transition =
+        "opacity 0.62s cubic-bezier(0.22,1,0.36,1), transform 0.62s cubic-bezier(0.22,1,0.36,1)";
+      el.style.transitionDelay = `${Math.min(index * 0.06, 0.3)}s`;
+    });
+
+    requestAnimationFrame(() => {
+      items.forEach((el) => {
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0) scale(1)";
+      });
+    });
+  }
 
   /* =========================
    * HERO SLIDER
@@ -225,7 +265,7 @@
 
     let idx = 0;
     let timer = null;
-    const intervalMs = 3800;
+    const intervalMs = 4200;
 
     function render() {
       slides.forEach((s, i) => s.classList.toggle("is-active", i === idx));
@@ -246,6 +286,7 @@
     }
 
     function start() {
+      if (reduceMotion) return;
       stop();
       timer = setInterval(next, intervalMs);
     }
@@ -311,6 +352,35 @@
   })();
 
   /* =========================
+   * CARD 3D HOVER
+   * ========================= */
+  (function initCardTilt() {
+    if (reduceMotion) return;
+
+    const cards = qsa(".room-card");
+
+    cards.forEach((card) => {
+      function reset() {
+        card.style.transform = "";
+      }
+
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+
+        const rotateY = (px - 0.5) * 8;
+        const rotateX = (0.5 - py) * 8;
+
+        card.style.transform = `translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      card.addEventListener("mouseleave", reset);
+      card.addEventListener("blur", reset, true);
+    });
+  })();
+
+  /* =========================
    * REVEAL ANIMATION
    * ========================= */
   const revealTargets = [
@@ -321,24 +391,50 @@
     ...qsa(".home-empty"),
   ];
 
-  revealTargets.forEach((el, index) => {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(24px)";
-    el.style.transition = "opacity 0.65s ease, transform 0.65s ease";
-    el.style.transitionDelay = `${Math.min(index * 0.03, 0.24)}s`;
-  });
+  if (!reduceMotion) {
+    revealTargets.forEach((el, index) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(30px) scale(0.985)";
+      el.style.transition =
+        "opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1)";
+      el.style.transitionDelay = `${Math.min(index * 0.035, 0.28)}s`;
+    });
 
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.style.opacity = "1";
-        entry.target.style.transform = "translateY(0)";
-        revealObserver.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.1 },
-  );
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.style.opacity = "1";
+          entry.target.style.transform = "translateY(0) scale(1)";
+          revealObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12 },
+    );
 
-  revealTargets.forEach((el) => revealObserver.observe(el));
+    revealTargets.forEach((el) => revealObserver.observe(el));
+  }
+
+  /* =========================
+   * HERO PARALLAX
+   * ========================= */
+  (function initHeroParallax() {
+    if (reduceMotion) return;
+
+    const hero = qs("#homeHero");
+    const content = qs(".home-hero__content", hero);
+    if (!hero || !content) return;
+
+    hero.addEventListener("mousemove", (e) => {
+      const rect = hero.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+      content.style.transform = `translate3d(${x * 10}px, ${y * 10}px, 0)`;
+    });
+
+    hero.addEventListener("mouseleave", () => {
+      content.style.transform = "";
+    });
+  })();
 })();
