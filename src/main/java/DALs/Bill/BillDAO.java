@@ -490,9 +490,9 @@ public class BillDAO extends DBContext {
     // ==========================================
     public boolean updateBillMeter(int billId, java.sql.Date billMonth, java.sql.Date dueDate, int oldElectric, int newElectric, int oldWater, int newWater) {
 
-    try {
+        try {
 
-        String sql = """
+            String sql = """
             UPDATE BILL
             SET bill_month = ?,
                 due_date = ?,
@@ -503,26 +503,26 @@ public class BillDAO extends DBContext {
             WHERE bill_id = ?
         """;
 
-        PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql);
 
-        ps.setDate(1, billMonth);
-        ps.setDate(2, dueDate);
-        ps.setInt(3, oldElectric);
-        ps.setInt(4, newElectric);
-        ps.setInt(5, oldWater);
-        ps.setInt(6, newWater);
-        ps.setInt(7, billId);
+            ps.setDate(1, billMonth);
+            ps.setDate(2, dueDate);
+            ps.setInt(3, oldElectric);
+            ps.setInt(4, newElectric);
+            ps.setInt(5, oldWater);
+            ps.setInt(6, newWater);
+            ps.setInt(7, billId);
 
-        int row = ps.executeUpdate();
+            int row = ps.executeUpdate();
 
-        return row > 0;
+            return row > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
-
-    return false;
-}
 
     // ==========================================
     // CHECK IF BILL ALREADY EXISTS FOR MONTH
@@ -790,8 +790,8 @@ public class BillDAO extends DBContext {
                 dto.setContract_id(rs.getInt("contract_id"));
                 dto.setMonthlyRent(rs.getBigDecimal("monthly_rent"));
                 dto.setLastElectric(rs.getInt("last_electric")); // thêm mới
-                dto.setLastWater(rs.getInt("last_water")); 
-                
+                dto.setLastWater(rs.getInt("last_water"));
+
                 list.add(dto);
             }
 
@@ -799,6 +799,33 @@ public class BillDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+    // ==========================================
+    // get startdate and end_date cua contract = roomid
+    // ==========================================
+    public RoomTenantDTO getContractDatesByRoomId(int roomId) {
+        String sql = """
+        SELECT c.start_date, c.end_date
+        FROM CONTRACT c
+        WHERE c.room_id = ? AND c.status = 'ACTIVE'
+    """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, roomId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                RoomTenantDTO dto = new RoomTenantDTO();
+                dto.setStartDate(rs.getDate("start_date").toLocalDate());
+                java.sql.Date end = rs.getDate("end_date");
+                if (end != null) {
+                    dto.setEndDate(end.toLocalDate());
+                }
+                return dto;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

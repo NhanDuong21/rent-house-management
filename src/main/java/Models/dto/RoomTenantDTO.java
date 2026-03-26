@@ -6,6 +6,7 @@
 package Models.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  *
@@ -19,11 +20,13 @@ public class RoomTenantDTO {
     private BigDecimal monthlyRent;
     private int lastElectric;
     private int lastWater;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public RoomTenantDTO() {
     }
 
-    public RoomTenantDTO(int roomId, int contract_id, String roomNumber, String tenantName, BigDecimal monthlyRent, int lastElectric, int lastWater) {
+    public RoomTenantDTO(int roomId, int contract_id, String roomNumber, String tenantName, BigDecimal monthlyRent, int lastElectric, int lastWater, LocalDate startDate, LocalDate endDate) {
         this.roomId = roomId;
         this.contract_id = contract_id;
         this.roomNumber = roomNumber;
@@ -31,6 +34,8 @@ public class RoomTenantDTO {
         this.monthlyRent = monthlyRent;
         this.lastElectric = lastElectric;
         this.lastWater = lastWater;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public int getRoomId() {
@@ -89,6 +94,20 @@ public class RoomTenantDTO {
         this.lastWater = lastWater;
     }
 
-    
+    public LocalDate getStartDate() {
+        return startDate;
+    }
 
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+    
 }
