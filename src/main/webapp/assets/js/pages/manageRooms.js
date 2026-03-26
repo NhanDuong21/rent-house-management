@@ -13,6 +13,10 @@ document.querySelectorAll(".room-status-btn").forEach(btn => {
 
 document.querySelectorAll(".room-status-options button").forEach(btn => {
     btn.addEventListener("click", () => {
+        document.querySelectorAll(".room-status-options button")
+            .forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
         selectedStatus = btn.dataset.status;
     });
 });
