@@ -1,6 +1,6 @@
 <%-- 
     Document   : generateBill
-    Created on : Mar 6, 2026, 1:17:22 PM
+    Created on : Mar 6, 2026, 1:17:22 PM
     Author     : To Thi Thao Trang - CE191027
 --%>
 
@@ -12,13 +12,11 @@
                active="m_billing"
                cssFile="${pageContext.request.contextPath}/assets/css/views/managerGenerateBill.css">
 
-    <div class="tbg-container">
+    <div class="tbg-container tbg-fade-page">
 
         <!-- HEADER -->
-        <div class="tbg-pagehead">
-
+        <div class="tbg-pagehead tbg-reveal" style="--delay: 0.05s;">
             <div class="tbg-pagehead-left">
-
                 <a href="${pageContext.request.contextPath}/manager/billing" class="tbg-back">
                     <i class="bi bi-arrow-left"></i>
                     <span>Back to Bills</span>
@@ -31,7 +29,6 @@
                     <span>/</span>
                     <span class="active">Generate</span>
                 </div>
-
             </div>
 
             <div class="tbg-pagehead-right">
@@ -40,11 +37,10 @@
                     <span>Generate monthly bill</span>
                 </div>
             </div>
-
         </div>
 
         <!-- CARD -->
-        <div class="tbg-card">
+        <div class="tbg-card tbg-reveal" style="--delay: 0.12s;">
             <div class="tbg-card-body">
 
                 <div class="tbg-title">
@@ -61,15 +57,13 @@
                 <!-- FORM -->
                 <form action="${pageContext.request.contextPath}/manager/billing/generate"
                       method="post"
-                      class="tbg-form">
+                      class="tbg-form"
+                      id="billForm">
 
                     <!-- TOP -->
                     <div class="tbg-form-top">
-
                         <div class="tbg-left">
-
-                            <!-- ROOM -->
-                            <div class="tbg-field">
+                            <div class="tbg-field tbg-reveal" style="--delay: 0.18s;">
                                 <label>Room</label>
                                 <select id="roomSelect" name="roomId" required>
                                     <c:choose>
@@ -92,91 +86,81 @@
                                 </select>
                             </div>
 
-                            <!-- TENANT -->
-                            <div class="tbg-field">
+                            <div class="tbg-field tbg-reveal" style="--delay: 0.22s;">
                                 <label>Tenant</label>
                                 <input type="text" id="tenantName" readonly>
                             </div>
-
                         </div>
 
                         <div class="tbg-right">
-
-                            <!-- BILL MONTH -->
-                            <div class="tbg-field">
+                            <div class="tbg-field tbg-reveal" style="--delay: 0.26s;">
                                 <label>Bill Month</label>
                                 <input type="month" name="billMonth" required>
                             </div>
 
-                            <!-- DUE DATE -->
-                            <div class="tbg-field">
+                            <div class="tbg-field tbg-reveal" style="--delay: 0.30s;">
                                 <label>Due Date</label>
                                 <input type="date" name="dueDate" required>
                             </div>
-
                         </div>
-
                     </div>
-                    <div class="tbg-meter-title">
+
+                    <div class="tbg-meter-title tbg-reveal" style="--delay: 0.34s;">
                         <i class="bi bi-speedometer2"></i>
                         Meter Input
                     </div>
-                    <div class="tbg-meter-grid">
 
-                        <!-- OLD ELECTRIC -->
-                        <div class="tbg-field">
+                    <div class="tbg-meter-grid">
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.38s;">
                             <label>Old Electric</label>
                             <input type="number" id="oldElectric" name="oldElectric" readonly>
                         </div>
 
-                        <!-- NEW ELECTRIC -->
-                        <div class="tbg-field">
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.42s;">
                             <label>New Electric</label>
                             <input type="number" id="newElectric" name="newElectric" required>
-                        </div> 
-                        <!-- ELECTRIC USAGE -->
-                        <div class="tbg-field">
+                        </div>
+
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.46s;">
                             <label>Electric Usage</label>
-                            <input type="number" id="electricUsage" readonly> </div>
-                        <!-- OLD WATER -->
-                        <div class="tbg-field">
+                            <input type="number" id="electricUsage" readonly>
+                        </div>
+
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.50s;">
                             <label>Old Water</label>
                             <input type="number" id="oldWater" name="oldWater" readonly>
                         </div>
-                        <!-- NEW WATER -->
-                        <div class="tbg-field">
+
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.54s;">
                             <label>New Water</label>
                             <input type="number" id="newWater" name="newWater" required>
                         </div>
-                        <!-- WATER USAGE -->
-                        <div class="tbg-field">
+
+                        <div class="tbg-field tbg-reveal" style="--delay: 0.58s;">
                             <label>Water Usage</label>
                             <input type="number" id="waterUsage" readonly>
                         </div>
                     </div>
-                    <!-- ACTION -->
-                    <div class="tbg-actions">
 
+                    <!-- ACTION -->
+                    <div class="tbg-actions tbg-reveal" style="--delay: 0.64s;">
                         <button type="submit" class="tbg-btn-generate">
                             <i class="bi bi-lightning-charge"></i>
                             Generate Bill
                         </button>
-
                     </div>
+
                     <!-- ERROR -->
                     <c:if test="${not empty error}">
-                        <div class="tbg-error">
+                        <div class="tbg-error tbg-reveal" style="--delay: 0.68s;">
                             ${error}
                         </div>
                     </c:if>
 
                 </form>
-
             </div>
         </div>
-
     </div>
 
     <script src="${pageContext.request.contextPath}/assets/js/pages/managerGenerateBill.js"></script>
-
 </layout:layout>
