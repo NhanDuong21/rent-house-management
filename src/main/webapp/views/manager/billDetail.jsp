@@ -1,6 +1,6 @@
 <%-- 
 Document   : billDetail.jsp
-Created on : Feb 25, 2026, 1:32:10 AM
+Created on : Feb 25, 2026, 1:32:10 AM
 Author     : To Thi Thao Trang - CE191027
 --%>
 
@@ -15,8 +15,13 @@ Author     : To Thi Thao Trang - CE191027
 
     <div class="tbd-container">
 
+        <!-- DECOR BACKGROUND -->
+        <div class="tbd-blob tbd-blob-1"></div>
+        <div class="tbd-blob tbd-blob-2"></div>
+        <div class="tbd-blob tbd-blob-3"></div>
+
         <!-- PAGE HEADER -->
-        <div class="tbd-pagehead">
+        <div class="tbd-pagehead tbd-reveal">
             <div class="tbd-pagehead-left">
 
                 <a href="${pageContext.request.contextPath}/manager/billing" class="tbd-back">
@@ -42,7 +47,7 @@ Author     : To Thi Thao Trang - CE191027
         </div>
 
         <!-- MAIN CARD -->
-        <div class="tbd-card">
+        <div class="tbd-card tbd-reveal">
             <div class="tbd-card-body">
 
                 <!-- TOP -->
@@ -76,13 +81,12 @@ Author     : To Thi Thao Trang - CE191027
 
                 <!-- BILL INFO -->
                 <div class="tbd-grid-2">
-
-                    <div class="tbd-line">
+                    <div class="tbd-line info-card">
                         <span class="tbd-label">Room Number</span>
                         <span class="tbd-value">${roomNumber}</span>
                     </div>
 
-                    <div class="tbd-line">
+                    <div class="tbd-line info-card">
                         <span class="tbd-label">Billing Period</span>
                         <span class="tbd-value">
                             <fmt:setLocale value="en_US"/>
@@ -91,7 +95,7 @@ Author     : To Thi Thao Trang - CE191027
                         </span>
                     </div>
 
-                    <div class="tbd-line">
+                    <div class="tbd-line info-card">
                         <span class="tbd-label">Issue Date</span>
                         <span class="tbd-value">
                             <fmt:setLocale value="en_US"/>
@@ -100,13 +104,12 @@ Author     : To Thi Thao Trang - CE191027
                         </span>
                     </div>
 
-                    <div class="tbd-line">
+                    <div class="tbd-line info-card">
                         <span class="tbd-label">Due Date</span>
                         <span class="tbd-value">
                             <fmt:formatDate value="${bill.dueDate}" pattern="dd/MM/yyyy"/>
                         </span>
                     </div>
-
                 </div>
 
                 <div class="tbd-divider tbd-divider-soft"></div>
@@ -118,26 +121,32 @@ Author     : To Thi Thao Trang - CE191027
                         Bill Breakdown
                     </div>
 
-                    <c:forEach items="${ListBillDetail}" var="d">
-                        <div class="tbd-row">
-                            <span>
-                                ${d.itemName}
-                                <c:if test="${bill.billId == d.billId && d.utilityId == 1}">
-                                    (Old: ${bill.oldElectricNumber}, New : ${bill.newElectricNumber})
-                                </c:if>
-                                <c:if test="${bill.billId == d.billId && d.utilityId == 2}">
-                                    (Old: ${bill.oldWaterNumber}, New: ${bill.newWaterNumber})
-                                </c:if>
-                            </span>
-                            <span>
-                                <fmt:formatNumber value="${d.unitPrice * d.quantity}" type="number"/> ₫
-                            </span>
-                        </div>
-                    </c:forEach>
+                    <div class="tbd-breakdown">
+                        <c:forEach items="${ListBillDetail}" var="d" varStatus="loop">
+                            <div class="tbd-row breakdown-row" style="--delay:${loop.index * 0.05}s;">
+                                <span>
+                                    ${d.itemName}
+                                    <c:if test="${bill.billId == d.billId && d.utilityId == 1}">
+                                        <span class="tbd-inline-note">
+                                            (Old: ${bill.oldElectricNumber}, New: ${bill.newElectricNumber})
+                                        </span>
+                                    </c:if>
+                                    <c:if test="${bill.billId == d.billId && d.utilityId == 2}">
+                                        <span class="tbd-inline-note">
+                                            (Old: ${bill.oldWaterNumber}, New: ${bill.newWaterNumber})
+                                        </span>
+                                    </c:if>
+                                </span>
+                                <span class="tbd-money">
+                                    <fmt:formatNumber value="${d.unitPrice * d.quantity}" type="number"/> ₫
+                                </span>
+                            </div>
+                        </c:forEach>
+                    </div>
 
                     <div class="tbd-total tbd-row">
                         <span>Total Amount</span>
-                        <span>
+                        <span class="tbd-total-amount" data-total="${totalAmount}">
                             <fmt:formatNumber value="${totalAmount}" type="number"/> ₫
                         </span>
                     </div>
@@ -154,7 +163,8 @@ Author     : To Thi Thao Trang - CE191027
                         </div>
 
                         <div class="tbd-qr-box">
-                            <img src="${pageContext.request.contextPath}${qr}" class="tbd-qr-img"/>
+                            <div class="tbd-qr-glow"></div>
+                            <img src="${pageContext.request.contextPath}${qr}" class="tbd-qr-img" alt="Payment QR"/>
                             <div class="tbd-qr-note">
                                 Scan this QR code to make payment
                             </div>
@@ -162,29 +172,27 @@ Author     : To Thi Thao Trang - CE191027
 
                         <c:choose>
 
-
                             <c:when test="${paymentStatus eq 'PENDING'}">
 
                                 <form action="${pageContext.request.contextPath}/manager/bills/paymentConfirm"
-                                      method="post" style="margin-top:20px;">
+                                      method="post" class="tbd-confirm-form">
                                     <input type="hidden" name="billId" value="${bill.billId}">
-                                    <button class="tbd-btn-confirm">
+                                    <button class="tbd-btn-confirm" id="confirmPaymentBtn">
                                         <i class="bi bi-check-circle"></i>
-                                        Confirm Payment Received
+                                        <span>Confirm Payment Received</span>
                                     </button>
                                 </form>
 
                             </c:when>
 
-
                             <c:otherwise>
 
                                 <button class="tbd-btn-confirm" disabled style="margin-top:20px;">
                                     <i class="bi bi-check-circle"></i>
-                                    Confirm Payment Received
+                                    <span>Confirm Payment Received</span>
                                 </button>
 
-                                <div class="tbd-qr-note" style="margin-top:8px;color:#888;">
+                                <div class="tbd-qr-note tbd-wait-note">
                                     Waiting for tenant payment request
                                 </div>
 
@@ -193,7 +201,7 @@ Author     : To Thi Thao Trang - CE191027
                         </c:choose>
 
                         <c:if test="${not empty errorMsg}">
-                            <div class="alert alert-danger">
+                            <div class="tbd-alert-danger">
                                 ${errorMsg}
                             </div>
                         </c:if>
@@ -206,4 +214,5 @@ Author     : To Thi Thao Trang - CE191027
 
     </div>
 
+    <script src="${pageContext.request.contextPath}/assets/js/pages/managerBillDetail.js"></script>
 </layout:layout>
