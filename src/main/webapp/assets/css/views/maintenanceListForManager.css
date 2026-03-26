@@ -118,12 +118,15 @@
   letter-spacing: -0.02em;
 }
 
-/* ===== SEARCH / FILTER ===== */
+/* ===== SEARCH / FILTER (FIXED HORIZONTAL) ===== */
 .ml-search-form {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+
+  flex-wrap: nowrap; /* FIX: không cho xuống dòng */
+
   padding: 10px;
   border-radius: 18px;
   background: rgba(248, 250, 252, 0.92);
@@ -131,12 +134,15 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
+/* Search box */
 .ml-search-box {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 250px;
-  flex: 1 1 260px;
+
+  flex: 1; /* cho input chiếm nhiều space */
+  min-width: 260px;
+
   padding: 0 2px;
 }
 
@@ -145,6 +151,7 @@
   font-size: 14px;
 }
 
+/* Input + select */
 .ml-search-form input,
 .ml-search-form .form-select {
   border: 1px solid rgba(203, 213, 225, 0.9);
@@ -156,6 +163,7 @@
   border-radius: 14px;
   padding: 10px 12px;
   box-shadow: none;
+
   transition:
     border-color 0.24s ease,
     box-shadow 0.24s ease,
@@ -163,17 +171,25 @@
     transform 0.18s ease;
 }
 
+/* Input full width */
 .ml-search-form input {
-  min-width: 220px;
-  flex: 1;
+  width: 100%;
 }
 
+/* Select fixed width */
+.ml-search-form .form-select {
+  width: 180px;
+  min-width: 160px;
+}
+
+/* Hover */
 .ml-search-form input:hover,
 .ml-search-form .form-select:hover {
   border-color: #bfdbfe;
   background: #ffffff;
 }
 
+/* Focus */
 .ml-search-form input:focus,
 .ml-search-form .form-select:focus {
   border-color: rgba(37, 99, 235, 0.55);
@@ -183,17 +199,13 @@
   background: #ffffff;
   transform: translateY(-1px);
 }
-
-.ml-search-form .form-select {
-  min-width: 170px;
-}
-
 /* ===== ACTION BUTTON ===== */
 .ml-action-btn {
   padding: 10px 14px;
   border-radius: 14px;
   font-size: 13px;
   font-weight: 800;
+  white-space: nowrap;
   border: 1px solid rgba(148, 163, 184, 0.22);
   color: var(--ml-text);
   background: rgba(255, 255, 255, 0.82);

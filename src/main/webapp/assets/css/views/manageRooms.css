@@ -44,32 +44,35 @@
     flex-wrap: wrap;
 }
 
-/* ================= SEARCH (LIKE FORMANAGER) ================= */
 .room-search-form {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: nowrap;
     padding: 10px;
     border-radius: 18px;
     background: rgba(248, 250, 252, 0.92);
     border: 1px solid rgba(203, 213, 225, 0.7);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
     margin-left: auto;
+    width: auto;
+    max-width: 100%;
 }
 
 .room-search-box {
     display: flex;
     align-items: center;
     gap: 10px;
-    min-width: 250px;
-    flex: 1 1 260px;
+    flex: 1 1 320px;
+    min-width: 280px;
     padding: 0 2px;
 }
 
 .room-search-ico {
     color: #64748b;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .searchRoom,
@@ -91,7 +94,8 @@
 }
 
 .searchRoom {
-    min-width: 220px;
+    width: 100%;
+    min-width: 0;
     flex: 1;
     font-size: 15px;
 }
@@ -117,6 +121,7 @@
 }
 
 .room-search-form .form-select {
+    width: 180px;
     min-width: 170px;
     font-size: 14px;
 }
@@ -137,6 +142,8 @@
     text-decoration: none;
     min-height: 42px;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition:
         background 0.22s ease,
         transform 0.18s ease,
