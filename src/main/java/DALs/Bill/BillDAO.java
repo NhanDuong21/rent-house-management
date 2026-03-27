@@ -485,44 +485,87 @@ public class BillDAO extends DBContext {
         }
     }
 
-    // ==========================================
-    // UPDATE ELECTRIC & WATER METER NUMBERS
-    // ==========================================
-    public boolean updateBillMeter(int billId, java.sql.Date billMonth, java.sql.Date dueDate, int oldElectric, int newElectric, int oldWater, int newWater) {
+   public boolean updateBillMeter(int billId, Date billMonth, Date dueDate,
+        int oldElectric, int newElectric, int oldWater, int newWater) {
 
-        try {
+    try {
+        connection.setAutoCommit(false);
 
-            String sql = """
-            UPDATE BILL
-            SET bill_month = ?,
-                due_date = ?,
-                old_electric_number = ?,
-                new_electric_number = ?,
-                old_water_number = ?,
-                new_water_number = ?
-            WHERE bill_id = ?
+        // Update BILL
+        String sql = """
+        UPDATE BILL
+        SET bill_month = ?, due_date = ?,
+            old_electric_number = ?, new_electric_number = ?,
+            old_water_number = ?, new_water_number = ?
+        WHERE bill_id = ?
         """;
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setDate(1, billMonth);
+        ps.setDate(2, dueDate);
+        ps.setInt(3, oldElectric);
+        ps.setInt(4, newElectric);
+        ps.setInt(5, oldWater);
+        ps.setInt(6, newWater);
+        ps.setInt(7, billId);
+        ps.executeUpdate();
 
-            ps.setDate(1, billMonth);
-            ps.setDate(2, dueDate);
-            ps.setInt(3, oldElectric);
-            ps.setInt(4, newElectric);
-            ps.setInt(5, oldWater);
-            ps.setInt(6, newWater);
-            ps.setInt(7, billId);
+        // Lấy utility trước
+        Utility electric = getUtilityByName("Electric");
+        Utility water = getUtilityByName("Water");
 
-            int row = ps.executeUpdate();
+        //  XÓA đúng điện + nước cũ
+        String deleteSql = "DELETE FROM BILL_DETAIL WHERE bill_id = ? AND utility_id = ?";
+        PreparedStatement psDel = connection.prepareStatement(deleteSql);
 
-            return row > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (electric != null) {
+            psDel.setInt(1, billId);
+            psDel.setInt(2, electric.getUtilityId());
+            psDel.executeUpdate();
         }
 
-        return false;
+        if (water != null) {
+            psDel.setInt(1, billId);
+            psDel.setInt(2, water.getUtilityId());
+            psDel.executeUpdate();
+        }
+
+        int month = billMonth.toLocalDate().getMonthValue();
+        int year = billMonth.toLocalDate().getYear();
+
+        // 4. Tính usage
+        int electricUsage = newElectric - oldElectric;
+        int waterUsage = newWater - oldWater;
+
+        //  Insert lại ELECTRIC
+        if (electric != null && electricUsage > 0) {
+            insertBillDetail( billId, electric.getUtilityId(), "Electric " + month + "/" + year, electric.getUnit(), BigDecimal.valueOf(electricUsage),  electric.getStandardPrice(), "UTILITY");
+        }
+
+        // Insert lại WATER
+        if (water != null && waterUsage > 0) {
+            insertBillDetail(billId, water.getUtilityId(), "Water " + month + "/" + year, water.getUnit(), BigDecimal.valueOf(waterUsage), water.getStandardPrice(),"UTILITY" );
+        }
+
+        connection.commit();
+        return true;
+
+    } catch (Exception e) {
+        try {
+            connection.rollback();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        e.printStackTrace();
+    } finally {
+        try {
+            connection.setAutoCommit(true);
+        } catch (Exception e) {
+        }
     }
+
+    return false;
+}
 
     // ==========================================
     // CHECK IF BILL ALREADY EXISTS FOR MONTH

@@ -82,7 +82,7 @@ public class ManagerEditBill extends HttpServlet {
             }
 
             // VALIDATE ELECTRIC
-            if (newElectric <= oldElectric) {
+            if (newElectric < oldElectric) {
                 request.setAttribute("error", "New electric meter must be greater than old meter.");
                 request.setAttribute("bill", bill);
                 request.getRequestDispatcher("/views/manager/editBill.jsp")
@@ -90,7 +90,7 @@ public class ManagerEditBill extends HttpServlet {
                 return;
             }
             // VALIDATE WATER
-            if (newWater <= oldWater) {
+            if (newWater < oldWater) {
                 request.setAttribute("error", "New water meter must be greater than old meter.");
                 request.setAttribute("bill", bill);
                 request.getRequestDispatcher("/views/manager/editBill.jsp")
