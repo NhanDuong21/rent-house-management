@@ -6,6 +6,8 @@ package Controllers.tenant;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +28,7 @@ import jakarta.servlet.http.Part;
  * @author truon
  */
 @WebServlet("/tenant/maintenance")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 5 * 1024 * 1024,
-        maxRequestSize = 20 * 1024 * 1024
-)
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 20 * 1024 * 1024)
 public class MaintenanceRequestForTenantController extends HttpServlet {
 
     private final MaintenanceRequestDAO dao = new MaintenanceRequestDAO();
@@ -132,22 +130,34 @@ public class MaintenanceRequestForTenantController extends HttpServlet {
                 return;
             }
 
+            //
             String fileName = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
-            //vao web.xml sua link lai cho dung nhe
-            String uploadPath = getServletContext().getInitParameter("maintenanceImageDir");
 
-            File dir = new File(uploadPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            String runtimePath = getServletContext().getRealPath("/assets/images/maintenance");
+            String sourcePath = getServletContext().getInitParameter("maintenanceImageDir");
+
+            File runtimeDir = new File(runtimePath);
+            if (!runtimeDir.exists()) {
+                runtimeDir.mkdirs();
             }
 
-            part.write(uploadPath + File.separator + fileName);
-            images.add(fileName);
-        }
+            File sourceDir = new File(sourcePath);
+            if (!sourceDir.exists()) {
+                sourceDir.mkdirs();
+            }
+            part.write(runtimePath + File.separator + fileName);
+            Files.copy(
+                    new File(runtimePath, fileName).toPath(),
+                    new File(sourcePath, fileName).toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
 
-        String imageString = String.join(",", images);
-        dao.createRequest(tenantId, roomId, category, description, imageString, utilityId);
-        response.sendRedirect(request.getContextPath() + "/tenant/maintenance");
+            images.add(fileName);
+            //
+
+            String imageString = String.join(",", images);
+            dao.createRequest(tenantId, roomId, category, description, imageString, utilityId);
+            response.sendRedirect(request.getContextPath() + "/tenant/maintenance");
+        }
     }
 
     private void showMaintenanceDetail(HttpServletRequest request,
