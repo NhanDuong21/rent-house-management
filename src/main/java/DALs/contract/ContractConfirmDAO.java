@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Models.dto.TxResult;
 import Utils.database.DBContext;
@@ -14,76 +16,73 @@ import Utils.database.DBContext;
  */
 public class ContractConfirmDAO extends DBContext {
 
-    @SuppressWarnings("CallToPrintStackTrace")
+    private static final Logger LOGGER = Logger.getLogger(ContractConfirmDAO.class.getName());
+
     public TxResult confirmContractWithDebug(int contractId) {
 
         String getSql = """
-            SELECT contract_id, room_id, tenant_id, status
-            FROM CONTRACT
-            WHERE contract_id = ?
-        """;
+                    SELECT contract_id, room_id, tenant_id, status
+                    FROM CONTRACT
+                    WHERE contract_id = ?
+                """;
 
-        String findOldActive = """
-            SELECT TOP 1 contract_id
-            FROM CONTRACT
-            WHERE room_id = ?
-              AND status = 'ACTIVE'
-              AND contract_id <> ?
-            ORDER BY end_date DESC, contract_id DESC
-        """;
+        String existsOtherActiveRoom = """
+                    SELECT TOP 1 1
+                    FROM CONTRACT
+                    WHERE room_id = ?
+                      AND status = 'ACTIVE'
+                      AND contract_id <> ?
+                """;
 
-        String endOldActive = """
-            UPDATE CONTRACT
-            SET status = 'ENDED', updated_at = SYSDATETIME()
-            WHERE contract_id = ? AND status = 'ACTIVE'
-        """;
+        String existsOtherActiveTenant = """
+                    SELECT TOP 1 1
+                    FROM CONTRACT
+                    WHERE tenant_id = ?
+                      AND status = 'ACTIVE'
+                      AND contract_id <> ?
+                """;
 
         String updateContract = """
-            UPDATE CONTRACT
-            SET status = 'ACTIVE', updated_at = SYSDATETIME()
-            WHERE contract_id = ? AND status = 'PENDING'
-        """;
+                    UPDATE CONTRACT
+                    SET status = 'ACTIVE',
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status = 'PENDING'
+                """;
 
         String updateRoom = """
-            UPDATE ROOM
-            SET status = 'OCCUPIED'
-            WHERE room_id = ?
-        """;
+                    UPDATE ROOM
+                    SET status = 'OCCUPIED'
+                    WHERE room_id = ?
+                """;
 
         String updateTenant = """
-            UPDATE TENANT
-            SET account_status = 'ACTIVE', updated_at = SYSDATETIME()
-            WHERE tenant_id = ?
-        """;
+                    UPDATE TENANT
+                    SET account_status = 'ACTIVE',
+                        updated_at = SYSDATETIME()
+                    WHERE tenant_id = ?
+                """;
 
         String activateOccupants = """
-            UPDATE OCCUPANT
-            SET status = 'ACTIVE',
-                updated_at = SYSDATETIME()
-            WHERE contract_id = ?
-              AND status = 'PENDING'
-        """;
-
-        String endOldActiveOccupants = """
-            UPDATE OCCUPANT
-            SET status = 'REMOVED',
-                updated_at = SYSDATETIME()
-            WHERE contract_id = ?
-              AND status = 'ACTIVE'
-        """;
+                    UPDATE OCCUPANT
+                    SET status = 'ACTIVE',
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status = 'PENDING'
+                """;
 
         String confirmPayment = """
-            UPDATE PAYMENT
-            SET status = 'CONFIRMED'
-            WHERE payment_id = (
-                SELECT TOP 1 payment_id
-                FROM PAYMENT
-                WHERE contract_id = ?
-                  AND method = 'BANK'
-                  AND status = 'PENDING'
-                ORDER BY paid_at DESC, payment_id DESC
-            )
-        """;
+                    UPDATE PAYMENT
+                    SET status = 'CONFIRMED'
+                    WHERE payment_id = (
+                        SELECT TOP 1 payment_id
+                        FROM PAYMENT
+                        WHERE contract_id = ?
+                          AND method = 'BANK'
+                          AND status = 'PENDING'
+                        ORDER BY paid_at DESC, payment_id DESC
+                    )
+                """;
 
         try (Connection conn = new DBContext().getConnection()) {
             conn.setAutoCommit(false);
@@ -99,37 +98,38 @@ public class ContractConfirmDAO extends DBContext {
                         conn.rollback();
                         return new TxResult(false, "NOT_FOUND", "Contract not found");
                     }
-                    status = rs.getString("status");
                     roomId = rs.getInt("room_id");
                     tenantId = rs.getInt("tenant_id");
+                    status = rs.getString("status");
                 }
             }
 
             if (!"PENDING".equalsIgnoreCase(status)) {
                 conn.rollback();
-                return new TxResult(false, "NOT_PENDING", "Current status=" + status);
+                return new TxResult(false, "NOT_PENDING", "Current status = " + status);
             }
 
-            Integer oldActiveId = null;
-            try (PreparedStatement ps = conn.prepareStatement(findOldActive)) {
+            try (PreparedStatement ps = conn.prepareStatement(existsOtherActiveRoom)) {
                 ps.setInt(1, roomId);
                 ps.setInt(2, contractId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        oldActiveId = rs.getInt(1);
+                        conn.rollback();
+                        return new TxResult(false, "ROOM_HAS_ACTIVE_CONTRACT",
+                                "Room already has another active contract");
                     }
                 }
             }
 
-            if (oldActiveId != null) {
-                try (PreparedStatement ps = conn.prepareStatement(endOldActive)) {
-                    ps.setInt(1, oldActiveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement(endOldActiveOccupants)) {
-                    ps.setInt(1, oldActiveId);
-                    ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(existsOtherActiveTenant)) {
+                ps.setInt(1, tenantId);
+                ps.setInt(2, contractId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        conn.rollback();
+                        return new TxResult(false, "TENANT_HAS_ACTIVE_CONTRACT",
+                                "Tenant already has another active contract");
+                    }
                 }
             }
 
@@ -140,7 +140,7 @@ public class ContractConfirmDAO extends DBContext {
             }
             if (a1 <= 0) {
                 conn.rollback();
-                return new TxResult(false, "FAIL_CONTRACT_UPDATE", "Row affected=" + a1);
+                return new TxResult(false, "FAIL_CONTRACT_UPDATE", "Row affected = " + a1);
             }
 
             int a2;
@@ -150,7 +150,7 @@ public class ContractConfirmDAO extends DBContext {
             }
             if (a2 <= 0) {
                 conn.rollback();
-                return new TxResult(false, "FAIL_ROOM_UPDATE", "roomId=" + roomId);
+                return new TxResult(false, "FAIL_ROOM_UPDATE", "roomId = " + roomId);
             }
 
             int a3;
@@ -160,7 +160,7 @@ public class ContractConfirmDAO extends DBContext {
             }
             if (a3 <= 0) {
                 conn.rollback();
-                return new TxResult(false, "FAIL_TENANT_UPDATE", "tenantId=" + tenantId);
+                return new TxResult(false, "FAIL_TENANT_UPDATE", "tenantId = " + tenantId);
             }
 
             try (PreparedStatement ps = conn.prepareStatement(activateOccupants)) {
@@ -177,7 +177,7 @@ public class ContractConfirmDAO extends DBContext {
             return new TxResult(true, "OK", null);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error confirming contract. contractId = " + contractId, e);
             return new TxResult(false, "EXCEPTION", e.getMessage());
         }
     }

@@ -1,5 +1,9 @@
 package DALs.auth;
 
+import Models.entity.OtpCode;
+import Utils.database.DBContext;
+import Utils.security.HashUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,10 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-
-import Models.entity.OtpCode;
-import Utils.database.DBContext;
-import Utils.security.HashUtil;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Description
@@ -20,23 +22,34 @@ import Utils.security.HashUtil;
  */
 public class OtpCodeDAO extends DBContext {
 
-    @SuppressWarnings("CallToPrintStackTrace")
+    private static final Logger LOGGER = Logger.getLogger(OtpCodeDAO.class.getName());
+
     public void invalidateOldOtps(int tenantId, String purpose) {
-        String sql = "UPDATE OTP_CODE SET used_at = SYSDATETIME() "
-                + "WHERE tenant_id = ? AND purpose = ? AND used_at IS NULL";
+        String sql = """
+                UPDATE OTP_CODE
+                SET used_at = SYSDATETIME()
+                WHERE tenant_id = ?
+                  AND purpose = ?
+                  AND used_at IS NULL
+                """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             ps.setString(2, purpose);
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    String.format("Failed to invalidate old OTPs. tenantId=%d, purpose=%s", tenantId, purpose),
+                    e);
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public int insertOtp(int tenantId, String purpose, String receiver, String otpHash, LocalDateTime expiresAt) {
-        String sql = "INSERT INTO OTP_CODE(tenant_id, purpose, receiver, otp_hash, expires_at, used_at) "
-                + "VALUES(?,?,?,?,?,NULL)";
+        String sql = """
+                INSERT INTO OTP_CODE (tenant_id, purpose, receiver, otp_hash, expires_at, used_at)
+                VALUES (?, ?, ?, ?, ?, NULL)
+                """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, tenantId);
             ps.setString(2, purpose);
@@ -50,25 +63,35 @@ public class OtpCodeDAO extends DBContext {
                     return rs.getInt(1);
                 }
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    String.format("Failed to insert OTP. tenantId=%d, purpose=%s, receiver=%s",
+                            tenantId, purpose, receiver),
+                    e);
         }
+
         return -1;
     }
 
-    //tìm OTP mới nhất còn hiệu lực để verify
-    // find dựa trên tiêu chí tenant id và purpoes
-    @SuppressWarnings("CallToPrintStackTrace")
+    /**
+     * Tìm OTP mới nhất còn hiệu lực để verify
+     */
     public OtpCode findValidLatestOtp(int tenantId, String purpose) {
         String sql = """
-    SELECT TOP 1 otp_id, tenant_id, purpose, receiver, otp_hash, expires_at, used_at 
-    FROM OTP_CODE 
-    WHERE tenant_id = ? AND purpose = ? AND used_at IS NULL AND expires_at > SYSDATETIME() 
-    ORDER BY otp_id DESC
+                SELECT TOP 1 otp_id, tenant_id, purpose, receiver, otp_hash, expires_at, used_at
+                FROM OTP_CODE
+                WHERE tenant_id = ?
+                  AND purpose = ?
+                  AND used_at IS NULL
+                  AND expires_at > SYSDATETIME()
+                ORDER BY otp_id DESC
                 """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             ps.setString(2, purpose);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     OtpCode o = new OtpCode();
@@ -82,40 +105,60 @@ public class OtpCodeDAO extends DBContext {
                     return o;
                 }
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    String.format("Failed to find latest valid OTP. tenantId=%d, purpose=%s", tenantId, purpose),
+                    e);
         }
+
         return null;
     }
 
-    //disable otp khi mà đã sử dụng
-    @SuppressWarnings("CallToPrintStackTrace")
+    /**
+     * Disable OTP khi đã sử dụng
+     */
     public boolean markUsed(int otpId) {
-        String sql = "UPDATE OTP_CODE SET used_at = SYSDATETIME() WHERE otp_id = ? AND used_at IS NULL";
+        String sql = """
+                UPDATE OTP_CODE
+                SET used_at = SYSDATETIME()
+                WHERE otp_id = ?
+                  AND used_at IS NULL
+                """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, otpId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    String.format("Failed to mark OTP as used. otpId=%d", otpId),
+                    e);
         }
+
         return false;
     }
 
-    //login laanf ddau voiw otp
+    /**
+     * Login lần đầu với OTP
+     */
     public void insertFirstLoginOtp(Connection conn, int tenantId, String email, String otpPlain)
             throws SQLException {
 
         String sql = """
-        INSERT INTO OTP_CODE (tenant_id, purpose, receiver, otp_hash, expires_at, used_at) 
-        VALUES (?, 'FIRST_LOGIN', ?, ?, DATEADD(MINUTE,10,SYSDATETIME()), NULL)
-    """;
+                INSERT INTO OTP_CODE (tenant_id, purpose, receiver, otp_hash, expires_at, used_at)
+                VALUES (?, 'FIRST_LOGIN', ?, ?, DATEADD(MINUTE, 10, SYSDATETIME()), NULL)
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             ps.setString(2, email);
             ps.setString(3, HashUtil.md5(otpPlain));
             ps.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE,
+                    String.format("Failed to insert first login OTP. tenantId=%d, email=%s", tenantId, email),
+                    e);
+            throw e;
         }
     }
-
 }

@@ -22,7 +22,7 @@ public class MailUtil {
     @SuppressWarnings("CallToPrintStackTrace")
     public static boolean sendOtp(String toEmail, String otp) {
         final String fromEmail = "nhanduong21779@gmail.com";
-        final String appPassword = "qdng mcca yfne uzib"; 
+        final String appPassword = "qdng mcca yfne uzib";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -30,14 +30,10 @@ public class MailUtil {
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
-        // THÊM 3 DÒNG NÀY
         props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        props.put("mail.debug", "true");
-
-        //trust
         props.put("mail.smtp.ssl.trust", "*");
-        props.put("mail.smtp.ssl.checkserveridentity", "false");
+
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -49,10 +45,53 @@ public class MailUtil {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(fromEmail));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-            msg.setSubject("[RentHouse] OTP Login");
-            msg.setText("OTP đăng nhập của bạn: " + otp + "\nHết hạn sau 10 phút.");
+            msg.setSubject("[RentHouse] OTP Verification");
+
+            String content = "<html>"
+                    + "<body style='font-family: Arial, sans-serif; background-color:#f4f6f8; padding:20px;'>"
+                    + "  <table width='100%' cellpadding='0' cellspacing='0'>"
+                    + "    <tr>"
+                    + "      <td align='center'>"
+                    + "        <table width='600px' style='background:#ffffff; border:1px solid #ddd; padding:30px;'>"
+                    + "          <tr>"
+                    + "            <td>"
+                    + "              <h2 style='color:#2c3e50; margin-bottom:20px;'>RentHouse System</h2>"
+                    + "              <p style='font-size:14px; color:#333;'>Dear User,</p>"
+                    + "              <p style='font-size:14px; color:#333;'>"
+                    + "                We received a request to log in to your account. Please use the One-Time Password (OTP) below to proceed:"
+                    + "              </p>"
+                    + "              <div style='text-align:center; margin:30px 0;'>"
+                    + "                <span style='font-size:24px; font-weight:bold; letter-spacing:4px; color:#2c3e50;'>"
+                    + otp
+                    + "                </span>"
+                    + "              </div>"
+                    + "              <p style='font-size:14px; color:#333;'>"
+                    + "                This OTP is valid for <strong>10 minutes</strong>. Do not share this code with anyone."
+                    + "              </p>"
+                    + "              <p style='font-size:14px; color:#333;'>"
+                    + "                If you did not request this, please ignore this email."
+                    + "              </p>"
+                    + "              <hr style='margin:30px 0;'>"
+                    + "              <p style='font-size:12px; color:#777;'>"
+                    + "                This is an automated message. Please do not reply."
+                    + "              </p>"
+                    + "              <p style='font-size:12px; color:#777;'>"
+                    + "                &copy; 2026 RentHouse. All rights reserved."
+                    + "              </p>"
+                    + "            </td>"
+                    + "          </tr>"
+                    + "        </table>"
+                    + "      </td>"
+                    + "    </tr>"
+                    + "  </table>"
+                    + "</body>"
+                    + "</html>";
+
+            msg.setContent(content, "text/html; charset=UTF-8");
+
             Transport.send(msg);
             return true;
+
         } catch (MessagingException e) {
             e.printStackTrace();
         }

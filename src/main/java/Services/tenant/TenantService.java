@@ -39,12 +39,12 @@ public class TenantService {
             return ServiceResult.fail("PHONE_FORMAT");
         }
 
-        //trung thi khoi update ton tai nguyen
+        // trung thi khoi update ton tai nguyen
         if (phone.equals(t.getPhoneNumber())) {
             return ServiceResult.ok("OK");
         }
 
-        if (tenantDAO.existsPhoneExceptTenant(tenantId, phone)) {
+        if (tenantDAO.checkPhoneDuplicateForTenant(tenantId, phone)) {
             return ServiceResult.fail("PHONE_EXISTS");
         }
 
@@ -80,32 +80,32 @@ public class TenantService {
         return tenantDAO.findById(id);
     }
 
-public ServiceResult toggleStatus(int tenantId) {
-    Tenant t = tenantDAO.findById(tenantId);
-    if (t == null) {
-        return ServiceResult.fail("NOT_FOUND");
+    public ServiceResult toggleStatus(int tenantId) {
+        Tenant t = tenantDAO.findById(tenantId);
+        if (t == null) {
+            return ServiceResult.fail("NOT_FOUND");
+        }
+
+        String current = t.getAccountStatus();
+
+        // Không cho toggle PENDING
+        if ("PENDING".equalsIgnoreCase(current)) {
+            return ServiceResult.fail("CANNOT_TOGGLE_PENDING");
+        }
+
+        // ACTIVE + có hợp đồng đang active → không cho phép lock
+        // (hệ thống tự quản lý status qua syncAllTenantStatuses)
+        if ("ACTIVE".equalsIgnoreCase(current) && tenantDAO.hasActiveContract(tenantId)) {
+            return ServiceResult.fail("HAS_ACTIVE_CONTRACT");
+        }
+
+        // LOCKED → ACTIVE: luôn cho phép, không cần điều kiện hợp đồng
+        // ACTIVE (không có hợp đồng) → LOCKED: cho phép
+        String next = "ACTIVE".equalsIgnoreCase(current) ? "LOCKED" : "ACTIVE";
+
+        boolean ok = tenantDAO.toggleStatus(tenantId, next);
+        return ok ? ServiceResult.ok(next) : ServiceResult.fail("UPDATE_FAILED");
     }
-
-    String current = t.getAccountStatus();
-
-    // Không cho toggle PENDING
-    if ("PENDING".equalsIgnoreCase(current)) {
-        return ServiceResult.fail("CANNOT_TOGGLE_PENDING");
-    }
-
-    // ACTIVE + có hợp đồng đang active → không cho phép lock
-    // (hệ thống tự quản lý status qua syncAllTenantStatuses)
-    if ("ACTIVE".equalsIgnoreCase(current) && tenantDAO.hasActiveContract(tenantId)) {
-        return ServiceResult.fail("HAS_ACTIVE_CONTRACT");
-    }
-
-    // LOCKED → ACTIVE: luôn cho phép, không cần điều kiện hợp đồng
-    // ACTIVE (không có hợp đồng) → LOCKED: cho phép
-    String next = "ACTIVE".equalsIgnoreCase(current) ? "LOCKED" : "ACTIVE";
-
-    boolean ok = tenantDAO.toggleStatus(tenantId, next);
-    return ok ? ServiceResult.ok(next) : ServiceResult.fail("UPDATE_FAILED");
-}
 
     public boolean updateTenant(Tenant t) {
         validateTenant(t);
@@ -193,7 +193,8 @@ public ServiceResult toggleStatus(int tenantId) {
 
     /**
      * Lấy map tenantId -> roomNumber cho các tenant có contract đang active.
-     * Tenant nào không có contract active sẽ không có entry trong map (hiện "—" ở JSP).
+     * Tenant nào không có contract active sẽ không có entry trong map (hiện "—" ở
+     * JSP).
      *
      * @return Map<tenantId, roomNumber>
      */

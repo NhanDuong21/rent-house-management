@@ -31,79 +31,93 @@
 
             <c:if test="${param.err eq 'DATE'}">
                 <div class="me-alert me-alert-danger">
-                    End date must be greater than start date.
+                    New end date must be greater than current end date.
                 </div>
             </c:if>
 
-            <c:if test="${param.err eq 'QR'}">
+            <c:if test="${param.err eq 'EXTEND_FAIL'}">
                 <div class="me-alert me-alert-danger">
-                    Payment QR data is required.
+                    Extend contract failed. Please try again.
                 </div>
             </c:if>
 
             <form method="post"
                   action="${pageContext.request.contextPath}/manager/contracts/extend"
-                  class="me-form">
+                  class="me-form"
+                  id="extendContractForm">
 
-                <input type="hidden" name="oldContractId" value="${cur.contractId}"/>
-                <input type="hidden" name="roomId" value="${cur.roomId}"/>
-                <input type="hidden" name="tenantId" value="${cur.tenantId}"/>
+                <input type="hidden" name="contractId" value="${cur.contractId}"/>
 
                 <div class="me-grid">
 
                     <div class="me-field">
-                        <label class="me-label">Start Date (suggested)</label>
+                        <label class="me-label" for="currentStartDate">Current Start Date</label>
                         <input class="me-input"
+                               id="currentStartDate"
                                type="date"
-                               name="startDate"
-                               value="<fmt:formatDate value='${suggestedStart}' pattern='yyyy-MM-dd'/>"
-                               required>
-                        <div class="me-hint">Suggested = old end date + 1 day</div>
+                               value="<fmt:formatDate value='${cur.startDate}' pattern='yyyy-MM-dd'/>"
+                               readonly>
                     </div>
 
                     <div class="me-field">
-                        <label class="me-label">End Date</label>
-                        <input class="me-input" type="date" name="endDate" required>
-                    </div>
-
-                    <div class="me-field">
-                        <label class="me-label">Monthly Rent</label>
+                        <label class="me-label" for="currentEndDate">Current End Date</label>
                         <input class="me-input"
-                               type="number"
-                               name="monthlyRent"
-                               min="0"
-                               value="${cur.monthlyRent}"
-                               required>
-                    </div>
-
-                    <div class="me-field">
-                        <label class="me-label">Deposit</label>
-                        <input class="me-input"
-                               type="number"
-                               name="deposit"
-                               min="0"
-                               value="${cur.deposit}"
-                               required>
+                               id="currentEndDate"
+                               type="date"
+                               value="<fmt:formatDate value='${cur.endDate}' pattern='yyyy-MM-dd'/>"
+                               readonly>
                     </div>
 
                     <div class="me-field me-field-full">
-                        <label class="me-label">Payment QR Data</label>
+                        <label class="me-label" for="newEndDate">New End Date</label>
                         <input class="me-input"
-                               type="text"
-                               name="paymentQrData"
-                               value="${cur.paymentQrData}"
-                               placeholder="/assets/images/qr/myqr.png"
-                               required>
-                        <div class="me-hint">Keep same QR if using same bank account.</div>
+                               id="newEndDate"
+                               type="date"
+                               name="endDate"
+                               required
+                               autocomplete="off">
+                        <div class="me-hint" id="extendHint">
+                            The contract will be extended by exactly <b>1 year</b> from the current end date.
+                        </div>
+                        <div class="me-error" id="newEndDateError" aria-live="polite"></div>
                     </div>
 
                 </div>
 
+                <div class="me-summary me-reveal" id="extendSummary">
+                    <div class="me-summary-head">
+                        <div class="me-summary-title">Extension Summary</div>
+                    </div>
+
+                    <div class="me-summary-grid">
+                        <div class="me-summary-item">
+                            <div class="me-summary-label">Current End Date</div>
+                            <div class="me-summary-value" id="summaryCurrentEnd">-</div>
+                        </div>
+
+                        <div class="me-summary-item">
+                            <div class="me-summary-label">Expected New End Date</div>
+                            <div class="me-summary-value" id="summaryExpectedEnd">-</div>
+                        </div>
+
+                        <div class="me-summary-item">
+                            <div class="me-summary-label">Selected New End Date</div>
+                            <div class="me-summary-value" id="summarySelectedEnd">-</div>
+                        </div>
+
+                        <div class="me-summary-item">
+                            <div class="me-summary-label">Status</div>
+                            <div class="me-summary-value" id="summaryStatus">Pending</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="me-actions">
                     <button type="submit"
+                            id="submitBtn"
                             class="me-btn me-btn-primary"
-                            onclick="return confirm('Create NEW PENDING renewal contract? Tenant will confirm transfer, then you confirm to activate.');">
-                        Create Renewal (PENDING)
+                            data-confirm="Extend this contract by updating its end date?">
+                        <span class="me-btn-text">Extend Contract</span>
                     </button>
 
                     <a class="me-btn me-btn-ghost"
@@ -113,13 +127,12 @@
                 </div>
 
                 <div class="me-note">
-                    After creating, tenant will see a new <b>PENDING</b> contract in their account and confirm payment.
+                    This action updates the <b>end date</b> of the current active contract. No new contract will be created.
                 </div>
             </form>
         </div>
 
     </div>
 
-    <script src="${pageContext.request.contextPath}/assets/js/pages/extendContract.js"></script>
-
+    <script src="${pageContext.request.contextPath}/assets/js/pages/managerExtendContract.js?v=1"></script>
 </layout:layout>

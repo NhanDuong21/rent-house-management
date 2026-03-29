@@ -621,3 +621,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+.me-error {
+  margin-top: 6px;
+  min-height: 18px;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.me-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.9;
+}

@@ -18,31 +18,30 @@ import Utils.database.DBContext;
  */
 public class RoomDAO extends DBContext {
 
-    //view available
+    // view available
     @Deprecated
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAvailable(RoomFilterDTO filterDTO) {
         List<Room> list = new ArrayList<>();
         String sql = """
-    SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, r.floor, r.max_tenants, r.is_mezzanine, r.description, r.has_air_conditioning, img.image_url AS cover_image
-    FROM ROOM r
-    INNER JOIN BLOCK b ON b.block_id = r.block_id
-	LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-    WHERE r.status = 'AVAILABLE'
-      AND (? IS NULL OR r.price >= ?)
-      AND (? IS NULL OR r.price <= ?)
-      AND (? IS NULL OR r.area  >= ?)
-      AND (? IS NULL OR r.area  <= ?)
-      AND (? IS NULL OR r.has_air_conditioning = ?) 
-      AND (? IS NULL OR r.is_mezzanine = ?)
-    ORDER BY b.block_name, r.room_number
-""";
+                    SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, r.floor, r.max_tenants, r.is_mezzanine, r.description, r.has_air_conditioning, img.image_url AS cover_image
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                	LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE r.status = 'AVAILABLE'
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                    ORDER BY b.block_name, r.room_number
+                """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
 
             int i = 1;
-            //moi query has 2 param
+            // moi query has 2 param
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
             ps.setBigDecimal(i++, filterDTO.getMaxPrice());
@@ -65,7 +64,7 @@ public class RoomDAO extends DBContext {
                 r.setArea(rs.getBigDecimal("area"));
                 r.setPrice(rs.getBigDecimal("price"));
                 r.setStatus(rs.getString("status"));
-                r.setFloor((Integer) rs.getObject("floor")); //oj easy debug
+                r.setFloor((Integer) rs.getObject("floor")); // oj easy debug
                 r.setMaxTenants((Integer) rs.getObject("max_tenants"));
                 r.setAirConditioning(rs.getBoolean("has_air_conditioning"));
                 r.setMezzanine(rs.getBoolean("is_mezzanine"));
@@ -80,28 +79,27 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
-    //PAGINATION - GUEST - TENANT
-    @SuppressWarnings("CallToPrintStackTrace")
+    // PAGINATION - GUEST - TENANT
     public List<Room> searchAvailablePaged(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
         String sql = """
-        SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, 
-               r.floor, r.max_tenants, r.is_mezzanine, r.description, 
-               r.has_air_conditioning, img.image_url AS cover_image
-        FROM ROOM r
-        INNER JOIN BLOCK b ON b.block_id = r.block_id
-        LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-        WHERE r.status = 'AVAILABLE'
-          AND (? IS NULL OR r.price >= ?)
-          AND (? IS NULL OR r.price <= ?)
-          AND (? IS NULL OR r.area  >= ?)
-          AND (? IS NULL OR r.area  <= ?)
-          AND (? IS NULL OR r.has_air_conditioning = ?)
-          AND (? IS NULL OR r.is_mezzanine = ?)
-        ORDER BY b.block_name, r.room_number
-        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-    """;
+                    SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status,
+                           r.floor, r.max_tenants, r.is_mezzanine, r.description,
+                           r.has_air_conditioning, img.image_url AS cover_image
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE r.status = 'AVAILABLE'
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                    ORDER BY b.block_name, r.room_number
+                    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -150,24 +148,23 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
-    //method đếm tổng số lượng phòng đang ở status 
-    //AVAILABLE dựa trên các điều kiện lọc (filter) 
-    @SuppressWarnings("CallToPrintStackTrace")
+    // method đếm tổng số lượng phòng đang ở status
+    // AVAILABLE dựa trên các điều kiện lọc (filter)
     public int countAvailable(RoomFilterDTO filterDTO) {
 
         String sql = """
-        SELECT COUNT(DISTINCT r.room_id) AS total
-        FROM ROOM r
-        INNER JOIN BLOCK b ON b.block_id = r.block_id
-        LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-        WHERE r.status = 'AVAILABLE'
-          AND (? IS NULL OR r.price >= ?)
-          AND (? IS NULL OR r.price <= ?)
-          AND (? IS NULL OR r.area  >= ?)
-          AND (? IS NULL OR r.area  <= ?)
-          AND (? IS NULL OR r.has_air_conditioning = ?)
-          AND (? IS NULL OR r.is_mezzanine = ?)
-    """;
+                    SELECT COUNT(DISTINCT r.room_id) AS total
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE r.status = 'AVAILABLE'
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -199,25 +196,24 @@ public class RoomDAO extends DBContext {
         return 0;
     }
 
-    //display full room ( ko phan biet room status )
+    // display full room ( ko phan biet room status )
     @Deprecated
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAll(RoomFilterDTO filterDTO) {
         List<Room> list = new ArrayList<>();
         String sql = """
-    SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, r.floor, r.max_tenants, r.is_mezzanine, r.description, r.has_air_conditioning, img.image_url AS cover_image
-    FROM ROOM r
-    INNER JOIN BLOCK b ON b.block_id = r.block_id
-	LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-    WHERE 1 = 1
-      AND (? IS NULL OR r.price >= ?)
-      AND (? IS NULL OR r.price <= ?)
-      AND (? IS NULL OR r.area  >= ?)
-      AND (? IS NULL OR r.area  <= ?)
-      AND (? IS NULL OR r.has_air_conditioning = ?) 
-      AND (? IS NULL OR r.is_mezzanine = ?)
-    ORDER BY b.block_name, r.room_number
-    """;
+                   SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, r.floor, r.max_tenants, r.is_mezzanine, r.description, r.has_air_conditioning, img.image_url AS cover_image
+                   FROM ROOM r
+                   INNER JOIN BLOCK b ON b.block_id = r.block_id
+                LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                   WHERE 1 = 1
+                     AND (? IS NULL OR r.price >= ?)
+                     AND (? IS NULL OR r.price <= ?)
+                     AND (? IS NULL OR r.area  >= ?)
+                     AND (? IS NULL OR r.area  <= ?)
+                     AND (? IS NULL OR r.has_air_conditioning = ?)
+                     AND (? IS NULL OR r.is_mezzanine = ?)
+                   ORDER BY b.block_name, r.room_number
+                   """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -258,28 +254,27 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
-    //PAGINATION - STAFF
-    @SuppressWarnings("CallToPrintStackTrace")
+    // PAGINATION - STAFF
     public List<Room> searchAllPaged(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
         String sql = """
-        SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status, 
-               r.floor, r.max_tenants, r.is_mezzanine, r.description, 
-               r.has_air_conditioning, img.image_url AS cover_image
-        FROM ROOM r
-        INNER JOIN BLOCK b ON b.block_id = r.block_id
-        LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-        WHERE 1=1
-          AND (? IS NULL OR r.price >= ?)
-          AND (? IS NULL OR r.price <= ?)
-          AND (? IS NULL OR r.area  >= ?)
-          AND (? IS NULL OR r.area  <= ?)
-          AND (? IS NULL OR r.has_air_conditioning = ?)
-          AND (? IS NULL OR r.is_mezzanine = ?)
-        ORDER BY b.block_name, r.room_number
-        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-    """;
+                    SELECT r.room_id, r.block_id, r.room_number, r.area, r.price, r.status,
+                           r.floor, r.max_tenants, r.is_mezzanine, r.description,
+                           r.has_air_conditioning, img.image_url AS cover_image
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE 1=1
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                    ORDER BY b.block_name, r.room_number
+                    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -328,22 +323,21 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public int countAll(RoomFilterDTO filterDTO) {
 
         String sql = """
-        SELECT COUNT(DISTINCT r.room_id) AS total
-        FROM ROOM r
-        INNER JOIN BLOCK b ON b.block_id = r.block_id
-        LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-        WHERE 1=1
-          AND (? IS NULL OR r.price >= ?)
-          AND (? IS NULL OR r.price <= ?)
-          AND (? IS NULL OR r.area  >= ?)
-          AND (? IS NULL OR r.area  <= ?)
-          AND (? IS NULL OR r.has_air_conditioning = ?)
-          AND (? IS NULL OR r.is_mezzanine = ?)
-    """;
+                    SELECT COUNT(DISTINCT r.room_id) AS total
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE 1=1
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -375,17 +369,16 @@ public class RoomDAO extends DBContext {
         return 0;
     }
 
-    //display cover image trong detail
-    @SuppressWarnings("CallToPrintStackTrace")
+    // display cover image trong detail
     public Room findById(int roomId) {
         String sql = """
-SELECT        ROOM.room_id, ROOM.block_id, BLOCK.block_name, ROOM.room_number, ROOM.area, ROOM.price, ROOM.status, ROOM.floor, ROOM.max_tenants, ROOM.is_mezzanine, ROOM.description, 
-                         ROOM.has_air_conditioning, img.image_url AS cover_image
-FROM            ROOM INNER JOIN
-                         BLOCK ON ROOM.block_id = BLOCK.block_id
-                         LEFT JOIN ROOM_IMAGE img ON img.room_id = ROOM.room_id AND img.is_cover = 1
-WHERE   ROOM.room_id = ?
-        """;
+                SELECT        ROOM.room_id, ROOM.block_id, BLOCK.block_name, ROOM.room_number, ROOM.area, ROOM.price, ROOM.status, ROOM.floor, ROOM.max_tenants, ROOM.is_mezzanine, ROOM.description,
+                                         ROOM.has_air_conditioning, img.image_url AS cover_image
+                FROM            ROOM INNER JOIN
+                                         BLOCK ON ROOM.block_id = BLOCK.block_id
+                                         LEFT JOIN ROOM_IMAGE img ON img.room_id = ROOM.room_id AND img.is_cover = 1
+                WHERE   ROOM.room_id = ?
+                        """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -400,7 +393,7 @@ WHERE   ROOM.room_id = ?
                     r.setArea(rs.getBigDecimal("area"));
                     r.setPrice(rs.getBigDecimal("price"));
                     r.setStatus(rs.getString("status"));
-                    r.setFloor((Integer) rs.getObject("floor")); //oj easy debug
+                    r.setFloor((Integer) rs.getObject("floor")); // oj easy debug
                     r.setMaxTenants((Integer) rs.getObject("max_tenants"));
                     r.setAirConditioning(rs.getBoolean("has_air_conditioning"));
                     r.setMezzanine(rs.getBoolean("is_mezzanine"));
@@ -416,16 +409,15 @@ WHERE   ROOM.room_id = ?
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> findAvailableRooms() {
         List<Room> list = new ArrayList<>();
 
         String sql = """
-        SELECT room_id, room_number, price
-        FROM ROOM
-        WHERE status = 'AVAILABLE'
-        ORDER BY room_number
-    """;
+                    SELECT room_id, room_number, price
+                    FROM ROOM
+                    WHERE status = 'AVAILABLE'
+                    ORDER BY room_number
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -444,7 +436,6 @@ WHERE   ROOM.room_id = ?
         return list;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean updateStatus(int roomId, String status) {
         String sql = "UPDATE ROOM SET status=? WHERE room_id=? AND status <> 'INACTIVE'";
 
@@ -458,7 +449,6 @@ WHERE   ROOM.room_id = ?
         return false;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean restoreRoom(int roomId) {
         String sql = "UPDATE ROOM SET status='AVAILABLE' WHERE room_id=? AND status='INACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -507,27 +497,26 @@ WHERE   ROOM.room_id = ?
         return false;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAllPagedV2(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
         String sql = """
-        SELECT r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status,
-               r.floor, r.max_tenants, r.is_mezzanine, r.description,
-               r.has_air_conditioning, img.image_url AS cover_image
-        FROM ROOM r
-        INNER JOIN BLOCK b ON b.block_id = r.block_id
-        LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-        WHERE 1=1
-          AND (? IS NULL OR r.price >= ?)
-          AND (? IS NULL OR r.price <= ?)
-          AND (? IS NULL OR r.area  >= ?)
-          AND (? IS NULL OR r.area  <= ?)
-          AND (? IS NULL OR r.has_air_conditioning = ?)
-          AND (? IS NULL OR r.is_mezzanine = ?)
-        ORDER BY b.block_name, r.room_number
-        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-    """;
+                    SELECT r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status,
+                           r.floor, r.max_tenants, r.is_mezzanine, r.description,
+                           r.has_air_conditioning, img.image_url AS cover_image
+                    FROM ROOM r
+                    INNER JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE 1=1
+                      AND (? IS NULL OR r.price >= ?)
+                      AND (? IS NULL OR r.price <= ?)
+                      AND (? IS NULL OR r.area  >= ?)
+                      AND (? IS NULL OR r.area  <= ?)
+                      AND (? IS NULL OR r.has_air_conditioning = ?)
+                      AND (? IS NULL OR r.is_mezzanine = ?)
+                    ORDER BY b.block_name, r.room_number
+                    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -582,13 +571,12 @@ WHERE   ROOM.room_id = ?
         return list;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean updateRoom(Room r) {
         String sql = """
-        UPDATE ROOM SET block_id=?, room_number=?, area=?, price=?, status=?, floor=?, max_tenants=?, is_mezzanine=?,
-                        has_air_conditioning=?, description=?
-        WHERE room_id=? AND status NOT IN ('INACTIVE','OCCUPIED')
-        """;
+                UPDATE ROOM SET block_id=?, room_number=?, area=?, price=?, status=?, floor=?, max_tenants=?, is_mezzanine=?,
+                                has_air_conditioning=?, description=?
+                WHERE room_id=? AND status NOT IN ('INACTIVE','OCCUPIED')
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             int i = 1;
             ps.setInt(i++, r.getBlockId());
@@ -609,24 +597,23 @@ WHERE   ROOM.room_id = ?
         return false;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public int addRoom(Room r) {
 
         String sql = """
-        INSERT INTO ROOM (
-            block_id,
-            room_number,
-            area,
-            price,
-            status,
-            floor,
-            max_tenants,
-            is_mezzanine,
-            has_air_conditioning,
-            description
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """;
+                    INSERT INTO ROOM (
+                        block_id,
+                        room_number,
+                        area,
+                        price,
+                        status,
+                        floor,
+                        max_tenants,
+                        is_mezzanine,
+                        has_air_conditioning,
+                        description
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(
                 sql, PreparedStatement.RETURN_GENERATED_KEYS)) {

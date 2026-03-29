@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Models.entity.RoomImage;
 import Utils.database.DBContext;
@@ -17,14 +19,15 @@ import Utils.database.DBContext;
  */
 public class RoomImageDAO extends DBContext {
 
-    @SuppressWarnings("CallToPrintStackTrace")
+    private static final Logger LOGGER = Logger.getLogger(RoomImageDAO.class.getName());
+
     public List<RoomImage> findByRoomId(int roomId) {
         String sql = """
-            SELECT image_id, room_id, image_url, is_cover, sort_order
-            FROM ROOM_IMAGE
-            WHERE room_id = ?
-            ORDER BY is_cover DESC, sort_order ASC, image_id ASC
-        """;
+                    SELECT image_id, room_id, image_url, is_cover, sort_order
+                    FROM ROOM_IMAGE
+                    WHERE room_id = ?
+                    ORDER BY is_cover DESC, sort_order ASC, image_id ASC
+                """;
 
         List<RoomImage> list = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -41,7 +44,7 @@ public class RoomImageDAO extends DBContext {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding room images by roomId=" + roomId, e);
         }
         return list;
     }
@@ -65,7 +68,6 @@ public class RoomImageDAO extends DBContext {
         return 0;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean insertImage(int roomId, String imageUrl) {
         String sql = "INSERT ROOM_IMAGE(room_id, image_url, is_cover, sort_order) VALUES (?, ?, 0, ?)";
         try {
@@ -77,12 +79,11 @@ public class RoomImageDAO extends DBContext {
                 return ps.executeUpdate() > 0;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error inserting room image. roomId=" + roomId + ", imageUrl=" + imageUrl, e);
             return false;
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean setCover(int roomId, int imageId) {
         String resetSql = "UPDATE ROOM_IMAGE SET is_cover=0 WHERE room_id=?";
         String setSql = "UPDATE ROOM_IMAGE SET is_cover=1 WHERE room_id=? AND image_id=?";
@@ -109,13 +110,19 @@ public class RoomImageDAO extends DBContext {
         } catch (SQLException e) {
             try {
                 connection.rollback();
-            } catch (SQLException ignored) {
+            } catch (SQLException rollbackEx) {
+                LOGGER.log(Level.SEVERE,
+                        "Error rolling back setCover transaction. roomId=" + roomId + ", imageId=" + imageId,
+                        rollbackEx);
             }
             try {
                 connection.setAutoCommit(true);
-            } catch (SQLException ignored) {
+            } catch (SQLException autoCommitEx) {
+                LOGGER.log(Level.SEVERE,
+                        "Error resetting autoCommit after setCover. roomId=" + roomId + ", imageId=" + imageId,
+                        autoCommitEx);
             }
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error setting cover image. roomId=" + roomId + ", imageId=" + imageId, e);
             return false;
         }
     }
@@ -126,7 +133,6 @@ public class RoomImageDAO extends DBContext {
      * ensureCover sẽ nhảy vào check nếu phòng mà ko còn cover nữa thì sẽ auto
      * lấy tấm ảnh kế tiếp để làm cover
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public Integer deleteImageReturnRoomId(int imageId) {
         String getSql = "SELECT room_id, is_cover FROM ROOM_IMAGE WHERE image_id=?";
         String delSql = "DELETE FROM ROOM_IMAGE WHERE image_id=?";
@@ -157,20 +163,19 @@ public class RoomImageDAO extends DBContext {
             return roomId;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error deleting room image. imageId=" + imageId, e);
             return null;
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public void ensureCover(int roomId) {
         String hasCoverSql = "SELECT 1 FROM ROOM_IMAGE WHERE room_id=? AND is_cover=1";
         String pickSql = """
-        SELECT TOP 1 image_id
-        FROM ROOM_IMAGE
-        WHERE room_id=?
-        ORDER BY sort_order ASC, image_id ASC
-    """;
+                    SELECT TOP 1 image_id
+                    FROM ROOM_IMAGE
+                    WHERE room_id=?
+                    ORDER BY sort_order ASC, image_id ASC
+                """;
         String setSql = "UPDATE ROOM_IMAGE SET is_cover=1 WHERE image_id=?";
 
         try {
@@ -201,7 +206,7 @@ public class RoomImageDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error ensuring cover image for roomId=" + roomId, e);
         }
     }
 }

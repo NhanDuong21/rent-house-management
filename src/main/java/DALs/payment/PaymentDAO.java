@@ -14,16 +14,16 @@ import Utils.database.DBContext;
  */
 public class PaymentDAO extends DBContext {
 
-    //Hàm này dùng để tìm kiếm giao dịch thanh toán qua ngân hàng gần đây nhất của một hợp đồng cụ thể.
-    @SuppressWarnings("CallToPrintStackTrace")
+    // Hàm này dùng để tìm kiếm giao dịch thanh toán qua ngân hàng gần đây nhất của
+    // một hợp đồng cụ thể.
     public Payment findLatestBankPaymentForContract(int contractId) {
 
         String sql = """
-            SELECT TOP 1 payment_id, contract_id, bill_id, method, amount, paid_at, status, note
-            FROM PAYMENT
-            WHERE contract_id = ? AND method = 'BANK'
-            ORDER BY paid_at DESC, payment_id DESC
-        """;
+                    SELECT TOP 1 payment_id, contract_id, bill_id, method, amount, paid_at, status, note
+                    FROM PAYMENT
+                    WHERE contract_id = ? AND method = 'BANK'
+                    ORDER BY paid_at DESC, payment_id DESC
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -50,16 +50,15 @@ public class PaymentDAO extends DBContext {
     }
 
     // tránh spam bấm nhiều lần: nếu đã có PENDING/CONFIRMED thì không insert nữa
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean hasPendingOrConfirmedBankForContract(int contractId) {
 
         String sql = """
-            SELECT 1
-            FROM PAYMENT
-            WHERE contract_id = ?
-              AND method = 'BANK'
-              AND status IN ('PENDING','CONFIRMED')
-        """;
+                    SELECT 1
+                    FROM PAYMENT
+                    WHERE contract_id = ?
+                      AND method = 'BANK'
+                      AND status IN ('PENDING','CONFIRMED')
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -72,18 +71,17 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
-    //check pending payment
-    @SuppressWarnings("CallToPrintStackTrace")
+    // check pending payment
     public boolean hasPendingBankPayment(int contractId) {
 
         String sql = """
-        SELECT TOP 1 1
-        FROM PAYMENT
-        WHERE contract_id = ?
-          AND method = 'BANK'
-          AND status = 'PENDING'
-        ORDER BY paid_at DESC, payment_id DESC
-    """;
+                    SELECT TOP 1 1
+                    FROM PAYMENT
+                    WHERE contract_id = ?
+                      AND method = 'BANK'
+                      AND status = 'PENDING'
+                    ORDER BY paid_at DESC, payment_id DESC
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -96,14 +94,13 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
-    //inser new data vào dbo payment để hiển thị bên manager contract confirm
-    @SuppressWarnings("CallToPrintStackTrace")
+    // inser new data vào dbo payment để hiển thị bên manager contract confirm
     public boolean insertTenantConfirmTransfer(int contractId, java.math.BigDecimal amount) {
 
         String sql = """
-            INSERT INTO PAYMENT (contract_id, bill_id, method, amount, paid_at, status, note)
-            VALUES (?, NULL, 'BANK', ?, SYSDATETIME(), 'PENDING', N'Tenant confirmed transfer')
-        """;
+                    INSERT INTO PAYMENT (contract_id, bill_id, method, amount, paid_at, status, note)
+                    VALUES (?, NULL, 'BANK', ?, SYSDATETIME(), 'PENDING', N'Tenant confirmed transfer')
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -116,20 +113,20 @@ public class PaymentDAO extends DBContext {
         return false;
     }
 
-    //tìm giao dịch chuyển khoản ngân hàng mới nhất đang ở trạng thái chờ và xác nhận nó đã thành công.
-    @SuppressWarnings("CallToPrintStackTrace")
+    // tìm giao dịch chuyển khoản ngân hàng mới nhất đang ở trạng thái chờ và xác
+    // nhận nó đã thành công.
     public boolean confirmLatestBankPayment(int contractId) {
 
         String sql = """
-    UPDATE PAYMENT SET status = 'CONFIRMED' WHERE payment_id = (
-            SELECT TOP 1 payment_id
-            FROM PAYMENT
-            WHERE contract_id = ?
-              AND method = 'BANK'
-              AND status = 'PENDING'
-            ORDER BY paid_at DESC
-        )
-    """;
+                UPDATE PAYMENT SET status = 'CONFIRMED' WHERE payment_id = (
+                        SELECT TOP 1 payment_id
+                        FROM PAYMENT
+                        WHERE contract_id = ?
+                          AND method = 'BANK'
+                          AND status = 'PENDING'
+                        ORDER BY paid_at DESC
+                    )
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -143,12 +140,12 @@ public class PaymentDAO extends DBContext {
     public double getMonthlyRevenue() {
 
         String sql = """
-        SELECT SUM(amount)
-        FROM PAYMENT
-        WHERE status = 'CONFIRMED'
-          AND MONTH(paid_at) = MONTH(GETDATE())
-          AND YEAR(paid_at) = YEAR(GETDATE())
-    """;
+                    SELECT SUM(amount)
+                    FROM PAYMENT
+                    WHERE status = 'CONFIRMED'
+                      AND MONTH(paid_at) = MONTH(GETDATE())
+                      AND YEAR(paid_at) = YEAR(GETDATE())
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -166,10 +163,10 @@ public class PaymentDAO extends DBContext {
     public double getTotalRevenue() {
 
         String sql = """
-        SELECT SUM(amount)
-        FROM PAYMENT
-        WHERE status = 'CONFIRMED'
-    """;
+                    SELECT SUM(amount)
+                    FROM PAYMENT
+                    WHERE status = 'CONFIRMED'
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 

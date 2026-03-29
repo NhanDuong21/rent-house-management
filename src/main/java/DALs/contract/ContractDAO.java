@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import DALs.payment.PaymentDAO;
 import Models.common.ServiceResult;
@@ -22,6 +24,8 @@ import Utils.database.DBContext;
  * @since 2026-02-11
  */
 public class ContractDAO extends DBContext {
+
+    private static final Logger LOGGER = Logger.getLogger(ContractDAO.class.getName());
 
     public int insertPendingContract(Connection conn, Contract c) throws SQLException {
         String sql = """
@@ -53,18 +57,17 @@ public class ContractDAO extends DBContext {
         return -1;
     }
 
-    //get list manage contract
-    @SuppressWarnings("CallToPrintStackTrace")
+    // get list manage contract
     public List<ManagerContractRowDTO> getManagerContracts() {
         List<ManagerContractRowDTO> list = new ArrayList<>();
 
         String sql = """
-SELECT CONTRACT.contract_id, ROOM.room_number, TENANT.full_name as tenant_name , CONTRACT.start_date, CONTRACT.monthly_rent, CONTRACT.status
-FROM     CONTRACT INNER JOIN
-                  ROOM ON CONTRACT.room_id = ROOM.room_id INNER JOIN
-                  TENANT ON CONTRACT.tenant_id = TENANT.tenant_id
-            ORDER BY CONTRACT.created_at DESC
-        """;
+                SELECT CONTRACT.contract_id, ROOM.room_number, TENANT.full_name as tenant_name , CONTRACT.start_date, CONTRACT.monthly_rent, CONTRACT.status
+                FROM     CONTRACT INNER JOIN
+                                  ROOM ON CONTRACT.room_id = ROOM.room_id INNER JOIN
+                                  TENANT ON CONTRACT.tenant_id = TENANT.tenant_id
+                            ORDER BY CONTRACT.created_at DESC
+                        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -79,34 +82,33 @@ FROM     CONTRACT INNER JOIN
                 list.add(contractRowDTO);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error getting manager contracts", e);
         }
 
         return list;
     }
 
-    //nếu m có 100 hợp đồng và mỗi trang hiển thị 10 cái, 
-    //m cần con số 100 này để vẽ ra các nút chuyển trang 1, 2, 3, ..., 10 trên UI. 
-    //nếu không m sẽ không biết khi nào thì hết dữ liệu để dừng phân trang.
-    @SuppressWarnings("CallToPrintStackTrace")
+    // nếu m có 100 hợp đồng và mỗi trang hiển thị 10 cái,
+    // m cần con số 100 này để vẽ ra các nút chuyển trang 1, 2, 3, ..., 10 trên UI.
+    // nếu không m sẽ không biết khi nào thì hết dữ liệu để dừng phân trang.
     public int countManagerContracts(String keyword, String status) {
         String sql = """
-        SELECT COUNT(*)
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        JOIN TENANT t ON c.tenant_id = t.tenant_id
-        WHERE 1=1
-          AND (
-                ? IS NULL OR ? = '' OR
-                CAST(c.contract_id AS NVARCHAR(20)) LIKE '%' + ? + '%' OR
-                r.room_number LIKE '%' + ? + '%' OR
-                t.full_name LIKE '%' + ? + '%'
-              )
-          AND (
-                ? IS NULL OR ? = '' OR
-                c.status = ?
-              )
-    """;
+                    SELECT COUNT(*)
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    JOIN TENANT t ON c.tenant_id = t.tenant_id
+                    WHERE 1=1
+                      AND (
+                            ? IS NULL OR ? = '' OR
+                            CAST(c.contract_id AS NVARCHAR(20)) LIKE '%' + ? + '%' OR
+                            r.room_number LIKE '%' + ? + '%' OR
+                            t.full_name LIKE '%' + ? + '%'
+                          )
+                      AND (
+                            ? IS NULL OR ? = '' OR
+                            c.status = ?
+                          )
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String k = (keyword == null) ? "" : keyword.trim();
@@ -129,12 +131,12 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    "Error counting manager contracts. keyword=" + keyword + ", status=" + status, e);
         }
         return 0;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<ManagerContractRowDTO> findManagerContracts(String keyword, String status, int page, int pageSize) {
         List<ManagerContractRowDTO> list = new ArrayList<>();
 
@@ -147,25 +149,25 @@ FROM     CONTRACT INNER JOIN
         int offset = (page - 1) * pageSize;
 
         String sql = """
-        SELECT c.contract_id, r.room_number, t.full_name as tenant_name,
-               c.start_date, c.monthly_rent, c.status
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        JOIN TENANT t ON c.tenant_id = t.tenant_id
-        WHERE 1=1
-          AND (
-                ? IS NULL OR ? = '' OR
-                CAST(c.contract_id AS NVARCHAR(20)) LIKE '%' + ? + '%' OR
-                r.room_number LIKE '%' + ? + '%' OR
-                t.full_name LIKE '%' + ? + '%'
-              )
-          AND (
-                ? IS NULL OR ? = '' OR
-                c.status = ?
-              )
-        ORDER BY c.created_at DESC
-        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-    """;
+                    SELECT c.contract_id, r.room_number, t.full_name as tenant_name,
+                           c.start_date, c.monthly_rent, c.status
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    JOIN TENANT t ON c.tenant_id = t.tenant_id
+                    WHERE 1=1
+                      AND (
+                            ? IS NULL OR ? = '' OR
+                            CAST(c.contract_id AS NVARCHAR(20)) LIKE '%' + ? + '%' OR
+                            r.room_number LIKE '%' + ? + '%' OR
+                            t.full_name LIKE '%' + ? + '%'
+                          )
+                      AND (
+                            ? IS NULL OR ? = '' OR
+                            c.status = ?
+                          )
+                    ORDER BY c.created_at DESC
+                    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String k = (keyword == null) ? "" : keyword.trim();
@@ -198,30 +200,32 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    "Error finding manager contracts. keyword=" + keyword
+                            + ", status=" + status + ", page=" + page + ", pageSize=" + pageSize,
+                    e);
         }
 
         return list;
     }
 
-    //get list contract theo tenantId
-    //sort theo status, pending gan 0,active gan 1, uu tien pending len dau
-    @SuppressWarnings("CallToPrintStackTrace")
+    // get list contract theo tenantId
+    // sort theo status, pending gan 0,active gan 1, uu tien pending len dau
     public List<Contract> findByTenantId(int tenantId) {
         List<Contract> list = new ArrayList<>();
 
         String sql = """
-        SELECT
-            c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id, 
-            c.start_date, c.end_date, c.monthly_rent, c.deposit, 
-            c.payment_qr_data, c.status, c.created_at, c.updated_at, r.room_number, b.block_name 
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        LEFT JOIN BLOCK b ON r.block_id = b.block_id
-        WHERE c.tenant_id = ?
-        ORDER BY
-            CASE c.status WHEN 'PENDING' THEN 0 WHEN 'ACTIVE' THEN 1 ELSE 2 END, c.created_at DESC
-    """;
+                    SELECT
+                        c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
+                        c.start_date, c.end_date, c.monthly_rent, c.deposit,
+                        c.payment_qr_data, c.status, c.created_at, c.updated_at, r.room_number, b.block_name
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    LEFT JOIN BLOCK b ON r.block_id = b.block_id
+                    WHERE c.tenant_id = ?
+                    ORDER BY
+                        CASE c.status WHEN 'PENDING' THEN 0 WHEN 'ACTIVE' THEN 1 ELSE 2 END, c.created_at DESC
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
@@ -248,27 +252,26 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding contracts by tenantId=" + tenantId, e);
         }
 
         return list;
     }
 
-    //get contract theo id de tenant ko xem contract cua ngkhac
-    @SuppressWarnings("CallToPrintStackTrace")
+    // get contract theo id de tenant ko xem contract cua ngkhac
     public Contract findByIdForTenant(int contractId, int tenantId) {
 
         String sql = """
-        SELECT
-            c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
-            c.start_date, c.end_date, c.monthly_rent, c.deposit,
-            c.payment_qr_data, c.status, c.created_at, c.updated_at,
-            r.room_number, b.block_name
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        LEFT JOIN BLOCK b ON r.block_id = b.block_id
-        WHERE c.contract_id = ? AND c.tenant_id = ?
-    """;
+                    SELECT
+                        c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
+                        c.start_date, c.end_date, c.monthly_rent, c.deposit,
+                        c.payment_qr_data, c.status, c.created_at, c.updated_at,
+                        r.room_number, b.block_name
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    LEFT JOIN BLOCK b ON r.block_id = b.block_id
+                    WHERE c.contract_id = ? AND c.tenant_id = ?
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -295,52 +298,52 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    "Error finding contract for tenant. contractId=" + contractId + ", tenantId=" + tenantId, e);
         }
         return null;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public Contract findDetailForTenant(int contractId, int tenantId) {
 
         String sql = """
-        SELECT
-            c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
-            c.start_date, c.end_date, c.monthly_rent, c.deposit,
-            c.payment_qr_data, c.status, c.created_at, c.updated_at,
+                    SELECT
+                        c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
+                        c.start_date, c.end_date, c.monthly_rent, c.deposit,
+                        c.payment_qr_data, c.status, c.created_at, c.updated_at,
 
-            r.room_number, r.floor, r.area, r.max_tenants,
-            r.is_mezzanine, r.has_air_conditioning, r.[description] AS room_description,
-            b.block_name,
+                        r.room_number, r.floor, r.area, r.max_tenants,
+                        r.is_mezzanine, r.has_air_conditioning, r.[description] AS room_description,
+                        b.block_name,
 
-            t.full_name AS tenant_name,
-            t.email AS tenant_email,
-            t.phone_number AS tenant_phone,
-            t.identity_code AS tenant_identity,
-            t.date_of_birth AS tenant_dob,
-            t.[address] AS tenant_address,
+                        t.full_name AS tenant_name,
+                        t.email AS tenant_email,
+                        t.phone_number AS tenant_phone,
+                        t.identity_code AS tenant_identity,
+                        t.date_of_birth AS tenant_dob,
+                        t.[address] AS tenant_address,
 
-            a.full_name AS landlord_name,
-            a.phone_number AS landlord_phone,
-            a.email AS landlord_email,
-            a.identity_code AS landlord_identity,
-            a.date_of_birth AS landlord_dob
+                        a.full_name AS landlord_name,
+                        a.phone_number AS landlord_phone,
+                        a.email AS landlord_email,
+                        a.identity_code AS landlord_identity,
+                        a.date_of_birth AS landlord_dob
 
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        LEFT JOIN BLOCK b ON r.block_id = b.block_id
-        JOIN TENANT t ON c.tenant_id = t.tenant_id
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    LEFT JOIN BLOCK b ON r.block_id = b.block_id
+                    JOIN TENANT t ON c.tenant_id = t.tenant_id
 
-        OUTER APPLY (
-            SELECT TOP 1 *
-            FROM STAFF
-            WHERE staff_role = 'ADMIN' AND [status] = 'ACTIVE'
-            ORDER BY staff_id ASC
-        ) a
+                    OUTER APPLY (
+                        SELECT TOP 1 *
+                        FROM STAFF
+                        WHERE staff_role = 'ADMIN' AND [status] = 'ACTIVE'
+                        ORDER BY staff_id ASC
+                    ) a
 
-        WHERE c.contract_id = ?
-          AND c.tenant_id = ?
-    """;
+                    WHERE c.contract_id = ?
+                      AND c.tenant_id = ?
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -348,7 +351,9 @@ FROM     CONTRACT INNER JOIN
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
-                    System.out.println("findDetailForTenant => no row, contractId=" + contractId + ", tenantId=" + tenantId);
+                    LOGGER.log(Level.INFO,
+                            "findDetailForTenant => no row, contractId={0}, tenantId={1}",
+                            new Object[] { contractId, tenantId });
                     return null;
                 }
 
@@ -393,59 +398,55 @@ FROM     CONTRACT INNER JOIN
                 c.setLandlordIdentityCode(rs.getString("landlord_identity"));
                 c.setLandlordDateOfBirth(rs.getDate("landlord_dob"));
 
-                System.out.println("findDetailForTenant => found contractId=" + c.getContractId()
-                        + ", tenantId=" + c.getTenantId()
-                        + ", status=" + c.getStatus());
-
                 return c;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    "Error finding detail for tenant. contractId=" + contractId + ", tenantId=" + tenantId, e);
         }
         return null;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public Contract findDetailForManager(int contractId) {
 
         String sql = """
-        SELECT
-            c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
-            c.start_date, c.end_date, c.monthly_rent, c.deposit,
-            c.payment_qr_data, c.status, c.created_at, c.updated_at,
+                    SELECT
+                        c.contract_id, c.room_id, c.tenant_id, c.created_by_staff_id,
+                        c.start_date, c.end_date, c.monthly_rent, c.deposit,
+                        c.payment_qr_data, c.status, c.created_at, c.updated_at,
 
-            r.room_number, r.floor, r.area, r.max_tenants,
-            r.is_mezzanine, r.has_air_conditioning, r.[description] AS room_description,
-            b.block_name,
+                        r.room_number, r.floor, r.area, r.max_tenants,
+                        r.is_mezzanine, r.has_air_conditioning, r.[description] AS room_description,
+                        b.block_name,
 
-            t.full_name AS tenant_name,
-            t.email AS tenant_email,
-            t.phone_number AS tenant_phone,
-            t.identity_code AS tenant_identity,
-            t.date_of_birth AS tenant_dob,
-            t.[address] AS tenant_address,
+                        t.full_name AS tenant_name,
+                        t.email AS tenant_email,
+                        t.phone_number AS tenant_phone,
+                        t.identity_code AS tenant_identity,
+                        t.date_of_birth AS tenant_dob,
+                        t.[address] AS tenant_address,
 
-            a.full_name AS landlord_name,
-            a.phone_number AS landlord_phone,
-            a.email AS landlord_email,
-            a.identity_code AS landlord_identity,
-            a.date_of_birth AS landlord_dob
+                        a.full_name AS landlord_name,
+                        a.phone_number AS landlord_phone,
+                        a.email AS landlord_email,
+                        a.identity_code AS landlord_identity,
+                        a.date_of_birth AS landlord_dob
 
-        FROM CONTRACT c
-        JOIN ROOM r ON c.room_id = r.room_id
-        LEFT JOIN BLOCK b ON r.block_id = b.block_id
-        JOIN TENANT t ON c.tenant_id = t.tenant_id
-        JOIN STAFF cb ON c.created_by_staff_id = cb.staff_id
+                    FROM CONTRACT c
+                    JOIN ROOM r ON c.room_id = r.room_id
+                    LEFT JOIN BLOCK b ON r.block_id = b.block_id
+                    JOIN TENANT t ON c.tenant_id = t.tenant_id
+                    JOIN STAFF cb ON c.created_by_staff_id = cb.staff_id
 
-        CROSS APPLY (
-            SELECT TOP 1 *
-            FROM STAFF
-            WHERE staff_role = 'ADMIN' AND [status] = 'ACTIVE'
-            ORDER BY staff_id ASC
-        ) a
+                    CROSS APPLY (
+                        SELECT TOP 1 *
+                        FROM STAFF
+                        WHERE staff_role = 'ADMIN' AND [status] = 'ACTIVE'
+                        ORDER BY staff_id ASC
+                    ) a
 
-        WHERE c.contract_id = ?
-    """;
+                    WHERE c.contract_id = ?
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -499,12 +500,11 @@ FROM     CONTRACT INNER JOIN
                 return c;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding detail for manager. contractId=" + contractId, e);
         }
         return null;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean updateStatus(int contractId, String status) {
         String sql = "UPDATE CONTRACT SET status = ?, updated_at = SYSDATETIME() WHERE contract_id = ?";
 
@@ -513,43 +513,44 @@ FROM     CONTRACT INNER JOIN
             ps.setInt(2, contractId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,
+                    "Error updating contract status. contractId=" + contractId + ", status=" + status, e);
         }
         return false;
     }
 
-    //update status contract to ENDED and sign time update to updated_at
+    // update status contract to ENDED and sign time update to updated_at
     public int expireActiveContracts(Connection conn) throws SQLException {
         String sql = """
-        UPDATE CONTRACT
-        SET status = 'ENDED',
-            updated_at = SYSDATETIME()
-        WHERE status = 'ACTIVE'
-          AND end_date IS NOT NULL
-          AND end_date < CAST(GETDATE() AS date)
-    """;
+                    UPDATE CONTRACT
+                    SET status = 'ENDED',
+                        updated_at = SYSDATETIME()
+                    WHERE status = 'ACTIVE'
+                      AND end_date IS NOT NULL
+                      AND end_date < CAST(GETDATE() AS date)
+                """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
         }
     }
 
-    //update room ve available 
+    // update room ve available
     public int releaseRoomsWithoutActiveContract(Connection conn) throws SQLException {
         String sql = """
-        UPDATE ROOM
-        SET status = 'AVAILABLE'
-        WHERE status = 'OCCUPIED'
-          AND room_id IN (
-              SELECT r.room_id
-              FROM ROOM r
-              LEFT JOIN CONTRACT c
-                ON c.room_id = r.room_id
-               AND c.status = 'ACTIVE'
-              WHERE r.status = 'OCCUPIED'
-              GROUP BY r.room_id
-              HAVING COUNT(c.contract_id) = 0
-          )
-    """;
+                    UPDATE ROOM
+                    SET status = 'AVAILABLE'
+                    WHERE status = 'OCCUPIED'
+                      AND room_id IN (
+                          SELECT r.room_id
+                          FROM ROOM r
+                          LEFT JOIN CONTRACT c
+                            ON c.room_id = r.room_id
+                           AND c.status = 'ACTIVE'
+                          WHERE r.status = 'OCCUPIED'
+                          GROUP BY r.room_id
+                          HAVING COUNT(c.contract_id) = 0
+                      )
+                """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
         }
@@ -559,7 +560,6 @@ FROM     CONTRACT INNER JOIN
      * Chạy job expire không throw ra ngoài để tránh làm gãy request. Gọi từ
      * Filter (mỗi X phút).
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public void runExpireJobSafely() {
         try (Connection conn = new DBContext().getConnection()) {
             conn.setAutoCommit(false);
@@ -569,7 +569,7 @@ FROM     CONTRACT INNER JOIN
 
             conn.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error running expire job safely", e);
         }
     }
 
@@ -580,17 +580,16 @@ FROM     CONTRACT INNER JOIN
      *
      * @param roomId ID của phòng cần kiểm tra
      * @return true nếu phòng đã có người ở (Busy), false nếu phòng trống
-     * (Available)
+     *         (Available)
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean existsActiveContractForRoom(int roomId) {
 
         String sql = """
-        SELECT 1
-        FROM CONTRACT
-        WHERE room_id = ?
-          AND status = 'ACTIVE'
-    """;
+                    SELECT 1
+                    FROM CONTRACT
+                    WHERE room_id = ?
+                      AND status = 'ACTIVE'
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, roomId);
@@ -600,13 +599,12 @@ FROM     CONTRACT INNER JOIN
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error checking active contract for roomId=" + roomId, e);
         }
 
         return false;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean existsActiveContractForTenant(int tenantId) {
         String sql = "SELECT 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -615,12 +613,11 @@ FROM     CONTRACT INNER JOIN
                 return rs.next();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error checking active contract for tenantId=" + tenantId, e);
         }
         return false;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public boolean existsPendingContractForTenant(int tenantId) {
         String sql = "SELECT 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'PENDING'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -629,7 +626,7 @@ FROM     CONTRACT INNER JOIN
                 return rs.next();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error checking pending contract for tenantId=" + tenantId, e);
         }
         return false;
     }
@@ -637,7 +634,6 @@ FROM     CONTRACT INNER JOIN
     /**
      * active room id hiện tại của tenant, nếu không có thì trả -1
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public int getActiveRoomIdOfTenant(int tenantId) {
         String sql = "SELECT TOP 1 room_id FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE' ORDER BY contract_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -648,7 +644,7 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error getting active room id of tenantId=" + tenantId, e);
         }
         return -1;
     }
@@ -656,7 +652,6 @@ FROM     CONTRACT INNER JOIN
     /**
      * active contract id hiện tại của tenant, nếu không có thì -1
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public int getActiveContractIdOfTenant(int tenantId) {
         String sql = "SELECT TOP 1 contract_id FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE' ORDER BY contract_id DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -667,7 +662,7 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error getting active contract id of tenantId=" + tenantId, e);
         }
         return -1;
     }
@@ -680,29 +675,28 @@ FROM     CONTRACT INNER JOIN
      * AVAILABLE - recalc TENANT account_status: ACTIVE if has ACTIVE, else
      * PENDING if has PENDING, else ACTIVE
      */
-    @SuppressWarnings("CallToPrintStackTrace")
     public ServiceResult terminateContractByManager(int contractId) {
         String lockSql = """
-            SELECT contract_id, room_id, tenant_id, status
-            FROM CONTRACT WITH (UPDLOCK, ROWLOCK)
-            WHERE contract_id = ?
-        """;
+                    SELECT contract_id, room_id, tenant_id, status
+                    FROM CONTRACT WITH (UPDLOCK, ROWLOCK)
+                    WHERE contract_id = ?
+                """;
 
         String cancelCurrentSql = """
-            UPDATE CONTRACT
-            SET status = 'CANCELLED',
-                updated_at = SYSDATETIME()
-            WHERE contract_id = ?
-              AND status IN ('ACTIVE','PENDING')
-        """;
+                    UPDATE CONTRACT
+                    SET status = 'CANCELLED',
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status IN ('ACTIVE','PENDING')
+                """;
 
         String cancelPendingSameRoomSql = """
-            UPDATE CONTRACT
-            SET status = 'CANCELLED',
-                updated_at = SYSDATETIME()
-            WHERE room_id = ?
-              AND status = 'PENDING'
-        """;
+                    UPDATE CONTRACT
+                    SET status = 'CANCELLED',
+                        updated_at = SYSDATETIME()
+                    WHERE room_id = ?
+                      AND status = 'PENDING'
+                """;
 
         String roomHasActiveSql = "SELECT TOP 1 1 FROM CONTRACT WHERE room_id = ? AND status = 'ACTIVE'";
         String roomHasPendingSql = "SELECT TOP 1 1 FROM CONTRACT WHERE room_id = ? AND status = 'PENDING'";
@@ -831,25 +825,24 @@ FROM     CONTRACT INNER JOIN
             return ServiceResult.ok("OK");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error terminating contract by manager. contractId=" + contractId, e);
             return ServiceResult.fail("EXCEPTION");
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public TenantMyRoomDTO findActiveMyRoomByTenantId(int tenantId) {
         String sql = """
-            SELECT TOP 1
-                c.contract_id,
-                r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status AS room_status, r.floor, r.max_tenants, r.is_mezzanine, r.has_air_conditioning, r.description, 
-                img.image_url AS cover_image
-            FROM CONTRACT c
-            JOIN ROOM r ON r.room_id = c.room_id
-            JOIN BLOCK b ON b.block_id = r.block_id
-            LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-            WHERE c.tenant_id = ? AND c.status = 'ACTIVE'
-            ORDER BY c.created_at DESC
-        """;
+                    SELECT TOP 1
+                        c.contract_id,
+                        r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status AS room_status, r.floor, r.max_tenants, r.is_mezzanine, r.has_air_conditioning, r.description,
+                        img.image_url AS cover_image
+                    FROM CONTRACT c
+                    JOIN ROOM r ON r.room_id = c.room_id
+                    JOIN BLOCK b ON b.block_id = r.block_id
+                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                    WHERE c.tenant_id = ? AND c.status = 'ACTIVE'
+                    ORDER BY c.created_at DESC
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
@@ -874,39 +867,37 @@ FROM     CONTRACT INNER JOIN
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding active room by tenantId=" + tenantId, e);
         }
         return null;
     }
 
-    //check coi có contract nào đang activce/pending theo roomId
-    @SuppressWarnings("CallToPrintStackTrace")
+    // check coi có contract nào đang activce/pending theo roomId
     public boolean hasBlockingContractByRoomId(int roomId) {
         String sql = """
-        SELECT TOP 1 1
-        FROM CONTRACT
-        WHERE room_id = ?
-          AND status IN ('ACTIVE','PENDING')
-    """;
+                    SELECT TOP 1 1
+                    FROM CONTRACT
+                    WHERE room_id = ?
+                      AND status IN ('ACTIVE','PENDING')
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, roomId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error checking blocking contract by roomId=" + roomId, e);
         }
         return true;
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public int ActiveContracts() {
 
         String sql = """
-        SELECT COUNT(*)
-        FROM CONTRACT
-        WHERE status = 'ACTIVE'
-    """;
+                    SELECT COUNT(*)
+                    FROM CONTRACT
+                    WHERE status = 'ACTIVE'
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -915,9 +906,30 @@ FROM     CONTRACT INNER JOIN
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error counting active contracts", e);
         }
 
         return 0;
+    }
+
+    public boolean extendActiveContract(Connection conn, int contractId, java.sql.Date newEndDate) throws SQLException {
+
+        String sql = """
+                    UPDATE CONTRACT
+                    SET end_date = ?,
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status = 'ACTIVE'
+                      AND end_date IS NOT NULL
+                      AND ? > end_date
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, newEndDate);
+            ps.setInt(2, contractId);
+            ps.setDate(3, newEndDate);
+            return ps.executeUpdate() > 0;
+        }
+
     }
 }

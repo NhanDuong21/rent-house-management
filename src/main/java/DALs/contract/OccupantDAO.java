@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Models.entity.Occupant;
 import Utils.database.DBContext;
@@ -19,13 +21,15 @@ import Utils.database.DBContext;
  */
 public class OccupantDAO extends DBContext {
 
+    private static final Logger LOGGER = Logger.getLogger(OccupantDAO.class.getName());
+
     public int insertOccupant(Connection conn, Occupant o) throws SQLException {
         String sql = """
-            INSERT INTO OCCUPANT
-                (contract_id, full_name, identity_code, phone_number, email, address, date_of_birth, gender, status)
-            VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO OCCUPANT
+                        (contract_id, full_name, identity_code, phone_number, email, address, date_of_birth, gender, status)
+                    VALUES
+                        (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, o.getContractId());
@@ -56,11 +60,11 @@ public class OccupantDAO extends DBContext {
 
     public int countPendingOrActiveByContractId(Connection conn, int contractId) throws SQLException {
         String sql = """
-            SELECT COUNT(*)
-            FROM OCCUPANT
-            WHERE contract_id = ?
-              AND status IN ('PENDING', 'ACTIVE')
-        """;
+                    SELECT COUNT(*)
+                    FROM OCCUPANT
+                    WHERE contract_id = ?
+                      AND status IN ('PENDING', 'ACTIVE')
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -75,12 +79,12 @@ public class OccupantDAO extends DBContext {
 
     public int activateOccupantsByContractId(Connection conn, int contractId) throws SQLException {
         String sql = """
-            UPDATE OCCUPANT
-            SET status = 'ACTIVE',
-                updated_at = SYSDATETIME()
-            WHERE contract_id = ?
-              AND status = 'PENDING'
-        """;
+                    UPDATE OCCUPANT
+                    SET status = 'ACTIVE',
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status = 'PENDING'
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -90,12 +94,12 @@ public class OccupantDAO extends DBContext {
 
     public int removeOccupantsByContractId(Connection conn, int contractId) throws SQLException {
         String sql = """
-            UPDATE OCCUPANT
-            SET status = 'REMOVED',
-                updated_at = SYSDATETIME()
-            WHERE contract_id = ?
-              AND status = 'ACTIVE'
-        """;
+                    UPDATE OCCUPANT
+                    SET status = 'REMOVED',
+                        updated_at = SYSDATETIME()
+                    WHERE contract_id = ?
+                      AND status = 'ACTIVE'
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -103,39 +107,38 @@ public class OccupantDAO extends DBContext {
         }
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     public List<Occupant> findByContractId(int contractId) {
         List<Occupant> list = new ArrayList<>();
 
         String sql = """
-            SELECT
-                o.occupant_id,
-                o.contract_id,
-                o.full_name,
-                o.identity_code,
-                o.phone_number,
-                o.email,
-                o.address,
-                o.date_of_birth,
-                o.gender,
-                o.status,
-                o.created_at,
-                o.updated_at,
-                df.file_url AS cccd_front_url,
-                db.file_url AS cccd_back_url
-            FROM OCCUPANT o
-            LEFT JOIN OCCUPANT_DOCUMENT df
-                ON df.occupant_id = o.occupant_id
-               AND df.document_type = 'CCCD_FRONT'
-               AND df.status = 'ACTIVE'
-            LEFT JOIN OCCUPANT_DOCUMENT db
-                ON db.occupant_id = o.occupant_id
-               AND db.document_type = 'CCCD_BACK'
-               AND db.status = 'ACTIVE'
-            WHERE o.contract_id = ?
-              AND o.status IN ('PENDING', 'ACTIVE')
-            ORDER BY o.occupant_id ASC
-        """;
+                    SELECT
+                        o.occupant_id,
+                        o.contract_id,
+                        o.full_name,
+                        o.identity_code,
+                        o.phone_number,
+                        o.email,
+                        o.address,
+                        o.date_of_birth,
+                        o.gender,
+                        o.status,
+                        o.created_at,
+                        o.updated_at,
+                        df.file_url AS cccd_front_url,
+                        db.file_url AS cccd_back_url
+                    FROM OCCUPANT o
+                    LEFT JOIN OCCUPANT_DOCUMENT df
+                        ON df.occupant_id = o.occupant_id
+                       AND df.document_type = 'CCCD_FRONT'
+                       AND df.status = 'ACTIVE'
+                    LEFT JOIN OCCUPANT_DOCUMENT db
+                        ON db.occupant_id = o.occupant_id
+                       AND db.document_type = 'CCCD_BACK'
+                       AND db.status = 'ACTIVE'
+                    WHERE o.contract_id = ?
+                      AND o.status IN ('PENDING', 'ACTIVE')
+                    ORDER BY o.occupant_id ASC
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractId);
@@ -163,7 +166,7 @@ public class OccupantDAO extends DBContext {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error finding occupants by contractId=" + contractId, e);
         }
 
         return list;

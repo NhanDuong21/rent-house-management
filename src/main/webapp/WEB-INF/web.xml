@@ -30,6 +30,16 @@
         <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/renthouse-config/contact.properties</param-value>
     </context-param>
 
+    <error-page>
+        <error-code>404</error-code>
+        <location>/views/errors/404.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/views/errors/500.jsp</location>
+    </error-page>
+
     <servlet>
         <servlet-name>MaintenanceRequest</servlet-name>
         <servlet-class>Controllers.manager.MaintenanceRequestForManagerController</servlet-class>
