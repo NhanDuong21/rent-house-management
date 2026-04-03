@@ -372,6 +372,14 @@
                             <c:if test="${Bill.billId == d.billId && d.utilityId == 2}">
                                 <strong>(Old: ${Bill.oldWaterNumber}, New: ${Bill.newWaterNumber})</strong>
                             </c:if>
+
+                            <c:if test="${Bill.billId == d.billId && d.chargeType ne 'RENT' && d.utilityId != 1 && d.utilityId != 2 && d.utilityId != 3 }">
+                                <strong>
+                                    (Quantity: <fmt:formatNumber value="${d.quantity}"/>)
+                                </strong>
+                            </c:if>
+
+                            
                         </span>
 
                         <span>

@@ -136,6 +136,13 @@ Author     : To Thi Thao Trang - CE191027
                                             (Old: ${bill.oldWaterNumber}, New: ${bill.newWaterNumber})
                                         </span>
                                     </c:if>
+
+                                    <c:if test="${ bill.billId == d.billId && d.chargeType ne 'RENT' && d.utilityId != 1 && d.utilityId != 2 && d.utilityId != 3 }">
+                                        <span class="tbd-inline-note">
+                                            (Quantity: <fmt:formatNumber value="${d.quantity}"/>)
+                                        </span>
+                                    </c:if>
+
                                 </span>
                                 <span class="tbd-money">
                                     <fmt:formatNumber value="${d.unitPrice * d.quantity}" type="number"/> ₫
