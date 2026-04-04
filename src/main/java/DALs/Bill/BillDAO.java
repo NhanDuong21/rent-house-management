@@ -551,17 +551,7 @@ public class BillDAO extends DBContext {
         return true;
 
     } catch (Exception e) {
-        try {
-            connection.rollback();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
         e.printStackTrace();
-    } finally {
-        try {
-            connection.setAutoCommit(true);
-        } catch (Exception e) {
-        }
     }
 
     return false;
@@ -573,14 +563,14 @@ public class BillDAO extends DBContext {
     public boolean isBillExist(int roomId, int month, int year) throws SQLException {
 
         String sql = """
-        SELECT 1
-        FROM BILL b
-        JOIN CONTRACT c ON b.contract_id = c.contract_id
-        WHERE c.room_id = ?
-        AND MONTH(b.bill_month) = ?
-        AND YEAR(b.bill_month) = ?
-        AND b.status != 'CANCELLED'
-    """;
+                SELECT 1
+                FROM BILL b
+                JOIN CONTRACT c ON b.contract_id = c.contract_id
+                WHERE c.room_id = ?
+                AND MONTH(b.bill_month) = ?
+                AND YEAR(b.bill_month) = ?
+                AND b.status != 'CANCELLED'
+            """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -723,13 +713,13 @@ public class BillDAO extends DBContext {
     // =========================
     public Bill findBillDetailByIdForTenant(int billId, int tenantId) {
         String sql = """
-        SELECT b.*
-        FROM BILL b
-        JOIN CONTRACT c ON b.contract_id = c.contract_id
-        WHERE b.bill_id = ?
-          AND c.tenant_id = ?
-          AND c.status = 'ACTIVE'
-    """;
+                        SELECT b.*
+                        FROM BILL b
+                        JOIN CONTRACT c ON b.contract_id = c.contract_id
+                        WHERE b.bill_id = ?
+                        AND c.tenant_id = ?
+                        AND c.status = 'ACTIVE'
+                    """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -809,19 +799,19 @@ public class BillDAO extends DBContext {
     public List<RoomTenantDTO> getRoomsWithTenant() {
         List<RoomTenantDTO> list = new ArrayList<>();
         String sql = """
-                    SELECT r.room_id, r.room_number, t.full_name, c.contract_id, c.monthly_rent,
-                        ISNULL(last_bill.new_electric_number, 0) AS last_electric,
-                        ISNULL(last_bill.new_water_number, 0)    AS last_water
+                    SELECT
+                        r.room_id,
+                        r.room_number,
+                        t.full_name,
+                        c.contract_id,
+                        c.monthly_rent,
+                        r.electricity_index AS last_electric,
+                        r.water_index AS last_water
                     FROM ROOM r
                     JOIN CONTRACT c ON r.room_id = c.room_id
                     JOIN TENANT t   ON t.tenant_id = c.tenant_id
-                    OUTER APPLY (
-                        SELECT TOP 1 new_electric_number, new_water_number
-                        FROM BILL
-                        WHERE contract_id = c.contract_id AND status != 'CANCELLED'
-                        ORDER BY bill_month DESC
-                    ) AS last_bill
-                    WHERE c.status = 'ACTIVE' AND r.status = 'OCCUPIED'
+                    WHERE c.status = 'ACTIVE'
+                    AND r.status = 'OCCUPIED'
                 """;
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -871,4 +861,40 @@ public class BillDAO extends DBContext {
         return null;
     }
 
+    // ==========================================
+    // Update room index every month => generate bill khi có roomId
+    // ==========================================
+    public void updateRoomMeter(int roomId, int electric, int water) {
+        String sql = "UPDATE ROOM SET electricity_index = ?, water_index = ? WHERE room_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, electric);
+            ps.setInt(2, water);
+            ps.setInt(3, roomId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ==========================================
+    // Update room index every month => edit bill khi co billId
+    // ==========================================
+    public void updateRoomMeterByBillId(int billId, int electric, int water) {
+        String sql = """
+                UPDATE r
+                SET r.electricity_index = ?, r.water_index = ?
+                FROM ROOM r
+                JOIN CONTRACT c ON r.room_id = c.room_id
+                JOIN BILL b ON b.contract_id = c.contract_id
+                WHERE b.bill_id = ?
+                """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, electric);
+            ps.setInt(2, water);
+            ps.setInt(3, billId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
