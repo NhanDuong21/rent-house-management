@@ -335,6 +335,8 @@ public class ContractService {
         return "Lỗi SQL: " + e.getMessage();
     }
 
+
+    
     //VIEW CONTRACT LIST
     public int countContracts(String keyword, String status) {
         return contractDAO.countManagerContracts(keyword, status);

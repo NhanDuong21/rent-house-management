@@ -229,6 +229,7 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Check email tồn tại
+     * Nguyen Huu Lap
      */
     public boolean existsEmail(String email) {
         String sql = """
@@ -255,6 +256,7 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Create Account Tenant
+     * Nguyen Huu Lap
      */
     public boolean insertTenant(String fullName,
             String identityCode,
@@ -303,6 +305,10 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Create Account manager
+     * Nguyen Huu Lap
+     * @param fullName
+     * @param identityCode
+     * @return 
      */
     public boolean insertManager(String fullName,
             String identityCode,
@@ -348,7 +354,9 @@ public class ManageAccountDAO extends DBContext {
 
         return false;
     }
-
+// Nguyen Huu Lap
+// Đếm số lượng Tenant
+    
     public int countTenants() {
         String sql = "SELECT COUNT(*) FROM TENANT";
 
@@ -365,7 +373,8 @@ public class ManageAccountDAO extends DBContext {
 
         return 0;
     }
-
+// Nguyen Huu Lap
+// Lấy thông tin để hiện thi trong form update
     public AdminAccountRowDTO getManagerById(int id) {
         String sql = """
                 SELECT
@@ -414,6 +423,7 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Hàm update Manager
+     * Nguyen Huu Lap
      */
     public boolean updateManager(int id, String name, String email,
             String phone, int gender, String dob, String identity, String status) {
@@ -457,7 +467,8 @@ public class ManageAccountDAO extends DBContext {
 
         return false;
     }
-
+// Nguyen Huu Lap
+// Lấy thông tin để hiện thi trong form update của Tenant
     public Tenant getTenantById(int id) {
         String sql = "SELECT * FROM TENANT WHERE tenant_id = ?";
 
@@ -492,6 +503,7 @@ public class ManageAccountDAO extends DBContext {
 
     /**
      * Update Tenant
+     * Nguyen Huu Lap
      */
     public boolean updateTenant(Tenant t) {
         String sql = """

@@ -190,9 +190,8 @@ body {
 .form-group {
   display: flex;
   flex-direction: column;
-  transform: translateY(18px);
-  opacity: 0;
-  animation: fieldIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .form-group:nth-child(1) {

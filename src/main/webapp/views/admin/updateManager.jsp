@@ -107,16 +107,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group full stagger-item">
-                            <label for="status">Status</label>
-                            <div class="input-shell">
-                                <i class="bi bi-shield-check input-icon"></i>
-                                <select id="status" name="status">
-                                    <option value="ACTIVE" ${manager.status == 'ACTIVE' ? 'selected' : ''}>Active</option>
-                                    <option value="INACTIVE" ${manager.status == 'INACTIVE' ? 'selected' : ''}>Inactive</option>
-                                </select>
-                            </div>
-                        </div>
+                        
 
                     </div>
 

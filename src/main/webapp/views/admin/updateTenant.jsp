@@ -134,25 +134,6 @@
                             </div>
                         </div>
 
-                        <!-- STATUS -->
-                        <div class="form-group full stagger-item">
-                            <label for="status">Status</label>
-                            <div class="input-shell">
-                                <i class="bi bi-shield-check input-icon"></i>
-                                <select id="status" name="status">
-                                    <option value="ACTIVE"
-                                            <c:if test="${tenant.accountStatus == 'ACTIVE'}">selected</c:if>>
-                                        Active
-                                    </option>
-
-                                    <option value="LOCKED"
-                                            <c:if test="${tenant.accountStatus == 'LOCKED'}">selected</c:if>>
-                                        Locked
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
                     </div>
 
                     <div class="form-actions">

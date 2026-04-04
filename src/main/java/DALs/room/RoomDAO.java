@@ -644,7 +644,7 @@ public class RoomDAO extends DBContext {
 
         return -1;
     }
-
+// Nguyen Huu Lap
     public int countAvailableRooms() {
 
         String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'AVAILABLE'";
@@ -661,7 +661,7 @@ public class RoomDAO extends DBContext {
 
         return 0;
     }
-
+// Nguyen Huu Lap
     public int countOccupiedRooms() {
 
         String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'OCCUPIED'";
