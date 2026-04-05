@@ -1,10 +1,10 @@
 package Services.bill;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import DALs.Bill.BillDAO;
-import DALs.Bill.PaymentConfirmBillDAO;
 import Models.dto.RoomTenantDTO;
 import Models.entity.Bill;
 
@@ -14,8 +14,9 @@ import Models.entity.Bill;
  */
 public class BillService {
 
-    private BillDAO dao = new BillDAO();
+    private final BillDAO dao = new BillDAO();
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public String generateBill(int roomId, String billMonthStr, String dueDateStr, int oldElectric, int newElectric, int oldWater, int newWater) {
         try {
             // Convert
@@ -78,16 +79,16 @@ public class BillService {
 
             return null; // success
 
-        } catch (Exception e) {
+        } catch (NumberFormatException | SQLException e) {
             e.printStackTrace();
             return "Generate bill failed";
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public String updateBill(int billId, String paymentStatus, Date billMonth, Date dueDate, int oldElectric, int newElectric, int oldWater, int newWater) {
         try {
             BillDAO dao = new BillDAO();
-            PaymentConfirmBillDAO paymentDAO = new PaymentConfirmBillDAO();
 
             Bill bill = dao.findBillDetailByIdForManager(billId);
             if (bill == null) {
