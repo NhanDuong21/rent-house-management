@@ -33,7 +33,7 @@ public class ManageRoomsController extends HttpServlet {
         if (page != null) {
             try {
                 pageIndex = Integer.parseInt(page);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 pageIndex = 1;
             }
         }
@@ -81,6 +81,7 @@ public class ManageRoomsController extends HttpServlet {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -105,7 +106,7 @@ public class ManageRoomsController extends HttpServlet {
 
             dao.updateRoomStatus(roomId, status);
 
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
 

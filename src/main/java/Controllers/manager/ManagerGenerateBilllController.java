@@ -36,6 +36,7 @@ public class ManagerGenerateBilllController extends HttpServlet {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -61,7 +62,7 @@ public class ManagerGenerateBilllController extends HttpServlet {
                 return;
             }
             response.sendRedirect(request.getContextPath() + "/manager/billing");
-        } catch (Exception e) {
+        } catch (ServletException | IOException | NumberFormatException e) {
             e.printStackTrace();
             loadRooms(request);
             request.setAttribute("error", "Generate bill failed");
