@@ -20,20 +20,7 @@ public class RoomGuestService {
     private final RoomDAO rdao = new RoomDAO();
     private final RoomImageDAO imgDao = new RoomImageDAO();
 
-    //phễu lọc (browser nhận string db nhận bigdec)
-    public List<Room> searchAvailable(String minPrice, String maxPrice, String minArea, String maxArea,
-            String hasAC, String hasMezzanine) {
-        RoomFilterDTO f = new RoomFilterDTO();
-        f.setMinPrice(parseDecimal(minPrice));
-        f.setMaxPrice(parseDecimal(maxPrice));
-        f.setMinArea(parseDecimal(minArea));
-        f.setMaxArea(parseDecimal(maxArea));
-        f.setHasAirConditioning(parseTriState(hasAC));  // any/yes/no -> null/true/false
-        f.setHasMezzanine(parseTriState(hasMezzanine));
-        return rdao.searchAvailable(f);
-    }
-
-    //phễu lọc (browser nhận string db nhận bigdec)
+    // phễu lọc (browser nhận string db nhận bigdec)
     public PageResult<Room> searchAvailablePaged(String minPrice, String maxPrice, String minArea, String maxArea,
             String hasAC, String hasMezzanine, int page, int pageSize) {
 

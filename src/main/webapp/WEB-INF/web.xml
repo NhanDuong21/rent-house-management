@@ -5,29 +5,29 @@
 
     <context-param>
         <param-name>occupantDocsUploadDir</param-name>
-        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/occupant-docs</param-value>
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/land-house-management/src/main/webapp/assets/images/occupant-docs</param-value>
     </context-param>
     <context-param>
         <param-name>tenantDocsUploadDir</param-name>
-        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/tenant-docs</param-value>
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/land-house-management/src/main/webapp/assets/images/tenant-docs</param-value>
     </context-param>
 
     <context-param>
         <param-name>maintenanceImageDir</param-name>
         <!-- clone ve thi edit url nay theo may -->
-        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/maintenance</param-value>
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/land-house-management/src/main/webapp/assets/images/maintenance</param-value>
     </context-param>
 
     <context-param>
         <param-name>roomImageSourceDir</param-name>
         <!-- clone ve thi edit url nay theo may -->
-        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/src/main/webapp/assets/images/rooms</param-value>
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/land-house-management/src/main/webapp/assets/images/rooms</param-value>
     </context-param>
 
     <!-- context param dẫn tới contact.properties ( file giống json ) -->
     <context-param>
         <param-name>contact_props_path</param-name>
-        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/LandHouseManagement/renthouse-config/contact.properties</param-value>
+        <param-value>C:/Users/LENOVO/OneDrive/Desktop/Ky-5/SWP391/land-house-management/renthouse-config/contact.properties</param-value>
     </context-param>
 
     <error-page>

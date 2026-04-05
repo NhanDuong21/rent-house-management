@@ -1,14 +1,14 @@
 package Controllers.auth;
 
-import Services.auth.ForgotPasswordService;
-import Services.auth.AuthService;
-import Models.authentication.AuthResult;
-import DALs.auth.TenantDAO;
-import DALs.auth.StaffDAO;
-import Models.entity.Tenant;
-import Models.entity.Staff;
-import Utils.security.HashUtil;
+import java.io.IOException;
 
+import DALs.auth.StaffDAO;
+import DALs.auth.TenantDAO;
+import Models.authentication.AuthResult;
+import Models.entity.Staff;
+import Models.entity.Tenant;
+import Services.auth.ForgotPasswordService;
+import Utils.security.HashUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,36 +16,34 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import java.io.IOException;
-
 /**
  * POST /forgot-password
- *   step=email       → gửi OTP, lưu fp_email vào session
- *   step=verifyOtp   → kiểm tra OTP, nếu đúng lưu fp_verified=true vào session
- *   step=resetPassword → đổi password, tự động đăng nhập, trả về redirect URL
+ * step=email → gửi OTP, lưu fp_email vào session
+ * step=verifyOtp → kiểm tra OTP, nếu đúng lưu fp_verified=true vào session
+ * step=resetPassword → đổi password, tự động đăng nhập, trả về redirect URL
  *
  * @author Duong Thien Nhan - CE190741
  */
-@WebServlet(name = "ForgotPasswordController", urlPatterns = {"/forgot-password"})
+@WebServlet(name = "ForgotPasswordController", urlPatterns = { "/forgot-password" })
 public class ForgotPasswordController extends HttpServlet {
 
-    private final ForgotPasswordService service    = new ForgotPasswordService();
-    private final AuthService           authService = new AuthService();
-    private final TenantDAO             tenantDAO   = new TenantDAO();
-    private final StaffDAO              staffDAO    = new StaffDAO();
+    private final ForgotPasswordService service = new ForgotPasswordService();
+    private final TenantDAO tenantDAO = new TenantDAO();
+    private final StaffDAO staffDAO = new StaffDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String step = request.getParameter("step");
-        if (step == null) step = "";
+        if (step == null)
+            step = "";
 
         switch (step.toLowerCase()) {
-            case "email"         -> handleEmailStep(request, response);
-            case "verifyotp"     -> handleVerifyOtp(request, response);
+            case "email" -> handleEmailStep(request, response);
+            case "verifyotp" -> handleVerifyOtp(request, response);
             case "resetpassword" -> handleResetPassword(request, response);
-            default              -> sendJson(response, false, "Yêu cầu không hợp lệ.");
+            default -> sendJson(response, false, "Yêu cầu không hợp lệ.");
         }
     }
 
@@ -116,7 +114,7 @@ public class ForgotPasswordController extends HttpServlet {
             throws IOException {
 
         HttpSession session = request.getSession(false);
-        String email    = (session == null) ? null : (String) session.getAttribute("fp_email");
+        String email = (session == null) ? null : (String) session.getAttribute("fp_email");
         Boolean verified = (session == null) ? null : (Boolean) session.getAttribute("fp_verified");
 
         // Bảo vệ: phải qua bước verifyOtp trước
@@ -125,7 +123,7 @@ public class ForgotPasswordController extends HttpServlet {
             return;
         }
 
-        String newPassword     = request.getParameter("newPassword");
+        String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
         if (newPassword == null || newPassword.isBlank()) {
@@ -192,11 +190,12 @@ public class ForgotPasswordController extends HttpServlet {
 
     private String resolveRedirect(AuthResult auth) {
         String role = auth.getRole();
-        if (role == null) return "/home";
+        if (role == null)
+            return "/home";
         return switch (role.toUpperCase()) {
-            case "ADMIN"   -> "/home";
+            case "ADMIN" -> "/home";
             case "MANAGER" -> "/home";
-            default        -> "/home";
+            default -> "/home";
         };
     }
 
@@ -206,8 +205,7 @@ public class ForgotPasswordController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         String safeMsg = message.replace("\\", "\\\\").replace("\"", "\\\"");
         response.getWriter().write(
-                "{\"success\":" + success + ",\"message\":\"" + safeMsg + "\"}"
-        );
+                "{\"success\":" + success + ",\"message\":\"" + safeMsg + "\"}");
     }
 
     private void sendJsonWithRedirect(HttpServletResponse response, boolean success, String message, String redirectUrl)
@@ -217,7 +215,6 @@ public class ForgotPasswordController extends HttpServlet {
         String safeMsg = message.replace("\\", "\\\\").replace("\"", "\\\"");
         String safeUrl = redirectUrl.replace("\\", "\\\\").replace("\"", "\\\"");
         response.getWriter().write(
-                "{\"success\":" + success + ",\"message\":\"" + safeMsg + "\",\"redirect\":\"" + safeUrl + "\"}"
-        );
+                "{\"success\":" + success + ",\"message\":\"" + safeMsg + "\",\"redirect\":\"" + safeUrl + "\"}");
     }
 }

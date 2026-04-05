@@ -20,6 +20,7 @@ public class RoomDAO extends DBContext {
 
     // view available
     @Deprecated
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAvailable(RoomFilterDTO filterDTO) {
         List<Room> list = new ArrayList<>();
         String sql = """
@@ -80,6 +81,7 @@ public class RoomDAO extends DBContext {
     }
 
     // PAGINATION - GUEST - TENANT
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAvailablePaged(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
@@ -150,6 +152,7 @@ public class RoomDAO extends DBContext {
 
     // method đếm tổng số lượng phòng đang ở status
     // AVAILABLE dựa trên các điều kiện lọc (filter)
+    @SuppressWarnings("CallToPrintStackTrace")
     public int countAvailable(RoomFilterDTO filterDTO) {
 
         String sql = """
@@ -198,6 +201,7 @@ public class RoomDAO extends DBContext {
 
     // display full room ( ko phan biet room status )
     @Deprecated
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAll(RoomFilterDTO filterDTO) {
         List<Room> list = new ArrayList<>();
         String sql = """
@@ -255,6 +259,7 @@ public class RoomDAO extends DBContext {
     }
 
     // PAGINATION - STAFF
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAllPaged(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
@@ -323,6 +328,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public int countAll(RoomFilterDTO filterDTO) {
 
         String sql = """
@@ -370,6 +376,7 @@ public class RoomDAO extends DBContext {
     }
 
     // display cover image trong detail
+    @SuppressWarnings("CallToPrintStackTrace")
     public Room findById(int roomId) {
         String sql = """
                 SELECT        ROOM.room_id, ROOM.block_id, BLOCK.block_name, ROOM.room_number, ROOM.area, ROOM.price, ROOM.status, ROOM.floor, ROOM.max_tenants, ROOM.is_mezzanine, ROOM.description,
@@ -409,6 +416,7 @@ public class RoomDAO extends DBContext {
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> findAvailableRooms() {
         List<Room> list = new ArrayList<>();
 
@@ -436,6 +444,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public boolean updateStatus(int roomId, String status) {
         String sql = "UPDATE ROOM SET status=? WHERE room_id=? AND status <> 'INACTIVE'";
 
@@ -449,6 +458,7 @@ public class RoomDAO extends DBContext {
         return false;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public boolean restoreRoom(int roomId) {
         String sql = "UPDATE ROOM SET status='AVAILABLE' WHERE room_id=? AND status='INACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -497,6 +507,7 @@ public class RoomDAO extends DBContext {
         return false;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<Room> searchAllPagedV2(RoomFilterDTO filterDTO, int page, int pageSize) {
         List<Room> list = new ArrayList<>();
 
@@ -571,6 +582,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public boolean updateRoom(Room r) {
         String sql = """
                 UPDATE ROOM SET block_id=?, room_number=?, area=?, price=?, status=?, floor=?, max_tenants=?, is_mezzanine=?,
@@ -597,6 +609,7 @@ public class RoomDAO extends DBContext {
         return false;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public int addRoom(Room r) {
 
         String sql = """
@@ -645,6 +658,7 @@ public class RoomDAO extends DBContext {
         return -1;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public int countAvailableRooms() {
 
         String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'AVAILABLE'";
@@ -662,6 +676,7 @@ public class RoomDAO extends DBContext {
         return 0;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public int countOccupiedRooms() {
 
         String sql = "SELECT COUNT(*) FROM ROOM WHERE status = 'OCCUPIED'";
@@ -679,6 +694,7 @@ public class RoomDAO extends DBContext {
         return 0;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public int countTotalRooms() {
 
         String sql = "SELECT COUNT(*) FROM ROOM";

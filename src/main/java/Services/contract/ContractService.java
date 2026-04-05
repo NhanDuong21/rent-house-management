@@ -30,8 +30,8 @@ public class ContractService {
     private final OtpCodeDAO otpDAO = new OtpCodeDAO();
     private final TenantDocumentDAO tenantDocumentDAO = new TenantDocumentDAO();
 
-    //FLOW 1: CREATE CONTRACT + CREATE TENANT (NO ACCOUNT) + OTP
-    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
+    // FLOW 1: CREATE CONTRACT + CREATE TENANT (NO ACCOUNT) + OTP
+    @SuppressWarnings({ "UseSpecificCatch", "CallToPrintStackTrace" })
     public ServiceResult createContractAndTenant(Contract c, Tenant t, String cccdFrontUrl, String cccdBackUrl) {
 
         if (t == null) {
@@ -43,16 +43,25 @@ public class ContractService {
         String phone = safe(t.getPhoneNumber());
         String email = safe(t.getEmail());
         String address = safe(t.getAddress());
-
         if (name.isBlank()) {
             return ServiceResult.fail("Tên tenant không được để trống.");
         }
         if (identity.isBlank()) {
             return ServiceResult.fail("Identity Code tenant không được để trống.");
         }
+
+        if (identity.length() != 12) {
+            return ServiceResult.fail("Identity Code tenant phải gồm đúng 12 chữ số.");
+        }
+
+        if (!identity.matches("\\d+")) {
+            return ServiceResult.fail("Identity Code tenant chỉ được chứa chữ số.");
+        }
+
         if (phone.isBlank()) {
             return ServiceResult.fail("SĐT tenant không được để trống.");
         }
+
         if (email.isBlank()) {
             return ServiceResult.fail("Email tenant không được để trống.");
         }
@@ -149,10 +158,11 @@ public class ContractService {
         }
     }
 
-    //FLOW 2: CREATE CONTRACT FOR EXISTING TENANT (HAS ACCOUNT)
-    //block: tenant chỉ được có 1 ACTIVE hoặc 1 PENDING (cùng lúc)
-    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
-    public ServiceResult createContractForExistingTenant(Contract c, int tenantId, String cccdFrontUrl, String cccdBackUrl) {
+    // FLOW 2: CREATE CONTRACT FOR EXISTING TENANT (HAS ACCOUNT)
+    // block: tenant chỉ được có 1 ACTIVE hoặc 1 PENDING (cùng lúc)
+    @SuppressWarnings({ "UseSpecificCatch", "CallToPrintStackTrace" })
+    public ServiceResult createContractForExistingTenant(Contract c, int tenantId, String cccdFrontUrl,
+            String cccdBackUrl) {
 
         if (tenantId <= 0) {
             return ServiceResult.fail("Tenant không hợp lệ.");
@@ -220,7 +230,7 @@ public class ContractService {
         }
     }
 
-    //VALIDATION HELPERS
+    // VALIDATION HELPERS
     private ServiceResult validateContractCommon(Contract c) {
         if (c == null) {
             return ServiceResult.fail("Contract không hợp lệ.");
@@ -272,11 +282,11 @@ public class ContractService {
      */
     private boolean existsActiveOrPendingByTenant(Connection conn, int tenantId) throws SQLException {
         String sql = """
-            SELECT TOP 1 1
-            FROM CONTRACT
-            WHERE tenant_id = ?
-              AND [status] IN ('ACTIVE','PENDING')
-        """;
+                    SELECT TOP 1 1
+                    FROM CONTRACT
+                    WHERE tenant_id = ?
+                      AND [status] IN ('ACTIVE','PENDING')
+                """;
         try (var ps = conn.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             try (var rs = ps.executeQuery()) {
@@ -335,7 +345,7 @@ public class ContractService {
         return "Lỗi SQL: " + e.getMessage();
     }
 
-    //VIEW CONTRACT LIST
+    // VIEW CONTRACT LIST
     public int countContracts(String keyword, String status) {
         return contractDAO.countManagerContracts(keyword, status);
     }
@@ -344,8 +354,7 @@ public class ContractService {
             String keyword,
             String status,
             int page,
-            int pageSize
-    ) {
+            int pageSize) {
         return contractDAO.findManagerContracts(keyword, status, page, pageSize);
     }
 }
