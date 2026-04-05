@@ -6,6 +6,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -75,7 +76,6 @@
 
             <div class="room-table-wrap">
                 <table class="room-table">
-
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -92,12 +92,10 @@
                     </thead>
 
                     <tbody id="roomTable">
-
                         <c:forEach items="${Rooms}" var="r" varStatus="loop">
                             <tr class="room-row"
                                 style="--row-delay: ${loop.index * 0.05}s;">
                                 <td class="room-mono">${r.roomId}</td>
-
                                 <td>${r.blockName}</td>
 
                                 <td class="fw-bold roomNumber">
@@ -107,11 +105,17 @@
                                 <td>${r.area}</td>
 
                                 <td class="price">
-                                    ${r.price} đ
+                                    <c:choose>
+                                        <c:when test="${not empty r.price}">
+                                            <fmt:formatNumber value="${r.price}" pattern="#,##0" /> đ
+                                        </c:when>
+                                        <c:otherwise>
+                                            0 đ
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
 
                                 <td>${r.floor}</td>
-
                                 <td>${r.maxTenants}</td>
 
                                 <td>
@@ -157,9 +161,7 @@
                                 </td>
                             </tr>
                         </c:if>
-
                     </tbody>
-
                 </table>
             </div>
 
