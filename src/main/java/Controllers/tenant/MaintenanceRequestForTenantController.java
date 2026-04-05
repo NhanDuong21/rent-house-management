@@ -87,17 +87,19 @@ public class MaintenanceRequestForTenantController extends HttpServlet {
                 .forward(request, response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        AuthResult user = (AuthResult) request.getSession().getAttribute("auth");
-        if (user == null || user.getTenant() == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+    AuthResult user = (AuthResult) request.getSession().getAttribute("auth");
+    if (user == null || user.getTenant() == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
 
-        int tenantId = user.getTenant().getTenantId();
+    int tenantId = user.getTenant().getTenantId();
+
+    try {
         String category = request.getParameter("category");
         String description = request.getParameter("description");
         int roomId = Integer.parseInt(request.getParameter("roomId"));
@@ -110,8 +112,31 @@ public class MaintenanceRequestForTenantController extends HttpServlet {
 
         List<String> images = new ArrayList<>();
 
-        for (Part part : request.getParts()) {
+        String runtimePath = getServletContext().getRealPath("/assets/images/maintenance");
+        String sourcePath = getServletContext().getInitParameter("maintenanceImageDir");
 
+        System.out.println("runtimePath = " + runtimePath);
+        System.out.println("sourcePath = " + sourcePath);
+
+        if (runtimePath == null || runtimePath.trim().isEmpty()) {
+            throw new ServletException("runtimePath is null");
+        }
+
+        if (sourcePath == null || sourcePath.trim().isEmpty()) {
+            throw new ServletException("maintenanceImageDir is missing");
+        }
+
+        File runtimeDir = new File(runtimePath);
+        if (!runtimeDir.exists()) {
+            runtimeDir.mkdirs();
+        }
+
+        File sourceDir = new File(sourcePath);
+        if (!sourceDir.exists()) {
+            sourceDir.mkdirs();
+        }
+
+        for (Part part : request.getParts()) {
             if (!"images".equals(part.getName())) {
                 continue;
             }
@@ -121,45 +146,56 @@ public class MaintenanceRequestForTenantController extends HttpServlet {
             }
 
             if (images.size() >= 3) {
-                tenantId = user.getTenant().getTenantId();
                 List<TenantMyRoomDTO> rooms = dao.getRoomsByTenantId(tenantId);
                 request.setAttribute("error", "You can upload a maximum of 3 images!");
                 request.setAttribute("rooms", rooms);
-                request.getRequestDispatcher("/views/tenant/createMaintenance.jsp")
-                        .forward(request, response);
+                request.getRequestDispatcher("/views/tenant/createMaintenance.jsp").forward(request, response);
                 return;
             }
 
-            //
-            String fileName = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
-
-            String runtimePath = getServletContext().getRealPath("/assets/images/maintenance");
-            String sourcePath = getServletContext().getInitParameter("maintenanceImageDir");
-
-            File runtimeDir = new File(runtimePath);
-            if (!runtimeDir.exists()) {
-                runtimeDir.mkdirs();
+            String contentType = part.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                List<TenantMyRoomDTO> rooms = dao.getRoomsByTenantId(tenantId);
+                request.setAttribute("error", "Only image files are allowed!");
+                request.setAttribute("rooms", rooms);
+                request.getRequestDispatcher("/views/tenant/createMaintenance.jsp").forward(request, response);
+                return;
             }
 
-            File sourceDir = new File(sourcePath);
-            if (!sourceDir.exists()) {
-                sourceDir.mkdirs();
+            String originalFileName = part.getSubmittedFileName();
+            String ext = "";
+            int dotIndex = originalFileName.lastIndexOf('.');
+            if (dotIndex >= 0) {
+                ext = originalFileName.substring(dotIndex);
             }
-            part.write(runtimePath + File.separator + fileName);
-            Files.copy(
-                    new File(runtimePath, fileName).toPath(),
-                    new File(sourcePath, fileName).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+
+            String fileName = java.util.UUID.randomUUID().toString() + ext;
+
+            File runtimeFile = new File(runtimeDir, fileName);
+            File sourceFile = new File(sourceDir, fileName);
+
+            part.write(runtimeFile.getAbsolutePath());
+            Files.copy(runtimeFile.toPath(), sourceFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             images.add(fileName);
-            //
-
-            String imageString = String.join(",", images);
-            dao.createRequest(tenantId, roomId, category, description, imageString, utilityId);
-            response.sendRedirect(request.getContextPath() + "/tenant/maintenance");
         }
-    }
 
+        String imageString = String.join(",", images);
+        System.out.println("imageString = " + imageString);
+
+        dao.createRequest(tenantId, roomId, category, description, imageString, utilityId);
+
+        response.sendRedirect(request.getContextPath() + "/tenant/maintenance");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+
+        List<TenantMyRoomDTO> rooms = dao.getRoomsByTenantId(tenantId);
+        request.setAttribute("error", "Có lỗi khi gửi yêu cầu bảo trì: " + e.getMessage());
+        request.setAttribute("rooms", rooms);
+        request.getRequestDispatcher("/views/tenant/createMaintenance.jsp").forward(request, response);
+    }
+}
     private void showMaintenanceDetail(HttpServletRequest request,
             HttpServletResponse response,
             AuthResult user)
