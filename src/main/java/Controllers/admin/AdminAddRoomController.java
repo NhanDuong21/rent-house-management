@@ -40,6 +40,7 @@ public class AdminAddRoomController extends HttpServlet {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -85,11 +86,10 @@ public class AdminAddRoomController extends HttpServlet {
 
                 finalBlockName = normalizeBlockName(newBlockNameRaw);
                 if (finalBlockName == null) {
-                    if (finalBlockName == null) {
+                    {
                         forwardWithError(req, resp, "Block name must be exactly 1 letter from A to Z");
                         return;
                     }
-                    return;
                 }
 
                 Integer existingBlockId = blockDAO.findIdByName(finalBlockName);
@@ -184,7 +184,7 @@ public class AdminAddRoomController extends HttpServlet {
             }
             imgDAO.ensureCover(roomId);
             resp.sendRedirect(req.getContextPath() + "/admin/rooms?msg=created");
-        } catch (Exception e) {
+        } catch (ServletException | IOException e) {
             e.printStackTrace();
             forwardWithError(req, resp, "System error: " + e.getMessage());
         }
@@ -219,7 +219,7 @@ public class AdminAddRoomController extends HttpServlet {
     private Integer parseInt(String s) {
         try {
             return Integer.valueOf(s);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return null;
         }
     }

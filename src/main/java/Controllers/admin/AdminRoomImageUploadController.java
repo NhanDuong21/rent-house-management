@@ -52,6 +52,7 @@ public class AdminRoomImageUploadController extends HttpServlet {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 

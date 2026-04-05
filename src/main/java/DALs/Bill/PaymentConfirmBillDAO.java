@@ -154,6 +154,7 @@ public class PaymentConfirmBillDAO extends DBContext {
     }
 
     // check bill co dang cho duyet ko - null -> tenant chua gui request thanh toan trong payment
+    @SuppressWarnings("CallToPrintStackTrace")
     public Payment getPendingPaymentByBillId(int billId) {
         String sql = "SELECT * "
                 + "FROM PAYMENT "
@@ -175,13 +176,14 @@ public class PaymentConfirmBillDAO extends DBContext {
                 return p;
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public List<PaymentHistoryRowDTO> getAllPaymentHistoryByTenantId(int tenant_id) {
         List<PaymentHistoryRowDTO> list = new ArrayList<>();
 
@@ -219,13 +221,14 @@ public class PaymentConfirmBillDAO extends DBContext {
                 pm.setAmount(rs.getBigDecimal("amount"));
                 list.add(pm);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
     }
 
         // getStatus payment = bill_id
+    @SuppressWarnings("CallToPrintStackTrace")
     public String getLatestPaymentStatus(int billId) {
         String sql = """
                     SELECT TOP 1 status
@@ -242,7 +245,7 @@ public class PaymentConfirmBillDAO extends DBContext {
                 return rs.getString("status");
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
