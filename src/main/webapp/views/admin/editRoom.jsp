@@ -210,7 +210,6 @@
                             ${isInactive || isOccupied ? 'disabled' : ''}>
 
                         <option value="AVAILABLE" ${r.status == 'AVAILABLE' ? 'selected' : ''}>AVAILABLE</option>
-                        <option value="OCCUPIED" ${r.status == 'OCCUPIED' ? 'selected' : ''}>OCCUPIED</option>
                         <option value="MAINTENANCE" ${r.status == 'MAINTENANCE' ? 'selected' : ''}>MAINTENANCE</option>
                         <option value="INACTIVE" ${r.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
