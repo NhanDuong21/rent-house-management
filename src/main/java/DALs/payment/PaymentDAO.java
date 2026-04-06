@@ -53,7 +53,7 @@ public class PaymentDAO extends DBContext {
     public boolean hasPendingOrConfirmedBankForContract(int contractId) {
 
         String sql = """
-                    SELECT 1
+                    SELECT *
                     FROM PAYMENT
                     WHERE contract_id = ?
                       AND method = 'BANK'
@@ -75,7 +75,7 @@ public class PaymentDAO extends DBContext {
     public boolean hasPendingBankPayment(int contractId) {
 
         String sql = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM PAYMENT
                     WHERE contract_id = ?
                       AND method = 'BANK'

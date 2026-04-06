@@ -606,7 +606,7 @@ public class ContractDAO extends DBContext {
     }
 
     public boolean existsActiveContractForTenant(int tenantId) {
-        String sql = "SELECT 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE'";
+        String sql = "SELECT * FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -619,7 +619,7 @@ public class ContractDAO extends DBContext {
     }
 
     public boolean existsPendingContractForTenant(int tenantId) {
-        String sql = "SELECT 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'PENDING'";
+        String sql = "SELECT * FROM CONTRACT WHERE tenant_id = ? AND status = 'PENDING'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, tenantId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -698,13 +698,13 @@ public class ContractDAO extends DBContext {
                       AND status = 'PENDING'
                 """;
 
-        String roomHasActiveSql = "SELECT TOP 1 1 FROM CONTRACT WHERE room_id = ? AND status = 'ACTIVE'";
-        String roomHasPendingSql = "SELECT TOP 1 1 FROM CONTRACT WHERE room_id = ? AND status = 'PENDING'";
+        String roomHasActiveSql = "SELECT TOP 1 * FROM CONTRACT WHERE room_id = ? AND status = 'ACTIVE'";
+        String roomHasPendingSql = "SELECT TOP 1 * FROM CONTRACT WHERE room_id = ? AND status = 'PENDING'";
 
         String updateRoomSql = "UPDATE ROOM SET status = ? WHERE room_id = ?";
 
-        String tenantHasActiveSql = "SELECT TOP 1 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE'";
-        String tenantHasPendingSql = "SELECT TOP 1 1 FROM CONTRACT WHERE tenant_id = ? AND status = 'PENDING'";
+        String tenantHasActiveSql = "SELECT TOP 1 * FROM CONTRACT WHERE tenant_id = ? AND status = 'ACTIVE'";
+        String tenantHasPendingSql = "SELECT TOP 1 * FROM CONTRACT WHERE tenant_id = ? AND status = 'PENDING'";
         String updateTenantSql = "UPDATE TENANT SET account_status = ? WHERE tenant_id = ?";
 
         try (Connection conn = new DBContext().getConnection()) {
@@ -875,7 +875,7 @@ public class ContractDAO extends DBContext {
     // check coi có contract nào đang activce/pending theo roomId
     public boolean hasBlockingContractByRoomId(int roomId) {
         String sql = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT
                     WHERE room_id = ?
                       AND status IN ('ACTIVE','PENDING')
@@ -939,7 +939,7 @@ public class ContractDAO extends DBContext {
      */
     public boolean existsActiveOrPendingByTenant(Connection conn, int tenantId) throws SQLException {
         String sql = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT
                     WHERE tenant_id = ?
                       AND [status] IN ('ACTIVE','PENDING')

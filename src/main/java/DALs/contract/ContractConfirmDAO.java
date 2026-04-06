@@ -27,7 +27,7 @@ public class ContractConfirmDAO extends DBContext {
                 """;
 
         String existsOtherActiveRoom = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT
                     WHERE room_id = ?
                       AND status = 'ACTIVE'
@@ -35,7 +35,7 @@ public class ContractConfirmDAO extends DBContext {
                 """;
 
         String existsOtherActiveTenant = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT
                     WHERE tenant_id = ?
                       AND status = 'ACTIVE'

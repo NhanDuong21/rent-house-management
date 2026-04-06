@@ -46,7 +46,7 @@ public class BlockDAO extends DBContext {
     }
 
     public boolean exists(int blockId) {
-        String sql = "SELECT 1 FROM BLOCK WHERE block_id = ?";
+        String sql = "SELECT * FROM BLOCK WHERE block_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, blockId);

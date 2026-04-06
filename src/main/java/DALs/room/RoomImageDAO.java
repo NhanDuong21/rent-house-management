@@ -169,7 +169,7 @@ public class RoomImageDAO extends DBContext {
     }
 
     public void ensureCover(int roomId) {
-        String hasCoverSql = "SELECT 1 FROM ROOM_IMAGE WHERE room_id=? AND is_cover=1";
+        String hasCoverSql = "SELECT * FROM ROOM_IMAGE WHERE room_id=? AND is_cover=1";
         String pickSql = """
                     SELECT TOP 1 image_id
                     FROM ROOM_IMAGE

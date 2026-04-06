@@ -168,7 +168,7 @@ public class ContractOccupantDAO extends DBContext {
 
     public boolean belongsToPrimaryTenant(int contractId, int primaryTenantId) {
         String sql = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT_OCCUPANT
                     WHERE contract_id = ?
                       AND tenant_id = ?
@@ -227,7 +227,7 @@ public class ContractOccupantDAO extends DBContext {
 
     public boolean contractHasPrimary(int contractId) {
         String sql = """
-                    SELECT TOP 1 1
+                    SELECT TOP 1 *
                     FROM CONTRACT_OCCUPANT
                     WHERE contract_id = ?
                       AND occupant_role = 'PRIMARY'
