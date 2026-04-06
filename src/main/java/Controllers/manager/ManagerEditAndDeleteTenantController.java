@@ -94,8 +94,6 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
                 t.setGender(Integer.parseInt(gender));
             }
 
-            t.setAvatar(request.getParameter("avatar"));
-
             try {
                 service.updateTenant(t);
             } catch (IllegalArgumentException ex) {
