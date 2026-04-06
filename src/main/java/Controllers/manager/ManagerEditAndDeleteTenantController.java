@@ -14,9 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author ADMIN
+ * @author Dang Huu Thanh - CE191422
  */
-@WebServlet(urlPatterns = {"/manager/tenant/edit"})
+@WebServlet(urlPatterns = { "/manager/tenant/edit" })
 public class ManagerEditAndDeleteTenantController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -44,8 +44,8 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String action  = request.getParameter("action");
-        String page    = request.getParameter("page");
+        String action = request.getParameter("action");
+        String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
         // ── Nhánh Reset Password ───────────────────────────────────────────────
@@ -71,7 +71,8 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
                 // Không có active contract → redirect về kèm lỗi
                 StringBuilder redirectUrl = new StringBuilder(
                         request.getContextPath() + "/manager/tenants?error="
-                        + java.net.URLEncoder.encode("Chỉ có thể chỉnh sửa tenant đang có hợp đồng active.", "UTF-8"));
+                                + java.net.URLEncoder.encode("Chỉ có thể chỉnh sửa tenant đang có hợp đồng active.",
+                                        "UTF-8"));
                 appendPageKeyword(redirectUrl, page, keyword);
                 response.sendRedirect(redirectUrl.toString());
                 return;
@@ -100,7 +101,7 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
             } catch (IllegalArgumentException ex) {
                 StringBuilder redirectUrl = new StringBuilder(
                         request.getContextPath() + "/manager/tenants?error="
-                        + java.net.URLEncoder.encode(ex.getMessage(), "UTF-8"));
+                                + java.net.URLEncoder.encode(ex.getMessage(), "UTF-8"));
                 appendPageKeyword(redirectUrl, page, keyword);
                 response.sendRedirect(redirectUrl.toString());
                 return;
@@ -120,7 +121,7 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
      * - PENDING: không cho toggle.
      */
     private void handleToggleStatus(HttpServletRequest request, HttpServletResponse response,
-                                    String page, String keyword) throws IOException {
+            String page, String keyword) throws IOException {
 
         int tenantId = Integer.parseInt(request.getParameter("tenantId"));
         TenantService service = new TenantService();
@@ -150,13 +151,14 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         if (errorMsg != null) {
             StringBuilder redirectUrl = new StringBuilder(
                     request.getContextPath() + "/manager/tenants?error="
-                    + java.net.URLEncoder.encode(errorMsg, "UTF-8"));
+                            + java.net.URLEncoder.encode(errorMsg, "UTF-8"));
             appendPageKeyword(redirectUrl, page, keyword);
             response.sendRedirect(redirectUrl.toString());
             return;
         }
 
-        StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/manager/tenants?success=status_changed");
+        StringBuilder redirectUrl = new StringBuilder(
+                request.getContextPath() + "/manager/tenants?success=status_changed");
         appendPageKeyword(redirectUrl, page, keyword);
         response.sendRedirect(redirectUrl.toString());
     }
@@ -166,7 +168,7 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
      * Chỉ cho phép khi tenant có active contract.
      */
     private void handleResetPassword(HttpServletRequest request, HttpServletResponse response,
-                                     String page, String keyword) throws IOException {
+            String page, String keyword) throws IOException {
 
         int tenantId = Integer.parseInt(request.getParameter("tenantId"));
         TenantService service = new TenantService();
@@ -175,7 +177,8 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         if (!service.hasActiveContract(tenantId)) {
             StringBuilder redirectUrl = new StringBuilder(
                     request.getContextPath() + "/manager/tenants?error="
-                    + java.net.URLEncoder.encode("Chỉ có thể reset password cho tenant đang có hợp đồng active.", "UTF-8"));
+                            + java.net.URLEncoder
+                                    .encode("Chỉ có thể reset password cho tenant đang có hợp đồng active.", "UTF-8"));
             appendPageKeyword(redirectUrl, page, keyword);
             response.sendRedirect(redirectUrl.toString());
             return;
@@ -185,7 +188,7 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         if (newPassword == null || newPassword.isBlank() || newPassword.length() < 6) {
             StringBuilder redirectUrl = new StringBuilder(
                     request.getContextPath() + "/manager/tenants?error="
-                    + java.net.URLEncoder.encode("Mật khẩu không hợp lệ (tối thiểu 6 ký tự).", "UTF-8"));
+                            + java.net.URLEncoder.encode("Mật khẩu không hợp lệ (tối thiểu 6 ký tự).", "UTF-8"));
             appendPageKeyword(redirectUrl, page, keyword);
             response.sendRedirect(redirectUrl.toString());
             return;
@@ -195,7 +198,7 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         if (t == null) {
             StringBuilder redirectUrl = new StringBuilder(
                     request.getContextPath() + "/manager/tenants?error="
-                    + java.net.URLEncoder.encode("Không tìm thấy tenant.", "UTF-8"));
+                            + java.net.URLEncoder.encode("Không tìm thấy tenant.", "UTF-8"));
             appendPageKeyword(redirectUrl, page, keyword);
             response.sendRedirect(redirectUrl.toString());
             return;
@@ -209,14 +212,15 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
         if (!ok) {
             StringBuilder redirectUrl = new StringBuilder(
                     request.getContextPath() + "/manager/tenants?error="
-                    + java.net.URLEncoder.encode("Reset password thất bại. Vui lòng thử lại.", "UTF-8"));
+                            + java.net.URLEncoder.encode("Reset password thất bại. Vui lòng thử lại.", "UTF-8"));
             appendPageKeyword(redirectUrl, page, keyword);
             response.sendRedirect(redirectUrl.toString());
             return;
         }
 
         // Thành công
-        StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/manager/tenants?success=password_reset");
+        StringBuilder redirectUrl = new StringBuilder(
+                request.getContextPath() + "/manager/tenants?success=password_reset");
         appendPageKeyword(redirectUrl, page, keyword);
         response.sendRedirect(redirectUrl.toString());
     }
@@ -224,12 +228,13 @@ public class ManagerEditAndDeleteTenantController extends HttpServlet {
     /**
      * Helper: append page và keyword vào redirectUrl nếu có.
      */
-    private void appendPageKeyword(StringBuilder url, String page, String keyword) throws java.io.UnsupportedEncodingException {
+    private void appendPageKeyword(StringBuilder url, String page, String keyword)
+            throws java.io.UnsupportedEncodingException {
         boolean hasQuery = url.indexOf("?") >= 0;
         if (keyword != null && !keyword.isBlank()) {
             url.append(hasQuery ? "&" : "?")
-               .append("keyword=")
-               .append(java.net.URLEncoder.encode(keyword, "UTF-8"));
+                    .append("keyword=")
+                    .append(java.net.URLEncoder.encode(keyword, "UTF-8"));
             hasQuery = true;
         }
         if (page != null && !page.isBlank()) {

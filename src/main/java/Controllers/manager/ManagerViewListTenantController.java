@@ -18,19 +18,19 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN
+ * @author Dang Huu Thanh - CE191422
  */
-@WebServlet(name = "ManagerViewListTenant", urlPatterns = {"/manager/tenants"})
+@WebServlet(name = "ManagerViewListTenant", urlPatterns = { "/manager/tenants" })
 public class ManagerViewListTenantController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -58,12 +58,6 @@ public class ManagerViewListTenantController extends HttpServlet {
 
         TenantService service = new TenantService();
 
-        // Tự động cập nhật status toàn bộ tenant dựa trên điều kiện hợp đồng
-        // - Có contract active (không phải ENDED/CANCELLED) → ACTIVE
-        // - Không có contract active → LOCKED
-        // - PENDING giữ nguyên
-        service.syncAllTenantStatuses();
-
         String keyword = request.getParameter("keyword");
         final int PAGE_SIZE = 10;
 
@@ -71,8 +65,10 @@ public class ManagerViewListTenantController extends HttpServlet {
         int currentPage = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
-            try { currentPage = Math.max(1, Integer.parseInt(pageParam)); }
-            catch (NumberFormatException ignored) {}
+            try {
+                currentPage = Math.max(1, Integer.parseInt(pageParam));
+            } catch (NumberFormatException ignored) {
+            }
         }
 
         List<Tenant> list;
@@ -88,7 +84,8 @@ public class ManagerViewListTenantController extends HttpServlet {
         }
 
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
-        if (totalPages < 1) totalPages = 1;
+        if (totalPages < 1)
+            totalPages = 1;
 
         // Map tenantId -> roomNumber cho contract đang active
         Map<Integer, String> activeRoomMap = service.getActiveRoomMap();
