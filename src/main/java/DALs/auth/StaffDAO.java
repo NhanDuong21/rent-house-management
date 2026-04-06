@@ -1,13 +1,13 @@
 package DALs.auth;
 
-import Models.entity.Staff;
-import Utils.database.DBContext;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import Models.entity.Staff;
+import Utils.database.DBContext;
 
 /**
  * Description
@@ -194,7 +194,7 @@ public class StaffDAO extends DBContext {
     }
 
     public boolean existsPhoneExceptStaff(int staffId, String phone) {
-        String sql = "SELECT 1 FROM STAFF WHERE phone_number = ? AND staff_id <> ?";
+        String sql = "SELECT * FROM STAFF WHERE phone_number = ? AND staff_id <> ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, phone);
