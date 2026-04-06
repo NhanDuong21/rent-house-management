@@ -77,36 +77,6 @@ public class OccupantDAO extends DBContext {
         return 0;
     }
 
-    public int activateOccupantsByContractId(Connection conn, int contractId) throws SQLException {
-        String sql = """
-                    UPDATE OCCUPANT
-                    SET status = 'ACTIVE',
-                        updated_at = SYSDATETIME()
-                    WHERE contract_id = ?
-                      AND status = 'PENDING'
-                """;
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
-            return ps.executeUpdate();
-        }
-    }
-
-    public int removeOccupantsByContractId(Connection conn, int contractId) throws SQLException {
-        String sql = """
-                    UPDATE OCCUPANT
-                    SET status = 'REMOVED',
-                        updated_at = SYSDATETIME()
-                    WHERE contract_id = ?
-                      AND status = 'ACTIVE'
-                """;
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, contractId);
-            return ps.executeUpdate();
-        }
-    }
-
     public List<Occupant> findByContractId(int contractId) {
         List<Occupant> list = new ArrayList<>();
 

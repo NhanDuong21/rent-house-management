@@ -45,9 +45,8 @@ public class PaymentConfirmBillDAO extends DBContext {
                     }
                 }
             }
-            //Insert PAYMENT (PENDING)
-            String sqlInsert
-                    = "INSERT INTO PAYMENT (bill_id, method, amount, paid_at, status, note) "
+            // Insert PAYMENT (PENDING)
+            String sqlInsert = "INSERT INTO PAYMENT (bill_id, method, amount, paid_at, status, note) "
                     + "VALUES (?, ?, ?, GETDATE(), 'PENDING', 'The invoice payment request has been submitted.')";
 
             try (PreparedStatement ps = connection.prepareStatement(sqlInsert)) {
@@ -69,8 +68,7 @@ public class PaymentConfirmBillDAO extends DBContext {
         try {
             connection.setAutoCommit(false);
 
-            String sqlUpdatePayment
-                    = "UPDATE PAYMENT SET status = 'CONFIRMED' "
+            String sqlUpdatePayment = "UPDATE PAYMENT SET status = 'CONFIRMED' "
                     + "WHERE payment_id = ("
                     + "SELECT TOP 1 payment_id "
                     + "FROM PAYMENT "
@@ -80,8 +78,7 @@ public class PaymentConfirmBillDAO extends DBContext {
             String sqlUpdateBill = "UPDATE BILL SET status = 'PAID' "
                     + "WHERE bill_id = ?";
 
-            String sqlUpdatePaymentNote
-                    = "UPDATE PAYMENT SET note = 'Payment successful' "
+            String sqlUpdatePaymentNote = "UPDATE PAYMENT SET note = 'Payment successful' "
                     + "WHERE payment_id = ("
                     + "SELECT TOP 1 payment_id "
                     + "FROM PAYMENT "
@@ -115,45 +112,8 @@ public class PaymentConfirmBillDAO extends DBContext {
         }
     }
 
-    public void rejectPayment(int billId) throws SQLException {
-        try {
-            connection.setAutoCommit(false);
-
-            String sqlUpdatePayment
-                    = "UPDATE PAYMENT SET status = 'REJECTED' "
-                    + "WHERE bill_id = ? AND status = 'PENDING'";
-
-            String sqlUpdateBill
-                    = "UPDATE BILL SET status = 'UNPAID' "
-                    + "WHERE bill_id = ?";
-
-            // Update PAYMENT
-            try (PreparedStatement ps1 = connection.prepareStatement(sqlUpdatePayment)) {
-                ps1.setInt(1, billId);
-
-                if (ps1.executeUpdate() == 0) {
-                    connection.rollback();
-                    throw new SQLException("No pending payment found to reject.");
-                }
-            }
-
-            // Update BILL
-            try (PreparedStatement ps2 = connection.prepareStatement(sqlUpdateBill)) {
-                ps2.setInt(1, billId);
-                ps2.executeUpdate();
-            }
-
-            connection.commit();
-
-        } catch (SQLException e) {
-            connection.rollback();
-            throw e;
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    // check bill co dang cho duyet ko - null -> tenant chua gui request thanh toan trong payment
+    // check bill co dang cho duyet ko - null -> tenant chua gui request thanh toan
+    // trong payment
     @SuppressWarnings("CallToPrintStackTrace")
     public Payment getPendingPaymentByBillId(int billId) {
         String sql = "SELECT * "
@@ -187,23 +147,23 @@ public class PaymentConfirmBillDAO extends DBContext {
     public List<PaymentHistoryRowDTO> getAllPaymentHistoryByTenantId(int tenant_id) {
         List<PaymentHistoryRowDTO> list = new ArrayList<>();
 
-      String sql = "SELECT "
-                    + "p.payment_id, "
-                    + "t.full_name, "
-                    + "r.room_number, "
-                    + "p.method, "
-                    + "p.status, "
-                    + "b.bill_month, "
-                    + "p.paid_at, "
-                    + "p.amount "
-                    + "FROM PAYMENT p "
-                    + "LEFT JOIN CONTRACT c ON p.contract_id = c.contract_id "
-                    + "LEFT JOIN BILL b ON p.bill_id = b.bill_id "
-                    + "LEFT JOIN CONTRACT c2 ON b.contract_id = c2.contract_id "
-                    + "LEFT JOIN ROOM r ON r.room_id = ISNULL(c.room_id, c2.room_id) "
-                    + "LEFT JOIN TENANT t ON t.tenant_id = ISNULL(c.tenant_id, c2.tenant_id) "
-                    + "WHERE t.tenant_id = ? "
-                    + "ORDER BY p.paid_at DESC";
+        String sql = "SELECT "
+                + "p.payment_id, "
+                + "t.full_name, "
+                + "r.room_number, "
+                + "p.method, "
+                + "p.status, "
+                + "b.bill_month, "
+                + "p.paid_at, "
+                + "p.amount "
+                + "FROM PAYMENT p "
+                + "LEFT JOIN CONTRACT c ON p.contract_id = c.contract_id "
+                + "LEFT JOIN BILL b ON p.bill_id = b.bill_id "
+                + "LEFT JOIN CONTRACT c2 ON b.contract_id = c2.contract_id "
+                + "LEFT JOIN ROOM r ON r.room_id = ISNULL(c.room_id, c2.room_id) "
+                + "LEFT JOIN TENANT t ON t.tenant_id = ISNULL(c.tenant_id, c2.tenant_id) "
+                + "WHERE t.tenant_id = ? "
+                + "ORDER BY p.paid_at DESC";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -227,7 +187,7 @@ public class PaymentConfirmBillDAO extends DBContext {
         return list;
     }
 
-        // getStatus payment = bill_id
+    // getStatus payment = bill_id
     @SuppressWarnings("CallToPrintStackTrace")
     public String getLatestPaymentStatus(int billId) {
         String sql = """

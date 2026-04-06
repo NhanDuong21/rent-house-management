@@ -112,15 +112,7 @@ public class TenantService {
         return tenantDAO.updateTenant(t);
     }
 
-    /**
-     * Tự động đồng bộ status tất cả tenant dựa trên hợp đồng.
-     * - Có contract active → ACTIVE
-     * - Không có contract active → LOCKED
-     * - PENDING giữ nguyên
-     */
-    public void syncAllTenantStatuses() {
-        tenantDAO.syncAllTenantStatuses();
-    }
+
 
     // ===== VALIDATION =====
 

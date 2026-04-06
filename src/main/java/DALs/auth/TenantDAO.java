@@ -525,30 +525,6 @@ public class TenantDAO extends DBContext {
         return false;
     }
 
-    /**
-     * Tự động đồng bộ status của tất cả tenant trừ PENDING dựa trên contract đang
-     * active.
-     */
-    public void syncAllTenantStatuses() {
-        String sqlActive = """
-                UPDATE TENANT
-                SET account_status = 'ACTIVE', updated_at = SYSDATETIME()
-                WHERE account_status <> 'PENDING'
-                  AND EXISTS (
-                      SELECT 1
-                      FROM CONTRACT
-                      WHERE CONTRACT.tenant_id = TENANT.tenant_id
-                        AND CONTRACT.status NOT IN ('ENDED', 'CANCELLED')
-                  )
-                """;
-
-        try (PreparedStatement psActive = connection.prepareStatement(sqlActive)) {
-            psActive.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Failed to sync all tenant statuses.", e);
-        }
-    }
-
     public List<Tenant> getTenantsPaged(int page, int pageSize) {
         List<Tenant> list = new ArrayList<>();
 
@@ -717,17 +693,11 @@ public class TenantDAO extends DBContext {
         Map<Integer, String> map = new HashMap<>();
 
         String sql = """
-                SELECT c.tenant_id, r.room_number
+                                SELECT c.tenant_id, r.room_number
                 FROM CONTRACT c
                 JOIN ROOM r ON r.room_id = c.room_id
                 WHERE c.status NOT IN ('ENDED', 'CANCELLED')
-                  AND c.contract_id = (
-                      SELECT MIN(c2.contract_id)
-                      FROM CONTRACT c2
-                      WHERE c2.tenant_id = c.tenant_id
-                        AND c2.status NOT IN ('ENDED', 'CANCELLED')
-                  )
-                """;
+                                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

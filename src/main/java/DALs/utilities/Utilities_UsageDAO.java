@@ -4,12 +4,13 @@
  */
 package DALs.utilities;
 
-import Models.entity.Utility;
-import Utils.database.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import Models.entity.Utility;
+import Utils.database.DBContext;
 
 /**
  *
@@ -162,24 +163,6 @@ public class Utilities_UsageDAO extends DBContext {
         return ids;
     }
 
-    public void generateBillDetailFromUsage(int billId, int contractId) {
-        String sql = "INSERT INTO BILL_DETAIL (bill_id, utility_id, item_name, unit, unit_price, quantity, charge_type) "
-                + "SELECT ?, uu.utility_id, u.utility_name, u.unit, u.standard_price, uu.quantity, 'UTILITY' "
-                + "FROM UTILITY_USAGE uu "
-                + "JOIN UTILITY u ON uu.utility_id = u.utility_id "
-                + "WHERE uu.contract_id = ? "
-                + "AND MONTH(uu.usage_date) = MONTH(GETDATE()) "
-                + "AND YEAR(uu.usage_date) = YEAR(GETDATE())";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, billId);
-            ps.setInt(2, contractId);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public int getUnpaidBillIdByTenantId(int tenantId) {
         String sql = "SELECT TOP 1 b.bill_id FROM BILL b "
                 + "JOIN CONTRACT c ON b.contract_id = c.contract_id "
@@ -230,7 +213,7 @@ public class Utilities_UsageDAO extends DBContext {
         }
     }
 
-// Xóa các utility bị untick
+    // Xóa các utility bị untick
     public void removeUtilityUsages(int contractId, List<Integer> utilityIds) {
         if (utilityIds == null || utilityIds.isEmpty()) {
             return;

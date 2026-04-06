@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
  * step=verifyOtp → kiểm tra OTP, nếu đúng lưu fp_verified=true vào session
  * step=resetPassword → đổi password, tự động đăng nhập, trả về redirect URL
  *
- * @author Duong Thien Nhan - CE190741
+ * @author Dang Huu Thanh - CE191422
  */
 @WebServlet(name = "ForgotPasswordController", urlPatterns = { "/forgot-password" })
 public class ForgotPasswordController extends HttpServlet {

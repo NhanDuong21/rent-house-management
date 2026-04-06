@@ -1,9 +1,5 @@
 package DALs.admin;
 
-import Models.dto.AdminAccountRowDTO;
-import Models.entity.Tenant;
-import Utils.database.DBContext;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import Models.dto.AdminAccountRowDTO;
+import Models.entity.Tenant;
+import Utils.database.DBContext;
 
 /**
  * Description
@@ -233,9 +233,9 @@ public class ManageAccountDAO extends DBContext {
      */
     public boolean existsEmail(String email) {
         String sql = """
-                SELECT 1 FROM TENANT WHERE email = ?
+                SELECT * FROM TENANT WHERE email = ?
                 UNION
-                SELECT 1 FROM STAFF WHERE email = ?
+                SELECT * FROM STAFF WHERE email = ?
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
