@@ -46,22 +46,6 @@ public class ManagerUtilitiesController extends HttpServlet {
                 request.getRequestDispatcher("/views/manager/utilities.jsp").forward(request, response);
                 break;
 
-            case "delete":
-                int idDelete = Integer.parseInt(request.getParameter("id"));
-                if (dao.isUtilityUsedInBill(idDelete)) {
-                    request.getSession().setAttribute("errorMsg", "Cannot be deleted! This utility is being used in the invoice.");
-                } else {
-                    boolean deleted = dao.deleteUtilities(idDelete);
-
-                    if (deleted) {
-                        request.getSession().setAttribute("successMsg", "Extension successfully removed!");
-                    } else {
-                        request.getSession().setAttribute("errorMsg", "Clear failure, please try again!");
-                    }
-                }
-                response.sendRedirect(request.getContextPath() + "/manager/utilities");
-                break;
-
             case "edit":
                 int idEdit = Integer.parseInt(request.getParameter("id"));
                 Utility uEdit = dao.getUtilityById(idEdit);
@@ -233,5 +217,4 @@ public class ManagerUtilitiesController extends HttpServlet {
                 break;
         }
     }
-
 }
