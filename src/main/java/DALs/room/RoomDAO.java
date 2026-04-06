@@ -332,35 +332,63 @@ public class RoomDAO extends DBContext {
     public int countAll(RoomFilterDTO filterDTO) {
 
         String sql = """
-                    SELECT COUNT(DISTINCT r.room_id) AS total
-                    FROM ROOM r
-                    INNER JOIN BLOCK b ON b.block_id = r.block_id
-                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-                    WHERE 1=1
-                      AND (? IS NULL OR r.price >= ?)
-                      AND (? IS NULL OR r.price <= ?)
-                      AND (? IS NULL OR r.area  >= ?)
-                      AND (? IS NULL OR r.area  <= ?)
-                      AND (? IS NULL OR r.has_air_conditioning = ?)
-                      AND (? IS NULL OR r.is_mezzanine = ?)
+                SELECT COUNT(DISTINCT r.room_id) AS total
+                FROM ROOM r
+                INNER JOIN BLOCK b ON b.block_id = r.block_id
+                LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                WHERE 1=1
+                  AND (? IS NULL OR r.price >= ?)
+                  AND (? IS NULL OR r.price <= ?)
+                  AND (? IS NULL OR r.area >= ?)
+                  AND (? IS NULL OR r.area <= ?)
+                  AND (? IS NULL OR r.has_air_conditioning = ?)
+                  AND (? IS NULL OR r.is_mezzanine = ?)
+                  AND (? IS NULL OR (
+                        r.room_number LIKE ?
+                        OR b.block_name LIKE ?
+                        OR r.status LIKE ?
+                  ))
+                  AND (? IS NULL OR ? = 'ALL' OR r.status = ?)
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             int i = 1;
 
+            String keyword = (filterDTO.getKeyword() == null || filterDTO.getKeyword().trim().isEmpty()) ? null
+                    : filterDTO.getKeyword().trim();
+
+            String keywordLike = (keyword == null) ? null : "%" + keyword + "%";
+
+            String status = (filterDTO.getStatus() == null || filterDTO.getStatus().trim().isEmpty()) ? null
+                    : filterDTO.getStatus().trim();
+
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
+
             ps.setBigDecimal(i++, filterDTO.getMaxPrice());
             ps.setBigDecimal(i++, filterDTO.getMaxPrice());
+
             ps.setBigDecimal(i++, filterDTO.getMinArea());
             ps.setBigDecimal(i++, filterDTO.getMinArea());
+
             ps.setBigDecimal(i++, filterDTO.getMaxArea());
             ps.setBigDecimal(i++, filterDTO.getMaxArea());
+
             ps.setObject(i++, filterDTO.getHasAirConditioning());
             ps.setObject(i++, filterDTO.getHasAirConditioning());
+
             ps.setObject(i++, filterDTO.getHasMezzanine());
             ps.setObject(i++, filterDTO.getHasMezzanine());
+
+            ps.setString(i++, keyword);
+            ps.setString(i++, keywordLike);
+            ps.setString(i++, keywordLike);
+            ps.setString(i++, keywordLike);
+
+            ps.setString(i++, status);
+            ps.setString(i++, status);
+            ps.setString(i++, status);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -512,27 +540,43 @@ public class RoomDAO extends DBContext {
         List<Room> list = new ArrayList<>();
 
         String sql = """
-                    SELECT r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status,
-                           r.floor, r.max_tenants, r.is_mezzanine, r.description,
-                           r.has_air_conditioning, img.image_url AS cover_image
-                    FROM ROOM r
-                    INNER JOIN BLOCK b ON b.block_id = r.block_id
-                    LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
-                    WHERE 1=1
-                      AND (? IS NULL OR r.price >= ?)
-                      AND (? IS NULL OR r.price <= ?)
-                      AND (? IS NULL OR r.area  >= ?)
-                      AND (? IS NULL OR r.area  <= ?)
-                      AND (? IS NULL OR r.has_air_conditioning = ?)
-                      AND (? IS NULL OR r.is_mezzanine = ?)
-                    ORDER BY b.block_name, r.room_number
-                    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                SELECT r.room_id, r.block_id, b.block_name, r.room_number, r.area, r.price, r.status,
+                       r.floor, r.max_tenants, r.is_mezzanine, r.description,
+                       r.has_air_conditioning, img.image_url AS cover_image
+                FROM ROOM r
+                INNER JOIN BLOCK b ON b.block_id = r.block_id
+                LEFT JOIN ROOM_IMAGE img ON img.room_id = r.room_id AND img.is_cover = 1
+                WHERE 1=1
+                  AND (? IS NULL OR r.price >= ?)
+                  AND (? IS NULL OR r.price <= ?)
+                  AND (? IS NULL OR r.area >= ?)
+                  AND (? IS NULL OR r.area <= ?)
+                  AND (? IS NULL OR r.has_air_conditioning = ?)
+                  AND (? IS NULL OR r.is_mezzanine = ?)
+                  AND (? IS NULL OR (
+                        r.room_number LIKE ?
+                        OR b.block_name LIKE ?
+                        OR r.status LIKE ?
+                  ))
+                  AND (? IS NULL OR ? = 'ALL' OR r.status = ?)
+                ORDER BY b.block_name, r.room_number
+                OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             int i = 1;
 
+            String keyword = (filterDTO.getKeyword() == null || filterDTO.getKeyword().trim().isEmpty())
+                    ? null
+                    : filterDTO.getKeyword().trim();
+
+            String keywordLike = (keyword == null) ? null : "%" + keyword + "%";
+
+            String status = (filterDTO.getStatus() == null || filterDTO.getStatus().trim().isEmpty())
+                    ? null
+                    : filterDTO.getStatus().trim();
+
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
             ps.setBigDecimal(i++, filterDTO.getMinPrice());
 
@@ -550,6 +594,15 @@ public class RoomDAO extends DBContext {
 
             ps.setObject(i++, filterDTO.getHasMezzanine());
             ps.setObject(i++, filterDTO.getHasMezzanine());
+
+            ps.setString(i++, keyword);
+            ps.setString(i++, keywordLike);
+            ps.setString(i++, keywordLike);
+            ps.setString(i++, keywordLike);
+
+            ps.setString(i++, status);
+            ps.setString(i++, status);
+            ps.setString(i++, status);
 
             int offset = (page - 1) * pageSize;
             ps.setInt(i++, offset);

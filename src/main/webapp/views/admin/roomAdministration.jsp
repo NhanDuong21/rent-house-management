@@ -24,7 +24,7 @@
             </a>
         </div>
 
-        <!-- ALERTS (server redirect msg/err) -->
+        <!-- ALERTS -->
         <c:if test="${not empty param.msg || not empty param.err}">
             <div class="ar-alert-wrap" id="arAlertWrap">
                 <c:choose>
@@ -67,34 +67,53 @@
         </c:if>
 
         <!-- SEARCH -->
-        <div class="ar-search-box">
+        <form class="ar-search-box" method="get" action="${ctx}/admin/rooms">
             <i class="bi bi-search"></i>
+
             <input id="arSearchInput"
+                   name="q"
                    type="text"
+                   value="${q}"
                    placeholder="Search by room number, block, status..."
                    autocomplete="off">
-            <button type="button" class="ar-clear" id="arClearBtn" title="Clear">
-                <i class="bi bi-x-lg"></i>
+
+            <input type="hidden" name="status" value="${status}" />
+
+            <button type="submit" class="ar-clear" title="Search">
+                <i class="bi bi-search"></i>
             </button>
-        </div>
+
+            <a class="ar-clear" href="${ctx}/admin/rooms" title="Clear">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        </form>
 
         <!-- STATUS TABS -->
         <div class="ar-tabs" id="arTabs">
-            <button type="button" class="ar-tab active" data-filter="ALL">
+            <a class="ar-tab ${empty status || status == 'ALL' ? 'active' : ''}"
+               href="${ctx}/admin/rooms?status=ALL&q=${q}">
                 <i class="bi bi-grid-3x3-gap-fill"></i> All
-            </button>
-            <button type="button" class="ar-tab" data-filter="AVAILABLE">
+            </a>
+
+            <a class="ar-tab ${status == 'AVAILABLE' ? 'active' : ''}"
+               href="${ctx}/admin/rooms?status=AVAILABLE&q=${q}">
                 <i class="bi bi-check-circle-fill"></i> Available
-            </button>
-            <button type="button" class="ar-tab" data-filter="OCCUPIED">
+            </a>
+
+            <a class="ar-tab ${status == 'OCCUPIED' ? 'active' : ''}"
+               href="${ctx}/admin/rooms?status=OCCUPIED&q=${q}">
                 <i class="bi bi-people-fill"></i> Occupied
-            </button>
-            <button type="button" class="ar-tab" data-filter="MAINTENANCE">
+            </a>
+
+            <a class="ar-tab ${status == 'MAINTENANCE' ? 'active' : ''}"
+               href="${ctx}/admin/rooms?status=MAINTENANCE&q=${q}">
                 <i class="bi bi-tools"></i> Maintenance
-            </button>
-            <button type="button" class="ar-tab" data-filter="INACTIVE">
+            </a>
+
+            <a class="ar-tab ${status == 'INACTIVE' ? 'active' : ''}"
+               href="${ctx}/admin/rooms?status=INACTIVE&q=${q}">
                 <i class="bi bi-slash-circle-fill"></i> Inactive
-            </button>
+            </a>
         </div>
 
         <!-- CARD -->
@@ -120,10 +139,7 @@
 
                     <tbody>
                         <c:forEach items="${rooms}" var="r">
-                            <tr class="ar-row"
-                                data-room="${r.roomNumber}"
-                                data-block="${r.blockName}"
-                                data-status="${r.status}">
+                            <tr class="ar-row">
                                 <td class="ar-mono">${r.roomId}</td>
 
                                 <td class="ar-strong">
@@ -177,7 +193,6 @@
                                             Edit
                                         </a>
 
-                                        <!-- AVAILABLE / MAINTENANCE: allow set inactive -->
                                         <c:if test="${r.status == 'AVAILABLE' || r.status == 'MAINTENANCE'}">
                                             <button type="button"
                                                     class="ar-action-btn danger js-delete-room"
@@ -188,7 +203,6 @@
                                             </button>
                                         </c:if>
 
-                                        <!-- OCCUPIED: show disabled + tooltip -->
                                         <c:if test="${r.status == 'OCCUPIED'}">
                                             <div class="ar-tooltip"
                                                  data-tip="Room has active contract. Cannot set INACTIVE.">
@@ -200,8 +214,6 @@
                                                 </button>
                                             </div>
                                         </c:if>
-
-                                        <!-- INACTIVE: do not show button -->
                                     </div>
                                 </td>
                             </tr>
@@ -231,7 +243,7 @@
                         </c:when>
                         <c:otherwise>
                             <a class="ar-page-btn"
-                               href="${ctx}/admin/rooms?page=${page - 1}">
+                               href="${ctx}/admin/rooms?page=${page - 1}&q=${q}&status=${status}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </c:otherwise>
@@ -239,14 +251,14 @@
 
                     <!-- Always show page 1 -->
                     <a class="ar-page-btn ${page == 1 ? 'active' : ''}"
-                       href="${ctx}/admin/rooms?page=1">1</a>
+                       href="${ctx}/admin/rooms?page=1&q=${q}&status=${status}">1</a>
 
                     <!-- Left ellipsis -->
                     <c:if test="${page > 4}">
                         <span class="ar-page-ellipsis">...</span>
                     </c:if>
 
-                    <!-- Middle window: currentPage ± 1 (bounded) -->
+                    <!-- Middle window -->
                     <c:set var="start" value="${page - 1}" />
                     <c:set var="end" value="${page + 1}" />
 
@@ -261,7 +273,7 @@
                     <c:forEach begin="${start}" end="${end}" var="i">
                         <c:if test="${i > 1 && i < totalPages}">
                             <a class="ar-page-btn ${i == page ? 'active' : ''}"
-                               href="${ctx}/admin/rooms?page=${i}">
+                               href="${ctx}/admin/rooms?page=${i}&q=${q}&status=${status}">
                                 ${i}
                             </a>
                         </c:if>
@@ -272,10 +284,10 @@
                         <span class="ar-page-ellipsis">...</span>
                     </c:if>
 
-                    <!-- Always show last page (if > 1) -->
+                    <!-- Last page -->
                     <c:if test="${totalPages > 1}">
                         <a class="ar-page-btn ${page == totalPages ? 'active' : ''}"
-                           href="${ctx}/admin/rooms?page=${totalPages}">
+                           href="${ctx}/admin/rooms?page=${totalPages}&q=${q}&status=${status}">
                             ${totalPages}
                         </a>
                     </c:if>
@@ -289,7 +301,7 @@
                         </c:when>
                         <c:otherwise>
                             <a class="ar-page-btn"
-                               href="${ctx}/admin/rooms?page=${page + 1}">
+                               href="${ctx}/admin/rooms?page=${page + 1}&q=${q}&status=${status}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </c:otherwise>

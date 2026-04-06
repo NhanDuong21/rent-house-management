@@ -15,9 +15,28 @@ public class RoomFilterDTO {
     private BigDecimal minArea;
     private BigDecimal maxArea;
 
-    //null = Any, true = Yes, false = No
+    // null = Any, true = Yes, false = No
     private Boolean hasAirConditioning;
     private Boolean hasMezzanine;
+
+    private String keyword;
+    private String status;
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public RoomFilterDTO() {
     }
