@@ -28,14 +28,34 @@ public class AdminRoomAdministrationController extends HttpServlet {
 
         try {
             String p = req.getParameter("page");
-            if (p != null) {
+            if (p != null && !p.trim().isEmpty()) {
                 page = Math.max(1, Integer.parseInt(p));
             }
         } catch (NumberFormatException ignored) {
         }
 
-        // hiện tại chưa filter => DTO rỗng (tất cả null)
+        String q = req.getParameter("q");
+        String status = req.getParameter("status");
+
+        if (q != null) {
+            q = q.trim();
+            if (q.isEmpty()) {
+                q = null;
+            }
+        }
+
+        if (status != null) {
+            status = status.trim();
+            if (status.isEmpty()) {
+                status = "ALL";
+            }
+        } else {
+            status = "ALL";
+        }
+
         RoomFilterDTO filter = new RoomFilterDTO();
+        filter.setKeyword(q);
+        filter.setStatus(status);
 
         int total = roomDAO.countAll(filter);
         int totalPages = (int) Math.ceil(total * 1.0 / pageSize);
@@ -50,6 +70,8 @@ public class AdminRoomAdministrationController extends HttpServlet {
         req.setAttribute("total", total);
         req.setAttribute("page", page);
         req.setAttribute("totalPages", totalPages);
+        req.setAttribute("q", q);
+        req.setAttribute("status", status);
 
         req.getRequestDispatcher("/views/admin/roomAdministration.jsp").forward(req, resp);
     }
