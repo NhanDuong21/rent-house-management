@@ -18,36 +18,36 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * POST /forgot-password
- * step=email → gửi OTP, lưu fp_email vào session
- * step=verifyOtp → kiểm tra OTP, nếu đúng lưu fp_verified=true vào session
- * step=resetPassword → đổi password, tự động đăng nhập, trả về redirect URL
- *
- * @author Dang Huu Thanh - CE191422
  */
 @WebServlet(name = "ForgotPasswordController", urlPatterns = { "/forgot-password" })
 public class ForgotPasswordController extends HttpServlet {
 
-    private final ForgotPasswordService service = new ForgotPasswordService();
-    private final TenantDAO tenantDAO = new TenantDAO();
-    private final StaffDAO staffDAO = new StaffDAO();
+    private ForgotPasswordService service;
+    private TenantDAO tenantDAO;
+    private StaffDAO staffDAO;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        try {
+            if (service == null)
+                service = new ForgotPasswordService();
 
-        String step = request.getParameter("step");
-        if (step == null)
-            step = "";
+            String step = request.getParameter("step");
+            if (step == null)
+                step = "";
 
-        switch (step.toLowerCase()) {
-            case "email" -> handleEmailStep(request, response);
-            case "verifyotp" -> handleVerifyOtp(request, response);
-            case "resetpassword" -> handleResetPassword(request, response);
-            default -> sendJson(response, false, "Yêu cầu không hợp lệ.");
+            switch (step.toLowerCase()) {
+                case "email" -> handleEmailStep(request, response);
+                case "verifyotp" -> handleVerifyOtp(request, response);
+                case "resetpassword" -> handleResetPassword(request, response);
+                default -> sendJson(response, false, "Yêu cầu không hợp lệ.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("ForgotPasswordController failed: " + e.getMessage(), e);
         }
     }
-
-    // ─── Bước 1: nhập email → gửi OTP ───────────────────────────────────────────
 
     private void handleEmailStep(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -66,7 +66,7 @@ public class ForgotPasswordController extends HttpServlet {
             case "SENT" -> {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("fp_email", email);
-                session.removeAttribute("fp_verified"); // reset nếu có từ lần trước
+                session.removeAttribute("fp_verified");
                 sendJson(response, true, "OTP đã được gửi.");
             }
             case "EMAIL_NOT_FOUND" ->
@@ -77,8 +77,6 @@ public class ForgotPasswordController extends HttpServlet {
                 sendJson(response, false, "Có lỗi xảy ra, vui lòng thử lại.");
         }
     }
-
-    // ─── Bước 2: nhập OTP → verify ───────────────────────────────────────────────
 
     private void handleVerifyOtp(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -103,12 +101,9 @@ public class ForgotPasswordController extends HttpServlet {
             return;
         }
 
-        // Đánh dấu đã xác thực OTP thành công
         session.setAttribute("fp_verified", true);
         sendJson(response, true, "OTP hợp lệ.");
     }
-
-    // ─── Bước 3: đặt mật khẩu mới → tự động đăng nhập ───────────────────────────
 
     private void handleResetPassword(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -117,7 +112,6 @@ public class ForgotPasswordController extends HttpServlet {
         String email = (session == null) ? null : (String) session.getAttribute("fp_email");
         Boolean verified = (session == null) ? null : (Boolean) session.getAttribute("fp_verified");
 
-        // Bảo vệ: phải qua bước verifyOtp trước
         if (email == null || !Boolean.TRUE.equals(verified)) {
             sendJson(response, false, "Phiên làm việc không hợp lệ. Vui lòng thực hiện lại từ đầu.");
             return;
@@ -139,11 +133,15 @@ public class ForgotPasswordController extends HttpServlet {
             return;
         }
 
+        if (tenantDAO == null)
+            tenantDAO = new TenantDAO();
+        if (staffDAO == null)
+            staffDAO = new StaffDAO();
+
         String newHash = HashUtil.md5(newPassword);
         boolean updated = false;
         AuthResult authResult = null;
 
-        // Thử cập nhật Tenant
         Integer tenantId = tenantDAO.findTenantIdByEmail(email);
         if (tenantId != null) {
             updated = tenantDAO.updatePasswordForTenant(tenantId, newHash);
@@ -155,7 +153,6 @@ public class ForgotPasswordController extends HttpServlet {
             }
         }
 
-        // Thử cập nhật Staff
         if (!updated) {
             Integer staffId = staffDAO.findStaffIdByEmail(email);
             if (staffId != null) {
@@ -174,19 +171,13 @@ public class ForgotPasswordController extends HttpServlet {
             return;
         }
 
-        // Xóa dữ liệu forgot-password khỏi session
         session.removeAttribute("fp_email");
         session.removeAttribute("fp_verified");
-
-        // Tự động đăng nhập — lưu auth vào session
         session.setAttribute("auth", authResult);
 
-        // Trả về redirect URL theo role
         String redirectUrl = request.getContextPath() + resolveRedirect(authResult);
         sendJsonWithRedirect(response, true, "Đổi mật khẩu thành công.", redirectUrl);
     }
-
-    // ─── helpers ─────────────────────────────────────────────────────────────────
 
     private String resolveRedirect(AuthResult auth) {
         String role = auth.getRole();

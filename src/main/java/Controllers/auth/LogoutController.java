@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package Controllers.auth;
 
 import java.io.IOException;
@@ -15,39 +11,47 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- *
- * @author Duong Thien Nhan - CE190741
- */
 public class LogoutController extends HttpServlet {
 
-    private final TenantDAO tenantDAO = new TenantDAO();
-    private final StaffDAO staffDAO = new StaffDAO();
+    private TenantDAO tenantDAO;
+    private StaffDAO staffDAO;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            AuthResult auth = (AuthResult) session.getAttribute("auth");
-            if (auth != null) {
-                if (auth.getTenant() != null) {
-                    tenantDAO.clearTokenForTenant(auth.getTenant().getTenantId());
+        try {
+            HttpSession session = request.getSession(false);
+
+            if (session != null) {
+                AuthResult auth = (AuthResult) session.getAttribute("auth");
+
+                if (auth != null) {
+                    if (tenantDAO == null)
+                        tenantDAO = new TenantDAO();
+                    if (staffDAO == null)
+                        staffDAO = new StaffDAO();
+
+                    if (auth.getTenant() != null) {
+                        tenantDAO.clearTokenForTenant(auth.getTenant().getTenantId());
+                    }
+                    if (auth.getStaff() != null) {
+                        staffDAO.clearTokenForStaff(auth.getStaff().getStaffId());
+                    }
                 }
-                if (auth.getStaff() != null) {
-                    staffDAO.clearTokenForStaff(auth.getStaff().getStaffId());
-                }
+
+                session.invalidate();
             }
-            session.invalidate();
+
+            Cookie c = new Cookie("REMEMBER_TOKEN", "");
+            c.setMaxAge(0);
+            c.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
+            response.addCookie(c);
+
+            response.sendRedirect(request.getContextPath() + "/home");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/home");
         }
-
-        Cookie c = new Cookie("REMEMBER_TOKEN", "");
-        c.setMaxAge(0);
-        c.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
-        response.addCookie(c);
-
-        response.sendRedirect(request.getContextPath() + "/home");
-
     }
 }
