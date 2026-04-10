@@ -4,33 +4,40 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Author: Duong Thien Nhan - CE190741 Created on: 2026-01-12
- */
 public class DBContext {
 
     protected Connection connection;
 
     public DBContext() {
-        String url = "jdbc:sqlserver://localhost:1433;"
-                + "databaseName=RentHouse;"
-                + "user=sa;"
-                + "password=12345678;"
+        String host = getEnv("DB_HOST", "localhost");
+        String port = getEnv("DB_PORT", "1433");
+        String dbName = getEnv("DB_NAME", "RentHouse");
+        String user = getEnv("DB_USER", "sa");
+        String password = getEnv("DB_PASSWORD", "12345678");
+
+        String url = "jdbc:sqlserver://" + host + ":" + port + ";"
+                + "databaseName=" + dbName + ";"
+                + "user=" + user + ";"
+                + "password=" + password + ";"
                 + "encrypt=true;"
                 + "trustServerCertificate=true;";
+
         try {
-            // Ensure SQL Server driver is loaded when the container doesn't auto-load it
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("SQL Server JDBC driver not found. Ensure mssql-jdbc is on the classpath.", e);
+            throw new RuntimeException("SQL Server JDBC driver not found.", e);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to connect to SQL Server. Check URL, credentials, and DB availability.", e);
+            throw new RuntimeException("Failed to connect to SQL Server: " + e.getMessage(), e);
         }
+    }
+
+    private String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return (value == null || value.isBlank()) ? defaultValue : value;
     }
 
     public Connection getConnection() {
         return this.connection;
     }
-
 }
