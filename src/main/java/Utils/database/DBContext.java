@@ -23,11 +23,15 @@ public class DBContext {
                 + "trustServerCertificate=true;";
 
         try {
+            System.out.println("[DB] Connecting to SQL Server host=" + host + " port=" + port + " db=" + dbName);
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url);
+            System.out.println("[DB] Connected successfully");
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
             throw new RuntimeException("SQL Server JDBC driver not found.", e);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to connect to SQL Server: " + e.getMessage(), e);
         }
     }
