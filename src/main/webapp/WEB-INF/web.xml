@@ -80,10 +80,6 @@
         <servlet-class>Controllers.auth.LogoutController</servlet-class>
     </servlet>
 
-    <servlet>
-        <servlet-name>ManagerHomeController</servlet-name>
-        <servlet-class>Controllers.manager.ManagerHomeController</servlet-class>
-    </servlet>
 
     <servlet>
         <servlet-name>ContactController</servlet-name>
@@ -273,11 +269,6 @@
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
         <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>ManagerHomeController</servlet-name>
-        <url-pattern>/manager/home</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-    String errorMessage = (String) request.getAttribute("javax.servlet.error.message");
-    Throwable exception = (Throwable) request.getAttribute("javax.servlet.error.exception");
+    String errorMessage = (String) request.getAttribute("jakarta.servlet.error.message");
+    Throwable exception = (Throwable) request.getAttribute("jakarta.servlet.error.exception");
 %>
 <!DOCTYPE html>
 <html lang="vi">
