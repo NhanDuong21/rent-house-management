@@ -49,7 +49,7 @@
         <div class="mb-card">
 
             <div class="mb-card-title">
-                All Bills (${totalBills})
+                All Bills (${totalBills-1})
             </div>
 
             <table class="mb-table">
